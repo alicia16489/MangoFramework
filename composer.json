@@ -1,6 +1,7 @@
 {
     "require": {
-        "symfony/class-loader": "2.3.0"
+        "symfony/class-loader": "2.3.0",
+        "pimple/pimple": "2.0.*@dev"
     },
     "config": {
         "vendor-dir": "vendors"

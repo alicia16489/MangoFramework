@@ -13,5 +13,7 @@ $loader->registerNamespaces(array(
 
 $loader->register();
 
+$container = new Pimple();
+
 // start app
 core\App\App::run();
