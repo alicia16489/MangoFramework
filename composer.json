@@ -1,0 +1,8 @@
+{
+    "require": {
+        "symfony/class-loader": "2.3.0"
+    },
+    "config": {
+        "vendor-dir": "vendors"
+    }
+}
