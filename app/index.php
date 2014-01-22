@@ -13,4 +13,5 @@ $loader->registerNamespaces(array(
 
 $loader->register();
 
+// start app
 core\App\App::run();
