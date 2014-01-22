@@ -9,6 +9,23 @@ use core\Response\Response;*/
 
 class App
 {
-  
+  public static $request;
+
+  public static function run()
+  {
+    self::start();
+  }
+
+  public static function start()
+  {
+
+  }
+
+  public static function init()
+  {
+
+  }
 }
+
+App::run();
 
