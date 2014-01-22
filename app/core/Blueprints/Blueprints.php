@@ -1,6 +1,8 @@
 <?php
 
-class BluePrints
+namespace core\Blueprints;
+
+class Blueprints
 {
 
 }
