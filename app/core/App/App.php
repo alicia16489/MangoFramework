@@ -5,7 +5,6 @@ namespace core\App;
 //use core\CommandLine\CommandLine;
 //use core\Config\Config;
 use core\Request\Request;
-$request = new Request();
 //use core\Response\Response;
 
 class App
@@ -13,11 +12,6 @@ class App
   public static $request;
 
   public static function run()
-  {
-    self::start();
-  }
-
-  public static function start()
   {
 
   }
