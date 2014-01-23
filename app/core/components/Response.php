@@ -1,6 +1,6 @@
 <?php
 
-namespace core\Response;
+namespace core\components;
 
 class Response
 {

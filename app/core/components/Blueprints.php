@@ -1,6 +1,6 @@
 <?php
 
-namespace core\Blueprints;
+namespace core\components;
 
 class Blueprints
 {

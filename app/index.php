@@ -7,13 +7,7 @@ use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 $loader = new UniversalClassLoader();
 $loader->useIncludePath(true);
-$loader->registerNamespaces(array(
-  "core" => __DIR__."/../app"
-));
-
 $loader->register();
 
-$container = new Pimple();
-
 // start app
-core\App\App::run();
+core\App::run();
