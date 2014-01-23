@@ -6,19 +6,8 @@ class Request
 {
   private $properties;
 
-  public function getRequestMethod()
-  {
-    return $this->requestMethod;
-  }
-
-  public function getRequestString()
-  {
-    return $this->requestString;
-  }
-
   public function __construct()
   {
-    var_dump($_SERVER);
     $env = array();
 
     $env['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'];
