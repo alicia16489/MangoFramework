@@ -31,10 +31,11 @@ class Container extends \Pimple
       }
     }
 
-    $this->loader();
+    $this->loaders();
+    $this->load();
   }
 
-  public function loader()
+  private function loaders()
   {
     // Config
     $this['Config'] = function ($c) {
@@ -60,6 +61,14 @@ class Container extends \Pimple
     $this['Response'] = function ($c) {
       return new $c['dependancies']['Response']();
     };
+  }
+
+  private function load()
+  {
+    foreach($this['dependancies'] as $key => $path)
+    {
+      $this[$key];
+    }
   }
 
 }
