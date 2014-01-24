@@ -18,11 +18,7 @@ class Blueprints
 
   public function __construct(Request $req)
   {
-    var_dump($req);
 
-    $list = include("./ressources/physical/list.php");
-
-    var_dump($list);
   }
 
   private function isRessource()
