@@ -33,7 +33,6 @@ class Container extends \Pimple
     }
 
     $this->loaders();
-    $this->load();
   }
 
   private function loaders()
@@ -67,14 +66,6 @@ class Container extends \Pimple
     $this['RessourceMap'] = function ($c) {
       return new $c['dependancies']['RessourceMap']();
     };
-  }
-
-  private function load()
-  {
-    foreach($this['dependancies'] as $key => $path)
-    {
-      $this[$key];
-    }
   }
 
 }

@@ -15,7 +15,8 @@ class App
   {
     self::$container = Container::getInstance();
 
-    var_dump(self::$container);
+    if(self::$container['Request']->properties['REQUEST_OPTION_PARTS'][1] != '/')
+      self::$container['Blueprints']->isRessource();
   }
 
 }

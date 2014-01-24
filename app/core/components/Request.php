@@ -19,6 +19,7 @@ class Request
     $env['REQUEST_OPTION_PARTS'] = explode("/",$env['REQUEST_OPTION']);
 
     $this->properties = $env;
+
   }
 
   public function extract($phpSelf,$scriptName)

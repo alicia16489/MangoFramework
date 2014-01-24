@@ -4,6 +4,7 @@ namespace core\components;
 
 class Blueprints
 {
+  private $request;
   public $ressource;
   public $method;
   public $options;
@@ -18,12 +19,12 @@ class Blueprints
 
   public function __construct(Request $req)
   {
-
+    $this->request = $req;
   }
 
-  private function isRessource()
+  public function isRessource()
   {
-
+    var_dump($this->request);
   }
 
   private function isRest()
