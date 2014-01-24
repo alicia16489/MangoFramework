@@ -31,8 +31,6 @@ class Container extends \Pimple
         throw new \Exception('Missing components : '.$key.' at path : '.$path);
       }
     }
-
-    $this->loaders();
   }
 
   private function loaders()
