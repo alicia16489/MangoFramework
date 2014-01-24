@@ -50,7 +50,7 @@ class Container extends \Pimple
 
     // Blueprints
     $this['Blueprints'] = function ($c) {
-      return new $c['dependancies']['Blueprints']();
+      return new $c['dependancies']['Blueprints']($c['Request']);
     };
 
     // Router
@@ -61,6 +61,11 @@ class Container extends \Pimple
     // Response
     $this['Response'] = function ($c) {
       return new $c['dependancies']['Response']();
+    };
+
+    // RessourceMap
+    $this['RessourceMap'] = function ($c) {
+      return new $c['dependancies']['RessourceMap']();
     };
   }
 
