@@ -26,11 +26,6 @@ class App
     // Enable ouput buffering
     ob_start();
 
-    // Disbale cache for AJAX requests
-    //if (self::$container['Request']->ajax === TRUE) {
-      //self::$container['Response']->cache(FALSE);
-    //}
-
     //self::stop();
   }
 

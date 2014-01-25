@@ -56,7 +56,7 @@
             505 => 'HTTP Version Not Supported'
         );
 
-        public function __construct($type = 'xml')
+        public function __construct($type = 'json')
         {
             $this->type = $type;
         }
@@ -255,10 +255,9 @@
                 $contentType = 'application/json';
             } else if ($this->type === 'html') {
                 $contentType = 'text/html';
-            } else {
-                $contentType = 'application/xml';
+            } else if ($this->type === 'xml') {
+                $contentType = 'text/xml';
             }
-            $contentType =
 
             $this->status($code)
                  ->header('content-Type', $contentType . ' ; charset=utf-8')
