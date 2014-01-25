@@ -1,5 +1,6 @@
 <?php
 
 return array(
-  "toto" => "roxx"
+  "user",
+  "comment"
 );
