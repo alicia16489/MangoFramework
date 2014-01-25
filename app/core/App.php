@@ -31,6 +31,7 @@ class App
       //self::$container['Response']->cache(FALSE);
     //}
 
+    //self::stop();
   }
 
   public static function stop($code = 200)

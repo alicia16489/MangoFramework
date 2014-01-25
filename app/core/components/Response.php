@@ -56,7 +56,7 @@
             505 => 'HTTP Version Not Supported'
         );
 
-        public function __construct($type = 'json')
+        public function __construct($type = 'xml')
         {
             $this->type = $type;
         }
@@ -159,33 +159,27 @@
 
 
         // TO DO : MAKE IT WORK
-        public function xmlEncode($data, $domElement = NULL, $domDocument = NULL) {
-            if (is_null($domDocument)) {
-                $domDocument = new DOMDocument;
-                $domDocument->formatOutput = true;
+        public function xmlEncode($data, $simpleXmlElement = NULL)
+        {
+            if (is_null($simpleXmlElement)) {
+                $simpleXmlElement = new \SimpleXMLElement("<?xml version=\"1.0\"?><root></root>");
 
-                $rootNode = $domDocument->createElement('entries');
-                $domDocument->appendChild($rootNode);
+                $this->xmlEncode($data, $simpleXmlElement);
 
-                $this->xmlEncode($data, $rootNode, $domDocument);
-
-                return $domDocument->saveXML();
+                $simpleXmlElement->asXML();
             } else {
-                if (is_array($data)) {
-                    foreach ($data as $k => $v) {
-                        if (is_int($k)) {
-                            $nodeName = 'entry';
+                foreach ($data as $key => $value) {
+                    if (is_array($value)) {
+                        if (!is_numeric($key)) {
+                            $node = $simpleXmlElement->addChild($key);
+                            $this->xmlEncode($value, $node);
                         } else {
-                            $nodeName = $k;
+                            $node = $simpleXmlElement->addChild('item' . $key);
+                            $this->xmlEncode($value, $node);
                         }
-                        $node = $domDocument->createElement($nodeName);
-                        $domElement->appendChild($node);
-                        $this->xmlEncode($v, $node, $domDocument);
+                    } else {
+                        $simpleXmlElement->addChild($key, $value);
                     }
-                } else {
-                    $newNode = $domDocument->createTextNode($data);
-
-                    $domElement->appendChild($newNode);
                 }
             }
         }
@@ -257,8 +251,17 @@
         {
             $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
 
+            if ($this->type === 'json') {
+                $contentType = 'application/json';
+            } else if ($this->type === 'html') {
+                $contentType = 'text/html';
+            } else {
+                $contentType = 'application/xml';
+            }
+            $contentType =
+
             $this->status($code)
-                 ->header('content-Type', (($this->type === 'json') ? 'application/json' : 'text/html') . '; charset=utf-8')
+                 ->header('content-Type', $contentType . ' ; charset=utf-8')
                  ->write($encodedData, $replace)
                  ->send();
         }

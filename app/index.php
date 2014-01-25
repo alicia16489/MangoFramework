@@ -16,7 +16,6 @@ core\App::$container['Response']->sendResponse(array("prénom" => "nicolas", "no
     $code = 200,
     $encode = TRUE,
     $replace = FALSE);
-core\App::stop();
 
 echo (core\App::$container['Response']->getLength());
 ?>
