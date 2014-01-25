@@ -167,7 +167,7 @@
 
                 $this->xmlEncode($data, $rootNode, $domDocument);
 
-                echo @$domDocument->saveXML();
+                echo $domDocument->saveXML();
             } else {
                 if (is_array($data)) {
                     foreach ($data as $k => $v) {
