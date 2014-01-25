@@ -16,8 +16,7 @@ class App
     self::$container = Container::getInstance();
     self::$container->loaders();
 
-    if(self::$container['Request']->properties['REQUEST_OPTION_PARTS'][1] != '/')
-      self::$container['Blueprints']->isRessource();
+    self::$container['Blueprints']->isRest();
   }
 
 }
