@@ -20,6 +20,8 @@ class Blueprints
   public function __construct(Request $req)
   {
     $this->request = $req;
+    $this->ressource = $req->properties['REQUEST_OPTION_PARTS'][1];
+    var_dump($this);
   }
 
   public function isRessource()
