@@ -9,15 +9,24 @@ class App
   public static function run()
   {
     self::init();
+
+    if(self::$container['Blueprints']->ressource != '/'){
+      if(self::$container['Blueprints']->isRessource()){
+
+      }
+      else{
+        // exception
+      }
+    }
+    else{
+      // exception
+    }
   }
 
   public static function init()
   {
     self::$container = Container::getInstance();
     self::$container->loaders();
-
-    if(self::$container['Request']->properties['REQUEST_OPTION_PARTS'][1] != '/')
-      self::$container['Blueprints']->isRessource();
   }
 
 }

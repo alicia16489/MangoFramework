@@ -21,12 +21,11 @@ class Blueprints
   {
     $this->request = $req;
     $this->ressource = $req->properties['REQUEST_OPTION_PARTS'][1];
-    var_dump($this);
   }
 
   public function isRessource()
   {
-    var_dump($this->request);
+    var_dump($this);
   }
 
   private function isRest()
