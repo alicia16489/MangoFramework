@@ -18,11 +18,19 @@ class App
 
     self::$container['Blueprints']->isRest();
 
+    // Flush output
     if (ob_get_length() > 0) {
         self::$container['Response']->write(ob_get_clean());
     }
 
+    // Enable ouput buffering
     ob_start();
+
+    // Disbale cache for AJAX requests
+    //if (self::$container['Request']->ajax === TRUE) {
+      //self::$container['Response']->cache(FALSE);
+    //}
+
   }
 
   public static function stop($code = 200)

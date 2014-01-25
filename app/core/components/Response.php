@@ -7,7 +7,7 @@
         protected $status = 200;
         protected $headers = array();
         protected $body;
-        protected $length = 0;
+        protected $length = NULL;
         protected $type;
         protected static $statusCodes = array(
             // Informational
@@ -157,6 +157,8 @@
 
         }
 
+
+        // TO DO : MAKE IT WORK
         public function xmlEncode($data, $domElement = NULL, $domDocument = NULL) {
             if (is_null($domDocument)) {
                 $domDocument = new DOMDocument;
@@ -167,7 +169,7 @@
 
                 $this->xmlEncode($data, $rootNode, $domDocument);
 
-                echo $domDocument->saveXML();
+                return $domDocument->saveXML();
             } else {
                 if (is_array($data)) {
                     foreach ($data as $k => $v) {
@@ -197,29 +199,44 @@
             return $this;
         }
 
-        public function sendHeader()
+        public function cache($expires)
         {
-            foreach($this->headers as $key => $value) {
-                if (is_array($value)) {
-                    foreach ($value as $v) {
-                        header($key . ': ' . $v, false);
-                    }
-                } else {
-                    header($key . ': ' . $value);
-                }
+            if ($expires === FALSE) {
+                $this->headers['Expires'] = 'Thu, 20 Aug 1992 02:17:31 GMT';
+                $this->headers['Cache-Control'] = array(
+                    'no-store, no-cache, must-revalidate',
+                    'post-check=0, pre-check=0',
+                    'max-age=0'
+                );
+
+                $this->headers['Pragma'] = 'no-cache';
+            } else {
+                $expires = is_int($expires) ? $expires : strtotime($expires);
+                $this->headers['Expires'] = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
+                $this->headers['Cache-Control'] = 'max-age='.($expires - time());
             }
 
             return $this;
         }
 
-        public function send()
+        public function send($html = FALSE)
         {
             if (ob_get_length() > 0) {
                 ob_end_clean();
             }
 
-            if (!headers_sent()) {
-                $this->sendHeader();
+            if ($html === FALSE) {
+                if (!headers_sent()) {
+                    foreach($this->headers as $key => $value) {
+                        if (is_array($value)) {
+                            foreach ($value as $v) {
+                                header($key . ': ' . $v, false);
+                            }
+                        } else {
+                            header($key . ': ' . $value);
+                        }
+                    }
+                }
             }
 
             exit($this->body);
@@ -227,7 +244,7 @@
 
         public function sendResponse($data, $code = 200, $encode = TRUE, $replace = FALSE)
         {
-            $encodedData = (($encode === TRUE) ? (($this->type === 'json') ? json_encode($data) : $this->xmlEncode($data)) : $data);
+            $encodedData = (($encode === TRUE) ? (($this->type === 'json') ? json_encode($data, JSON_FORCE_OBJECT) : $this->xmlEncode($data)) : $data);
 
             $this->status($code)
                  ->header('content-Type', 'application/json')
