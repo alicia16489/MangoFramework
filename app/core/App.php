@@ -14,8 +14,6 @@ class App
   public static function init()
   {
     self::$container = Container::getInstance();
-
-    var_dump(self::$container);
   }
 
 }
