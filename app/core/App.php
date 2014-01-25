@@ -12,16 +12,16 @@ class App
 
     if(self::$container['Blueprints']->ressource != '/'){
       if(self::$container['Blueprints']->isRessource()){
-        echo "here";
+        if(self::$container['Blueprints']->isRest()){
 
-
+        }
       }
       else{
-        // exception
+        // error response
       }
     }
     else{
-      // exception
+      // error response
     }
   }
 
@@ -29,11 +29,7 @@ class App
   {
     self::$container = Container::getInstance();
     self::$container->loaders();
-<<<<<<< HEAD
-=======
 
-    self::$container['Blueprints']->isRest();
->>>>>>> blueprints
   }
 
 }
