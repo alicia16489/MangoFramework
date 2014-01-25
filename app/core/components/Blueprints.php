@@ -29,7 +29,6 @@ class Blueprints extends \core\App
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
     $logicList = self::$container['RessourceMap']->ressources['logic'];
 
-
     if(in_array($this->ressource, $physicalList) || in_array($this->ressource,$logicList))
       return true;
 
@@ -43,11 +42,14 @@ class Blueprints extends \core\App
       if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
         if($method == $this->method || ($this->method == "get" && $method == "index")){
           $this->method = $method;
+
+          if($method == "get" || $method == "put" || $method == "delete")
+            $this->options['id'] = $this->request->properties['REQUEST_OPTION_PARTS'][2];
+
           return true;
         }
       }
     }
-
     return false;
   }
 
