@@ -27,10 +27,10 @@ class Blueprints
   public function isRessource()
   {
     $physicalList = App::$container['RessourceMap']->ressources['physical'];
-    $logicList = App::$container['RessourceMap']->ressources['physical'];
+    $logicList = App::$container['RessourceMap']->ressources['logic'];
 
 
-    if(in_array($this->ressource, ) || in_array($this->ressource,$test2))
+    if(in_array($this->ressource, $physicalList) || in_array($this->ressource,$logicList))
       return true;
 
     return false;
