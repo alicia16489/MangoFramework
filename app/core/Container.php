@@ -33,7 +33,7 @@ class Container extends \Pimple
     }
   }
 
-  private function loaders()
+  public function loaders()
   {
     // Config
     $this['Config'] = function ($c) {
