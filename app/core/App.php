@@ -1,6 +1,7 @@
 <?php
 
 namespace core;
+use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
 {
@@ -13,7 +14,7 @@ class App
     if(self::$container['Blueprints']->ressource != '/'){
       if(self::$container['Blueprints']->isRessource()){
         if(self::$container['Blueprints']->isRest()){
-
+          var_dump(self::$container['Blueprints']);
         }
       }
       else{
@@ -27,9 +28,19 @@ class App
 
   public static function init()
   {
+    self::autoloader();
     self::$container = Container::getInstance();
     self::$container->loaders();
 
+  }
+
+  public static function autoloader()
+  {
+    require '../vendors/autoload.php';
+
+    $loader = new UniversalClassLoader();
+    $loader->useIncludePath(true);
+    $loader->register();
   }
 
 }
