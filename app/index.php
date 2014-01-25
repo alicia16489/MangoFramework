@@ -12,7 +12,7 @@ $loader->register();
 // start app
 core\App::run();
 var_dump(core\App::$container['Response']);
-core\App::$container['Response']->sendResponse(array("prénom" => "nicolas", "nom" => "nicolas", "sousbranche" => array("age" => "21")),
+core\App::$container['Response']->sendResponse(array("prénom" => "nicolas", "nom" => "portier", "sousbranche" => array("age" => "21")),
     $code = 200,
     $encode = TRUE,
     $replace = FALSE);
