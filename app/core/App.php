@@ -13,9 +13,10 @@ class App
     if(self::$container['Blueprints']->ressource != '/'){
       if(self::$container['Blueprints']->isRessource()){
         echo "here";
+
+
       }
       else{
-        echo "false";
         // exception
       }
     }

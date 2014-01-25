@@ -21,15 +21,12 @@ class Blueprints extends \core\App
   {
     $this->request = $req;
     $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
-    var_dump($this);
   }
 
   public function isRessource()
   {
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
     $logicList = self::$container['RessourceMap']->ressources['logic'];
-
-    var_dump($physicalList);
 
     if(in_array($this->ressource, $physicalList) || in_array($this->ressource,$logicList))
       return true;
