@@ -29,6 +29,11 @@ class App
   {
     self::$container = Container::getInstance();
     self::$container->loaders();
+<<<<<<< HEAD
+=======
+
+    self::$container['Blueprints']->isRest();
+>>>>>>> blueprints
   }
 
 }

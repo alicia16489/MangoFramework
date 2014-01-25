@@ -20,6 +20,7 @@ class Blueprints extends \core\App
   public function __construct(Request $req)
   {
     $this->request = $req;
+    $this->method = strtolower($req->properties['REQUEST_METHOD']);
     $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
   }
 
@@ -34,9 +35,19 @@ class Blueprints extends \core\App
     return false;
   }
 
-  private function isRest()
+  public function isRest()
   {
+    foreach($this->restPaterns as $method => $patern)
+    {
+      if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
+        if($method == $this->method || ($this->method == "get" && $method == "index")){
+          $this->method = $method;
+          return true;
+        }
+      }
+    }
 
+    return false;
   }
 
   private function isComplexe()
