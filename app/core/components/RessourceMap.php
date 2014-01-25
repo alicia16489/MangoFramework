@@ -37,7 +37,7 @@ class RessourceMap
     if(false !== ($dh = opendir($dir))){
       while (false !== ($filename = readdir($dh))) {
         if($filename != "." && $filename != "..")
-          $files[] = $filename;
+          $files[] = str_replace(".php","",$filename);
       }
     }
     else{
