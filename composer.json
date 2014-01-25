@@ -1,7 +1,8 @@
 {
     "require": {
         "symfony/class-loader": "2.3.0",
-        "pimple/pimple": "2.0.*@dev"
+        "pimple/pimple": "2.0.*@dev",
+        "illuminate/database" : "4.2"
     },
     "config": {
         "vendor-dir": "vendors"
