@@ -26,12 +26,12 @@ class Router extends Mux
     if(!empty($this->options['id']))
       $this->route .= "/:id";
 
+    self::$container['Router']->execute();
   }
 
   public function execute()
   {
     $this->add($this->route, [$this->ressource,$this->method]);
-
     $route = $this->dispatch( $_SERVER['PATH_INFO'] );
     Executor::execute($route);
   }

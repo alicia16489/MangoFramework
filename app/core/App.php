@@ -20,8 +20,6 @@ class App
 
           self::$container['Router']->restRouting();
         }
-
-        self::$container['Router']->execute();
       }
       else{
         // error response
