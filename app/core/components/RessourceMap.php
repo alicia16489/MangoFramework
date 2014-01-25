@@ -5,6 +5,7 @@ namespace core\components;
 class RessourceMap
 {
   public $ressources = array();
+  private $physicalListPath = "./ressources/physical/list.php";
 
   public function __construct()
   {
@@ -14,12 +15,13 @@ class RessourceMap
 
   private function getPhysical()
   {
-    //if(!is_readable("./ressources/physical/list.php"))
-
     if(!file_exists("./ressources/physical/list.php"))
-      throw new Exception("Missing physical ressource list from ORM migrate command, path : "."./ressources/physical/list.php");
+      throw new Exception("Missing physical ressource list from ORM migrate command, path : ".$this->physicalListPath);
 
-    return include("./ressources/physical/list.php");
+    if(!is_readable("./ressources/physical/list.php"))
+      throw new Exception("File not readable, premission denied, path : ".$this->physicalListPath);
+
+    return (include($this->physicalListPath));
   }
 
   private function getLogic()
