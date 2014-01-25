@@ -1,10 +1,13 @@
 {
     "require": {
+        "php": ">=5.4.0",
         "symfony/class-loader": "2.3.0",
         "pimple/pimple": "2.0.*@dev",
-        "illuminate/database" : "4.2"
+        "illuminate/database" : "dev-master",
+        "davedevelopment/phpmig" : "*"
     },
     "config": {
         "vendor-dir": "vendors"
-    }
+    },
+    "minimum-stability": "dev"
 }

@@ -2,7 +2,7 @@
 
 namespace core;
 
-class Container extends \Pimple
+class Container extends \Pimple implements \ArrayAccess
 {
   private static $container;
 
@@ -23,8 +23,11 @@ class Container extends \Pimple
       'Blueprints' => __NAMESPACE__.'\components\Blueprints',
       'Router' => __NAMESPACE__.'\components\Router',
       'Response' => __NAMESPACE__.'\components\Response',
-      'RessourceMap' => __NAMESPACE__.'\components\RessourceMap'
+      'RessourceMap' => __NAMESPACE__.'\components\RessourceMap',
+      'Database' => __NAMESPACE__.'\components\Database'
     );
+
+      $this['db'] =
 
     foreach($this['dependancies'] as $key => $path){
       if(!class_exists($path)){
@@ -64,6 +67,11 @@ class Container extends \Pimple
     $this['RessourceMap'] = function ($c) {
       return new $c['dependancies']['RessourceMap']();
     };
+    //Database
+    $this['Database'] = function ($c) {
+          return new $c['dependancies']['Database']();
+      };
+
   }
 
 }
