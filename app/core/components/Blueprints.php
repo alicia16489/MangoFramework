@@ -21,7 +21,6 @@ class Blueprints extends \core\App
   {
     $this->request = $req;
     $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
-    var_dump($this);
   }
 
   public function isRessource()
