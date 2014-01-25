@@ -20,13 +20,20 @@ class Blueprints
   public function __construct(Request $req)
   {
     $this->request = $req;
-    $this->ressource = $req->properties['REQUEST_OPTION_PARTS'][1];
+    $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
     var_dump($this);
   }
 
   public function isRessource()
   {
-    var_dump($this->request);
+    $physicalList = App::$container['RessourceMap']->ressources['physical'];
+    $logicList = App::$container['RessourceMap']->ressources['physical'];
+
+
+    if(in_array($this->ressource, ) || in_array($this->ressource,$test2))
+      return true;
+
+    return false;
   }
 
   private function isRest()
