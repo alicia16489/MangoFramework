@@ -42,11 +42,14 @@ class Blueprints extends \core\App
       if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
         if($method == $this->method || ($this->method == "get" && $method == "index")){
           $this->method = $method;
+
+          if($method == "get" || $method == "put" || $method == "delete")
+            $this->options['id'] = $this->request->properties['REQUEST_OPTION_PARTS'][2];
+
           return true;
         }
       }
     }
-
     return false;
   }
 
