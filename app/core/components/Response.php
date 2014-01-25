@@ -219,6 +219,15 @@
             return $this;
         }
 
+        // TO DO
+        public function jsonEncodeUTF8($data)
+        {
+            //$data = array_map('htmlentities', $data);
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+
+            return $json;
+        }
+
         public function send($html = FALSE)
         {
             if (ob_get_length() > 0) {
@@ -237,6 +246,8 @@
                         }
                     }
                 }
+            } else {
+                $this->type = 'html';
             }
 
             exit($this->body);
@@ -244,10 +255,10 @@
 
         public function sendResponse($data, $code = 200, $encode = TRUE, $replace = FALSE)
         {
-            $encodedData = (($encode === TRUE) ? (($this->type === 'json') ? json_encode($data, JSON_FORCE_OBJECT) : $this->xmlEncode($data)) : $data);
+            $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
 
             $this->status($code)
-                 ->header('content-Type', 'application/json')
+                 ->header('content-Type', (($this->type === 'json') ? 'application/json' : 'text/html') . '; charset=utf-8')
                  ->write($encodedData, $replace)
                  ->send();
         }
