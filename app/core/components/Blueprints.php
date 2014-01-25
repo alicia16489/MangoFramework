@@ -2,7 +2,7 @@
 
 namespace core\components;
 
-class Blueprints
+class Blueprints extends \core\App
 {
   private $request;
   public $ressource;
@@ -31,10 +31,15 @@ class Blueprints
   public function isRessource()
   {
 <<<<<<< HEAD
+<<<<<<< HEAD
     var_dump($this);
 =======
     $physicalList = App::$container['RessourceMap']->ressources['physical'];
     $logicList = App::$container['RessourceMap']->ressources['logic'];
+=======
+    $physicalList = self::$container['RessourceMap']->ressources['physical'];
+    $logicList = self::$container['RessourceMap']->ressources['logic'];
+>>>>>>> blueprints
 
 
     if(in_array($this->ressource, $physicalList) || in_array($this->ressource,$logicList))
