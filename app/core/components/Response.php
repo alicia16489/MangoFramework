@@ -231,7 +231,7 @@
 
             $this->status($code)
                  ->header('content-Type', 'application/json')
-                 ->write($json, $replace)
+                 ->write($encodedData, $replace)
                  ->send();
         }
 
