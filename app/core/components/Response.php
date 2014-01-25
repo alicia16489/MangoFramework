@@ -157,25 +157,24 @@
 
         }
 
-
         // TO DO : MAKE IT WORK
-        public function xmlEncode($data, $simpleXmlElement = NULL)
+        public function xmlEncode($data, $simpleXmlElement = NULL, $file)
         {
             if (is_null($simpleXmlElement)) {
                 $simpleXmlElement = new \SimpleXMLElement("<?xml version=\"1.0\"?><root></root>");
 
                 $this->xmlEncode($data, $simpleXmlElement);
 
-                $simpleXmlElement->asXML();
+                $simpleXmlElement->asXML($file);
             } else {
                 foreach ($data as $key => $value) {
                     if (is_array($value)) {
                         if (!is_numeric($key)) {
                             $node = $simpleXmlElement->addChild($key);
-                            $this->xmlEncode($value, $node);
+                            $this->xmlEncode($value, $node, $file);
                         } else {
                             $node = $simpleXmlElement->addChild('item' . $key);
-                            $this->xmlEncode($value, $node);
+                            $this->xmlEncode($value, $node, $file);
                         }
                     } else {
                         $simpleXmlElement->addChild($key, $value);
@@ -249,7 +248,7 @@
 
         public function sendResponse($data, $code = 200, $encode = TRUE, $replace = FALSE)
         {
-            $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
+            $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, 'test.xml')) : $data);
 
             if ($this->type === 'json') {
                 $contentType = 'application/json';
