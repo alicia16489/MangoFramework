@@ -9,6 +9,8 @@ class App
 
   public static function run()
   {
+    try
+    {
     self::init();
 
     if(self::$container['Blueprints']->ressource != '/'){
@@ -24,6 +26,11 @@ class App
     else{
       // error response
     }
+    }
+    catch(\Exception $e)
+    {
+      var_dump($e);
+    }
   }
 
   public static function init()
@@ -31,7 +38,6 @@ class App
     self::autoloader();
     self::$container = Container::getInstance();
     self::$container->loaders();
-
   }
 
   public static function autoloader()

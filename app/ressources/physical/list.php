@@ -1,6 +1,5 @@
 <?php
 
 return array(
-  "User",
-  "Comment"
+  "User","Comment"
 );
