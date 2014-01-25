@@ -1,6 +1,7 @@
 <?php
 
 namespace core;
+
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
@@ -12,10 +13,15 @@ class App
     self::init();
 
     if(self::$container['Blueprints']->ressource != '/'){
+
       if(self::$container['Blueprints']->isRessource()){
+
         if(self::$container['Blueprints']->isRest()){
-          var_dump(self::$container['Blueprints']);
+
+          self::$container['Router']->restRouting();
         }
+
+        self::$container['Router']->execute();
       }
       else{
         // error response

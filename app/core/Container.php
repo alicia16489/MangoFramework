@@ -52,7 +52,7 @@ class Container extends \Pimple
 
     // Router
     $this['Router'] = function ($c) {
-      return new $c['dependancies']['Router']();
+      return new $c['dependancies']['Router']($c['Blueprints']);
     };
 
     // Response
