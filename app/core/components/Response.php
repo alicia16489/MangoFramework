@@ -233,8 +233,6 @@
                         }
                     }
                 }
-            } else {
-                $this->type = 'html';
             }
 
             exit($this->body);
