@@ -19,12 +19,14 @@ class App
         if(self::$container['Blueprints']->isRest()){
 
           self::$container['Router']->restRouting();
+          self::$container['Router']->execute();
         }
 
-        self::$container['Router']->execute();
+
       }
       else{
         // error response
+        echo "ressource not found";
       }
     }
     else{
