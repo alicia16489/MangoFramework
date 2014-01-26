@@ -48,4 +48,4 @@
     var_dump(core\App::$container['Response']);
 
     $analysis = new utils\docGen(array('utils/htmlPattern.php'));
-    var_dump($analysis->create());
+    $analysis->create();
