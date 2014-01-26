@@ -1,6 +1,7 @@
 <?php
 
 namespace core;
+
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
@@ -9,26 +10,21 @@ class App
 
   public static function run()
   {
-    try
-    {
-    self::init();
+    try {
+      self::init();
 
-    if(self::$container['Blueprints']->ressource != '/'){
-      if(self::$container['Blueprints']->isRessource()){
-        if(self::$container['Blueprints']->isRest()){
-          var_dump(self::$container['Blueprints']);
+      if (self::$container['Blueprints']->ressource != '/') {
+        if (self::$container['Blueprints']->isRessource()) {
+          if (self::$container['Blueprints']->isRest()) {
+            var_dump(self::$container['Blueprints']);
+          }
+        } else {
+          // error response
         }
-      }
-      else{
+      } else {
         // error response
       }
-    }
-    else{
-      // error response
-    }
-    }
-    catch(\Exception $e)
-    {
+    } catch (\Exception $e) {
       var_dump($e);
     }
   }
