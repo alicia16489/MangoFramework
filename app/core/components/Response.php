@@ -255,6 +255,7 @@
             }
         }
 
+        // Should be on of App.php's method..
         public function sendResponse($data, $type = "json", $customParams)
         {
             $params = array(
