@@ -215,13 +215,13 @@
             return $json;
         }
 
-        public function send($html = FALSE)
+        public function send($die = TRUE)
         {
             if (ob_get_length() > 0) {
                 ob_end_clean();
             }
 
-            if ($html === FALSE) {
+            if ($this->type !== 'html') {
                 if (!headers_sent()) {
                     foreach($this->headers as $key => $value) {
                         if (is_array($value)) {
@@ -235,14 +235,18 @@
                 }
             }
 
-            exit($this->body);
+            if ($die === FALSE) {
+                echo ($this->body);
+            } else {
+                die ($this->body);
+            }
         }
 
-        public function sendResponse($data, $code = 200, $encode = TRUE, $replace = FALSE, $type = "json")
+        public function sendResponse($data, $type = "json", $params = array("code" => 200, "encode" => TRUE, "replace" => FALSE, "die" => TRUE))
         {
             $this->type = $type;
 
-            $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
+            $encodedData = (($params['encode'] === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
 
             if ($this->type === 'json') {
                 $contentType = 'application/json';
@@ -252,9 +256,9 @@
                 $contentType = 'text/xml';
             }
 
-            $this->status($code)
+            $this->status($params['code'])
                  ->header('content-Type', $contentType . ' ; charset=utf-8')
-                 ->write($encodedData, $replace)
-                 ->send();
+                 ->write($encodedData, $params['replace'])
+                 ->send($params['die']);
         }
     }
