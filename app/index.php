@@ -22,9 +22,10 @@
                 "age" => "21"
             )
         ),
-        'html',
+        'json',
         array(
             'die' => TRUE,
+            'erasePrevBuffer' => TRUE
         )
     );
 
