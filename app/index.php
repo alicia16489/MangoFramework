@@ -24,11 +24,7 @@
         ),
         'html',
         array(
-            'code' => 200,
-            'encode' => TRUE,
-            'replace' => FALSE,
-            'die' => FALSE,
-            'xmlFile' => NULL
+            'die' => TRUE,
         )
     );
 

@@ -74,7 +74,7 @@
                             self::$statusCodes[$kcode] = $message;
                         }
                     } else {
-                        Throw New \Exception('Invalid var type : "statusCode" must be an array in this case');
+                        Throw New \Exception('Invalid var type : $code must be an array in this case');
                     }
                 } else {
                     Throw New \Exception('Invalid status code');
@@ -228,10 +228,12 @@
             return $json;
         }
 
-        public function send($die = TRUE)
+        public function send($die = TRUE, $erasePrevBuffer = TRUE)
         {
-            if (ob_get_length() > 0) {
-                ob_end_clean();
+            if ($erasePrevBuffer === TRUE) {
+                if (ob_get_length() > 0) {
+                    ob_end_clean();
+                }
             }
 
             if (!headers_sent()) {
@@ -253,14 +255,28 @@
             }
         }
 
-        public function sendResponse($data, $type = "json", $params = array("code" => 200, "encode" => TRUE, "replace" => FALSE, "die" => TRUE, "xmlFile" => NULL))
+        public function sendResponse($data, $type = "json", $customParams)
         {
+            $params = array(
+                "code" => 200,
+                "encode" => TRUE,
+                "replace" => FALSE,
+                "die" => TRUE,
+                "xmlFile" => NULL,
+                "erasePrevBuffer" => TRUE
+            );
+
+            if (is_array($customParams)) {
+                $params = array_merge($params, $customParams);
+            } else {
+                Throw New \Exception('Invalid var type : $customParams must be an array');
+            }
+
             if (in_array($type, $this->validType)) {
                 $this->type = $type;
             } else {
                 Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
             }
-
 
             $encodedData = (($params['encode'] === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, $params['xmlFile'])) : $data);
 
@@ -275,6 +291,6 @@
             $this->status($params['code'])
                  ->header('content-Type', $contentType . ' ; charset=utf-8')
                  ->write($encodedData, $params['replace'])
-                 ->send($params['die']);
+                 ->send($params['die'], $params['erasePrevBuffer']);
         }
     }
