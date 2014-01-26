@@ -13,8 +13,21 @@
     core\App::run();
 
 
-    // test response
+    // TEST THE RESPONSE
     var_dump(core\App::$container['Response']);
+
+    // set the response data default
+    core\App::$container['Response']->setData(array(
+            "prénom" => "nicolas",
+            "nom" => "portier",
+            "sousbranche" => array(
+                "age" => "21"
+            )
+        )
+    );
+
+    // set response type (json html or xml)
+    core\App::$container['Response']->setType('json');
 
     // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
     // if not all old or/and next content in buffer will be append
@@ -22,47 +35,11 @@
         'die' => TRUE,
         'erasePrevBuffer' => TRUE,
     );
+
     // JSON RESPONSE
-    core\App::$container['Response']->sendResponse(
-        array(
-            "prénom" => "nicolas",
-            "nom" => "portier",
-            "sousbranche" => array(
-                "age" => "21"
-            )
-        ),
-        'html',
-        $params
-    );
+    core\App::$container['Response']->sendResponse($params);
 
-    /* //XML RESPONSE
-    core\App::$container['Response']->sendResponse(
-        array(
-            "prénom" => "nicolas",
-            "nom" => "portier",
-            "sousbranche" => array(
-                "age" => "21"
-            )
-        ),
-        'xml',
-        $params
-    );
-    */
-
-    /* //HTML RESPONSE
-    core\App::$container['Response']->sendResponse(
-        array(
-            "prénom" => "nicolas",
-            "nom" => "portier",
-            "sousbranche" => array(
-                "age" => "21"
-            )
-        ),
-        'html',
-        $params
-    );
-    */
-
+    // test if response was successful
     var_dump(array(core\App::$container['Response']->getStatus() => core\App::$container['Response']->is("successful")));
 
     var_dump(core\App::$container['Response']);

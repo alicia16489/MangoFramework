@@ -8,7 +8,9 @@
         protected $headers = array();
         protected $body;
         protected $length = NULL;
-        protected $type;
+        protected $type = 'json';
+        protected $data = NULL;
+        protected $defaultData;
         protected $validType = array(
             "json",
             "xml",
@@ -134,6 +136,24 @@
             return $this;
         }
 
+        public function setType($type)
+        {
+            if (in_array($type, $this->validType)) {
+                $this->type = $type;
+            } else {
+                Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
+            }
+        }
+
+        public function setData($data, $type = 'default')
+        {
+            if ($type === 'default') {
+                $this->defaultData = $data;
+            } else {
+                $this->data = $data;
+            }
+        }
+
         public function is($type = 'empty')
         {
             switch ($type) {
@@ -162,7 +182,6 @@
             }
         }
 
-        // TO DO : MAKE IT WORK
         public function xmlEncode($data, $simpleXmlElement = NULL, $file = NULL)
         {
             if (is_null($simpleXmlElement)) {
@@ -228,6 +247,19 @@
             return $json;
         }
 
+        public function sendHeader()
+        {
+            foreach($this->headers as $key => $value) {
+                if (is_array($value)) {
+                    foreach ($value as $v) {
+                        header($key . ': ' . $v, false);
+                    }
+                } else {
+                    header($key . ': ' . $value);
+                }
+            }
+        }
+
         public function send($die = TRUE, $erasePrevBuffer = TRUE)
         {
             if ($erasePrevBuffer === TRUE) {
@@ -237,15 +269,7 @@
             }
 
             if (!headers_sent()) {
-                foreach($this->headers as $key => $value) {
-                    if (is_array($value)) {
-                        foreach ($value as $v) {
-                            header($key . ': ' . $v, false);
-                        }
-                    } else {
-                        header($key . ': ' . $value);
-                    }
-                }
+                $this->sendHeader();
             }
 
             if ($die === FALSE) {
@@ -256,7 +280,7 @@
         }
 
         // Should be on of App.php's method..
-        public function sendResponse($data, $type = "json", $customParams)
+        public function sendResponse($customParams = NULL)
         {
             $params = array(
                 "code" => 200,
@@ -264,29 +288,33 @@
                 "replace" => FALSE,
                 "die" => TRUE,
                 "xmlFile" => NULL,
-                "erasePrevBuffer" => TRUE,
+                "erasePrevBuffer" => TRUE
             );
 
-            if (is_array($customParams)) {
-                $params = array_merge($params, $customParams);
+            if (!is_null($this->data) && !empty($this->data)) {
+                $data = $this->data;
             } else {
-                Throw New \Exception('Invalid var type : $customParams must be an array');
+                $data = $this->defaultData;
             }
 
-            if (in_array($type, $this->validType)) {
-                $this->type = $type;
+            if (is_array($customParams) && !is_null($customParams)) {
+                $params = array_merge($params, $customParams);
+            }
+
+            if (in_array($this->type, $this->validType)) {
+                $type = $this->type;
             } else {
                 Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
             }
 
-            $encodedData = (($params['encode'] === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, $params['xmlFile'])) : $data);
+            $encodedData = (($params['encode'] === TRUE) ? (($type === 'json' || $type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, $params['xmlFile'])) : $type);
 
             if ($this->type === 'json') {
                 $contentType = 'application/json';
             } else if ($this->type === 'html') {
                 $contentType = 'text/html';
             } else if ($this->type === 'xml') {
-                $contentType = 'text/xml';
+                $contentType = 'application/xml';
             }
 
             $this->status($params['code'])
