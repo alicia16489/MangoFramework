@@ -56,10 +56,7 @@
             505 => 'HTTP Version Not Supported'
         );
 
-        public function __construct($type = 'json')
-        {
-            $this->type = $type;
-        }
+        public function __construct() {}
 
         public function status($code, $add = FALSE)
         {
@@ -154,18 +151,17 @@
                 default:
                     Throw new \Exception('Invalid var value');
             }
-
         }
 
         // TO DO : MAKE IT WORK
-        public function xmlEncode($data, $simpleXmlElement = NULL, $file)
+        public function xmlEncode($data, $simpleXmlElement = NULL, $file = NULL)
         {
             if (is_null($simpleXmlElement)) {
                 $simpleXmlElement = new \SimpleXMLElement("<?xml version=\"1.0\"?><root></root>");
 
                 $this->xmlEncode($data, $simpleXmlElement);
 
-                $simpleXmlElement->asXML($file);
+                return $simpleXmlElement->asXML();
             } else {
                 foreach ($data as $key => $value) {
                     if (is_array($value)) {
@@ -212,11 +208,9 @@
             return $this;
         }
 
-        // TO DO
         public function jsonEncodeUTF8($data)
         {
-            //$data = array_map('htmlentities', $data);
-            $json = json_encode($data, JSON_UNESCAPED_UNICODE);
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT);
 
             return $json;
         }
@@ -246,9 +240,11 @@
             exit($this->body);
         }
 
-        public function sendResponse($data, $code = 200, $encode = TRUE, $replace = FALSE)
+        public function sendResponse($data, $code = 200, $encode = TRUE, $replace = FALSE, $type = "json")
         {
-            $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, 'test.xml')) : $data);
+            $this->type = $type;
+
+            $encodedData = (($encode === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
 
             if ($this->type === 'json') {
                 $contentType = 'application/json';
@@ -263,5 +259,4 @@
                  ->write($encodedData, $replace)
                  ->send();
         }
-
     }
