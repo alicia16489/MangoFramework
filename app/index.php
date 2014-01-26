@@ -11,9 +11,13 @@
 
     // start app
     core\App::run();
+
+
     // test response
     var_dump(core\App::$container['Response']);
 
+    // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
+    // if not all old or/and next content in buffer will be append
     core\App::$container['Response']->sendResponse(
         array(
             "prénom" => "nicolas",
