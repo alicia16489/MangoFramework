@@ -46,3 +46,6 @@
     var_dump(array(core\App::$container['Response']->getStatus() => core\App::$container['Response']->is("successful")));
 
     var_dump(core\App::$container['Response']);
+
+    $analysis = new utils\docGen(array('utils/htmlPattern.php'));
+    var_dump($analysis->create());
