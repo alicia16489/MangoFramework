@@ -263,7 +263,7 @@
                 "replace" => FALSE,
                 "die" => TRUE,
                 "xmlFile" => NULL,
-                "erasePrevBuffer" => TRUE
+                "erasePrevBuffer" => TRUE,
             );
 
             if (is_array($customParams)) {

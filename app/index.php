@@ -18,6 +18,11 @@
 
     // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
     // if not all old or/and next content in buffer will be append
+    $params = array(
+        'die' => TRUE,
+        'erasePrevBuffer' => TRUE,
+    );
+    // JSON RESPONSE
     core\App::$container['Response']->sendResponse(
         array(
             "prénom" => "nicolas",
@@ -26,12 +31,37 @@
                 "age" => "21"
             )
         ),
-        'json',
-        array(
-            'die' => TRUE,
-            'erasePrevBuffer' => TRUE
-        )
+        'html',
+        $params
     );
+
+    /* //XML RESPONSE
+    core\App::$container['Response']->sendResponse(
+        array(
+            "prénom" => "nicolas",
+            "nom" => "portier",
+            "sousbranche" => array(
+                "age" => "21"
+            )
+        ),
+        'xml',
+        $params
+    );
+    */
+
+    /* //HTML RESPONSE
+    core\App::$container['Response']->sendResponse(
+        array(
+            "prénom" => "nicolas",
+            "nom" => "portier",
+            "sousbranche" => array(
+                "age" => "21"
+            )
+        ),
+        'html',
+        $params
+    );
+    */
 
     var_dump(array(core\App::$container['Response']->getStatus() => core\App::$container['Response']->is("successful")));
 
