@@ -9,6 +9,11 @@
         protected $body;
         protected $length = NULL;
         protected $type;
+        protected $validType = array(
+            "json",
+            "xml",
+            "html"
+        );
         protected static $statusCodes = array(
             // Informational
             100 => '100 Continue',
@@ -79,8 +84,12 @@
             return $this;
         }
 
-        public function getStatus($messageOnly = FALSE, $code = 200)
+        public function getStatus($messageOnly = FALSE, $code = NULL)
         {
+            if (is_null($code)) {
+                $code = $this->status;
+            }
+
             if ($messageOnly === TRUE) {
                 if (array_key_exists($code, self::$statusCodes)) {
                     return self::$statusCodes[$code];
@@ -88,7 +97,7 @@
                     Throw New \Exception('Invalid status code');
                 }
             } else {
-                return $this->headers;
+                return $code;
             }
         }
 
@@ -159,9 +168,13 @@
             if (is_null($simpleXmlElement)) {
                 $simpleXmlElement = new \SimpleXMLElement("<?xml version=\"1.0\"?><root></root>");
 
-                $this->xmlEncode($data, $simpleXmlElement);
+                $this->xmlEncode($data, $simpleXmlElement, $file);
 
-                return $simpleXmlElement->asXML();
+                if (!is_null($file)) {
+                    $simpleXmlElement->asXML($file);
+                } else {
+                    return $simpleXmlElement->asXML();
+                }
             } else {
                 foreach ($data as $key => $value) {
                     if (is_array($value)) {
@@ -221,16 +234,14 @@
                 ob_end_clean();
             }
 
-            if ($this->type !== 'html') {
-                if (!headers_sent()) {
-                    foreach($this->headers as $key => $value) {
-                        if (is_array($value)) {
-                            foreach ($value as $v) {
-                                header($key . ': ' . $v, false);
-                            }
-                        } else {
-                            header($key . ': ' . $value);
+            if (!headers_sent()) {
+                foreach($this->headers as $key => $value) {
+                    if (is_array($value)) {
+                        foreach ($value as $v) {
+                            header($key . ': ' . $v, false);
                         }
+                    } else {
+                        header($key . ': ' . $value);
                     }
                 }
             }
@@ -242,11 +253,16 @@
             }
         }
 
-        public function sendResponse($data, $type = "json", $params = array("code" => 200, "encode" => TRUE, "replace" => FALSE, "die" => TRUE))
+        public function sendResponse($data, $type = "json", $params = array("code" => 200, "encode" => TRUE, "replace" => FALSE, "die" => TRUE, "xmlFile" => NULL))
         {
-            $this->type = $type;
+            if (in_array($type, $this->validType)) {
+                $this->type = $type;
+            } else {
+                Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
+            }
 
-            $encodedData = (($params['encode'] === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data)) : $data);
+
+            $encodedData = (($params['encode'] === TRUE) ? (($this->type === 'json' || $this->type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, $params['xmlFile'])) : $data);
 
             if ($this->type === 'json') {
                 $contentType = 'application/json';
