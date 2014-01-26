@@ -27,7 +27,10 @@
     );
 
     // set response type (json html or xml)
-    core\App::$container['Response']->setType('json');
+    core\App::$container['Response']->setType('html');
+
+    // set pretty print or not to have a beautiful JSON print
+    core\App::$container['Response']->setPrettyPrint(TRUE);
 
     // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
     // if not all old or/and next content in buffer will be append
@@ -43,3 +46,6 @@
     var_dump(array(core\App::$container['Response']->getStatus() => core\App::$container['Response']->is("successful")));
 
     var_dump(core\App::$container['Response']);
+
+    $analysis = new utils\docGen(array('htmlPattern.php'));
+    var_dump($analysis->create());

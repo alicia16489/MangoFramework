@@ -11,6 +11,7 @@
         protected $type = 'json';
         protected $data = NULL;
         protected $defaultData;
+        public $prettyPrint = FALSE;
         protected $validType = array(
             "json",
             "xml",
@@ -154,6 +155,11 @@
             }
         }
 
+        public function setPrettyPrint($bool)
+        {
+            $this->prettyPrint = $bool;
+        }
+
         public function is($type = 'empty')
         {
             switch ($type) {
@@ -242,7 +248,11 @@
 
         public function jsonEncodeUTF8($data)
         {
-            $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT);
+            if ($this->prettyPrint === TRUE) {
+                $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
+            } else {
+                $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT);
+            }
 
             return $json;
         }
