@@ -26,7 +26,7 @@ class App
     // Enable ouput buffering
     ob_start();
 
-    self::stop();
+    //self::stop();
   }
 
   public static function stop($code = 200)
