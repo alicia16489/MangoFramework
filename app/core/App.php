@@ -16,9 +16,9 @@ class App
     self::$container = Container::getInstance();
     self::$container->loaders();
 
-    self::$container['Blueprints']->analyse();
 
-    var_dump(self::$container['Blueprints']->type);
+
+    var_dump(self::$container['Blueprints']->exist);
   }
 
 }

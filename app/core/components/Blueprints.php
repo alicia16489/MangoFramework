@@ -7,6 +7,7 @@ class Blueprints extends \core\App
   private $request;
   public $ressource;
   public $type;
+  public $exist = array();
   public $method;
   public $options;
 
@@ -24,22 +25,41 @@ class Blueprints extends \core\App
   {
     $this->request = $req;
     $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
+    $this->isLogic();
+    $this->isPhysical();
   }
 
-  public function analyse()
+  private function isPhysical()
   {
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
+
+    var_dump($physicalList);
+    echo $this->ressource;
+    if(in_array($this->ressource, $physicalList)){
+      $class = '\ressources\physical\\'.$this->ressource;
+
+      if(class_exists ($class)){
+        $this->exist['physical'] = true;
+        return;
+      }
+    }
+    $this->exist['physical'] = false;
+  }
+
+  private function isLogic()
+  {
     $logicList = self::$container['RessourceMap']->ressources['logic'];
 
     if(in_array($this->ressource,$logicList)){
-      $this->isLogic();
+      $class = '\ressources\logic\\'.$this->ressource;
+
+      if(class_exists ($class)){
+        $this->exist['logic'] = true;
+        return;
+      }
     }
 
-    if(in_array($this->ressource, $physicalList)  && $this->type != "physical"){
-      $this->isRest();
-    }
-
-    return false;
+      $this->exist['logic'] = false;
   }
 
   private function isRest()
@@ -60,18 +80,6 @@ class Blueprints extends \core\App
 
   private function getOptions()
   {
-
-  }
-
-  private function isLogic()
-  {
-    $class = '\ressources\logic\\'.$this->ressource;
-
-    if(class_exists ($class))
-      $ressource = new $class();
-    else
-      return;
-
 
   }
 }
