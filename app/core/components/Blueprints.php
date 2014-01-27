@@ -2,43 +2,59 @@
 
 namespace core\components;
 
+class ressourceException extends \Exception
+{
+}
+
 class Blueprints extends \core\App
 {
-  private $request;
+  public $route;
+  public $pathInfo;
   public $ressource;
   public $type;
   public $exist = array();
-  public $method;
+  public $restMethod;
+  private $method;
   public $options;
 
   private $paterns = array(
     "rest" => array(
-      "#^\/[a-zA-Z]+\/?$#",
-      "#^\/[a-zA-Z]+\/\d+$#"
+      "#^\/[a-zA-Z0-9]+\/?$#",
+      "#^\/[a-zA-Z0-9]+\/\d+$#"
     ),
-    "complexe" => array(
-
-    )
+    "logic" => "#^\/[a-zA-Z0-9]+\/?$#",
+    "complexe" => array()
   );
 
-  public function __construct(Request $req)
+  public function __construct(Request $request)
   {
-    $this->request = $req;
-    $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
-    $this->isLogic();
-    $this->isPhysical();
+    $this->pathInfo = $request->properties['REQUEST_OPTION'];
+    $this->ressource = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]);
+    $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);;
+    $this->existAsLogic();
+    $this->existAsPhysical();
   }
 
-  private function isPhysical()
+  public function setMethod($method, $object)
+  {
+    $class = get_class($object);
+    if (!method_exists($object, $method))
+      throw new ressourceException('Method "' . $method . '" missing, logic ressource : ' . $class);
+  }
+
+  public function getMethod()
+  {
+    return $this->method;
+  }
+
+  private function existAsPhysical()
   {
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
 
-    var_dump($physicalList);
-    echo $this->ressource;
-    if(in_array($this->ressource, $physicalList)){
-      $class = '\ressources\physical\\'.$this->ressource;
+    if (in_array($this->ressource, $physicalList)) {
+      $class = '\ressources\physical\\' . $this->ressource;
 
-      if(class_exists ($class)){
+      if (class_exists($class)) {
         $this->exist['physical'] = true;
         return;
       }
@@ -46,40 +62,119 @@ class Blueprints extends \core\App
     $this->exist['physical'] = false;
   }
 
-  private function isLogic()
+  private function existAsLogic()
   {
     $logicList = self::$container['RessourceMap']->ressources['logic'];
 
-    if(in_array($this->ressource,$logicList)){
-      $class = '\ressources\logic\\'.$this->ressource;
+    if (in_array($this->ressource, $logicList)) {
+      $class = '\ressources\logic\\' . $this->ressource;
 
-      if(class_exists ($class)){
+      if (class_exists($class)) {
         $this->exist['logic'] = true;
         return;
       }
     }
 
-      $this->exist['logic'] = false;
+    $this->exist['logic'] = false;
   }
 
-  private function isRest()
+  public function isLogic()
   {
-    foreach($this->paterns['rest'] as $method => $patern)
-    {
-      if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
-        $this->method = strtolower($this->request->properties['REQUEST_METHOD']);
-        $this->type = "rest";
+    if (preg_match($this->paterns['logic'], $this->pathInfo)) {
+      $class = 'ressources\logic\\' . $this->ressource;
+      $ressource = new $class();
+
+      if (method_exists($ressource, 'get')) {
+        return true;
       }
     }
+
+    return false;
   }
 
-  private function complexe()
+  public function isSubLogic()
+  {
+
+    if (!preg_match($this->paterns['logic'], $this->pathInfo)) {
+      $class = 'ressources\logic\\' . $this->ressource;
+      $ressource = new $class();
+
+      if (property_exists($class, "routes")) {
+        foreach ($ressource->routes as $route => $value) {
+          if (is_array($value) && isset($value['cond'])) {
+            if ($this->routeMatch($route, $value['cond'])) {
+              $this->setMethod($value['method'], $ressource);
+              $this->route = $route;
+              return true;
+            }
+          } else {
+            if ($this->routeMatch($route)) {
+              if (is_array($value))
+                $this->setMethod($value['method'], $ressource);
+              else
+                $this->setMethod($value, $ressource);
+
+              $this->route = $route;
+
+              return true;
+            }
+          }
+        }
+      }
+
+    }
+
+    return false;
+  }
+
+  public function isRest()
+  {
+    foreach ($this->paterns['rest'] as $method => $patern) {
+      if (preg_match($patern, $this->pathInfo)) {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
+  private function isComplexe()
   {
 
   }
 
   private function getOptions()
   {
+
+  }
+
+  public function routeMatch($route, $paterns = NULL)
+  {
+    $split = explode("/", $route);
+
+    // build regex
+    $regex = "#^\/";
+    foreach ($split as $key => $part) {
+      if ($key > 1)
+        $regex .= "\/";
+
+      if ($part != "") {
+        if ($part[0] == ":") {
+          if (!is_null($paterns) && isset($paterns[$part]))
+            $regex .= $paterns[$part];
+          else
+            $regex .= "[a-zA-Z0-9]+";
+
+        } else {
+          $regex .= $part;
+        }
+
+      }
+    }
+
+    $regex .= "\/?$#";
+
+    return preg_match($regex, $this->pathInfo);
 
   }
 }
