@@ -1,38 +1,71 @@
 <?php
 
 namespace core\components;
+
 use Pux\Mux;
 use Pux\Executor;
 
 class Router extends Mux
 {
   private $route;
-  private $ressource;
-  private $method;
-  private $options;
+  private $blueprints;
 
   public function __construct(Blueprints $blueprints)
   {
-    $this->route = '/'.strtolower($blueprints->ressource);
-    $this->ressource = strtolower($blueprints->ressource);
-    $this->method = $blueprints->method;
-    $this->options = $blueprints->options;
+    $this->blueprints = $blueprints;
+  }
+
+  public function errorRouting()
+  {
+    $this->add('/error/:status', ['\core\components\Error', 'run']);
+  }
+
+  public function logicRouting()
+  {
+    $routePatern = '/' . strtolower($this->blueprints->ressource);
+    $this->blueprints->ressource = '\ressources\logic\\' . $this->blueprints->ressource;
+
+    $this->add($routePatern, [$this->blueprints->ressource, 'get']);
+    $this->add($routePatern . "/", [$this->blueprints->ressource, 'get']);
+
+    $this->prepare($_SERVER['PATH_INFO']);
+  }
+
+  public function subLogicRouting()
+  {
+    $routePatern = $this->blueprints->route;
+    $this->blueprints->ressource = '\ressources\logic\\' . $this->blueprints->ressource;
+
+    $this->add($routePatern, [$this->blueprints->ressource, $this->blueprints->getMethod()]);
+
+    $this->prepare($_SERVER['PATH_INFO']);
   }
 
   public function restRouting()
   {
-    $this->ressource = '\ressources\physical\\'.$this->ressource;
+    $routePatern = '/' . strtolower($this->blueprints->ressource);
+    $this->blueprints->ressource = '\ressources\physical\\' . $this->blueprints->ressource;
 
-    if(!empty($this->options['id']))
-      $this->route .= "/:id";
+    $this->get($routePatern . "/", [$this->blueprints->ressource, 'index']);
+    $this->get($routePatern, [$this->blueprints->ressource, 'index']);
+    $this->get($routePatern . '/:id', [$this->blueprints->ressource, $this->blueprints->restMethod]);
+    $this->post($routePatern, [$this->blueprints->ressource, $this->blueprints->restMethod]);
+    $this->put($routePatern . '/:id', [$this->blueprints->ressource, $this->blueprints->restMethod]);
+    $this->delete($routePatern . '/:id', [$this->blueprints->ressource, $this->blueprints->restMethod]);
 
-    self::$container['Router']->execute();
+    $this->prepare($_SERVER['PATH_INFO']);
+  }
+
+  public function prepare($path)
+  {
+    $prepare = $this->dispatch($path);
+    if (!empty($prepare)) {
+      $this->route = $this->dispatch($path);
+    }
   }
 
   public function execute()
   {
-    $this->add($this->route, [$this->ressource,$this->method]);
-    $route = $this->dispatch( $_SERVER['PATH_INFO'] );
-    Executor::execute($route);
+    Executor::execute($this->route);
   }
 }
