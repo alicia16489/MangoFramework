@@ -6,54 +6,54 @@ class Blueprints extends \core\App
 {
   private $request;
   public $ressource;
+  public $type;
   public $method;
   public $options;
 
-  private $restPaterns = array(
-    "index" => "#^\/[a-zA-Z]+\/?$#",
-    "get" => "#^\/[a-zA-Z]+\/\d+$#",
-    "post" => "#^\/[a-zA-Z]+\/?$#",
-    "put" => "#^\/[a-zA-Z]+\/\d+$#",
-    "delete" => "#^\/[a-zA-Z]+\/\d+$#"
+  private $paterns = array(
+    "rest" => array(
+      "#^\/[a-zA-Z]+\/?$#",
+      "#^\/[a-zA-Z]+\/\d+$#"
+    ),
+    "complexe" => array(
+
+    )
   );
 
   public function __construct(Request $req)
   {
     $this->request = $req;
-    $this->method = strtolower($req->properties['REQUEST_METHOD']);
     $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
   }
 
-  public function isRessource()
+  public function analyse()
   {
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
     $logicList = self::$container['RessourceMap']->ressources['logic'];
 
-    if(in_array($this->ressource, $physicalList) || in_array($this->ressource,$logicList))
-      return true;
+    if(in_array($this->ressource,$logicList)){
+      $this->isLogic();
+    }
+
+    if(in_array($this->ressource, $physicalList)  && $this->type != "physical"){
+      $this->isRest();
+    }
 
     return false;
   }
 
-  public function isRest()
+  private function isRest()
   {
-    foreach($this->restPaterns as $method => $patern)
+    foreach($this->paterns['rest'] as $method => $patern)
     {
       if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
-        if($method == $this->method || ($this->method == "get" && $method == "index")){
-          $this->method = $method;
-
-          if($method == "get" || $method == "put" || $method == "delete")
-            $this->options['id'] = $this->request->properties['REQUEST_OPTION_PARTS'][2];
-
-          return true;
-        }
+        $this->method = strtolower($this->request->properties['REQUEST_METHOD']);
+        $this->type = "rest";
       }
     }
-    return false;
   }
 
-  private function isComplexe()
+  private function complexe()
   {
 
   }
@@ -61,5 +61,10 @@ class Blueprints extends \core\App
   private function getOptions()
   {
 
+  }
+
+  private function isLogic()
+  {
+    var_dump($this->request);
   }
 }

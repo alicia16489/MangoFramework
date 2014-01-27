@@ -16,7 +16,7 @@ class App
     self::$container = Container::getInstance();
     self::$container->loaders();
 
-    self::$container['Blueprints']->isRest();
+    self::$container['Blueprints']->analyse();
   }
 
 }
