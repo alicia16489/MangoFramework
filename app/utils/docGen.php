@@ -7,6 +7,8 @@
     Class docGen
     {
         protected $filePaths = array();
+        public $prettyMode = FALSE;
+        public $docPath = 'doc.php';
 
         public function __construct($filePaths, $docPattern = NULL)
         {
@@ -17,38 +19,75 @@
             }
         }
 
-        public function appendContent($content, $path)
+        public function cleanPattern($char, $content)
+        {
+            if (!is_array($char)) {
+                $contentClean = str_replace($char, '\\' . $char, $content);
+            } else {
+                $contentClean = str_replace($char, '', $content);
+            }
+
+            return $contentClean;
+        }
+
+        public function appendContent($content)
         {
             $searchTrim = array(' ', "\t", "\n", "\r", "\0", "\x0B");
-            $contentTrim = str_replace($searchTrim, '', $content);
-            $contentTrim = str_replace('*', '\*', $contentTrim);
-            $contentTrim = str_replace('{', '\{', $contentTrim);
-            $contentTrim = str_replace('}', '\}', $contentTrim);
-            $contentTrim = str_replace(')', '\)', $contentTrim);
-            $contentTrim = str_replace('(', '\(', $contentTrim);
-            $contentTrim = str_replace(']', '\]', $contentTrim);
-            $contentTrim = str_replace('[', '\[', $contentTrim);
-            $contentTrim = str_replace('|', '\|', $contentTrim);
-            $contentTrim = str_replace('$', '\$', $contentTrim);
+            $searchClean = array('*', '{', '}', '(', ')', '[', ']', '|', '$', '.', '#', '?');
 
-            $pattern = "#" . $contentTrim . "#i";
+            $contentClean = $this->cleanPattern($searchTrim, $content);
 
-            $docContent = str_replace($searchTrim, '', file_get_contents($path));
+            foreach ($searchClean as $s) {
+                $contentClean = $this->cleanPattern($s, $contentClean);
+            }
+
+            $pattern = "#" . $contentClean . "#i";
+            $docContent = str_replace($searchTrim, '', file_get_contents($this->docPath));
 
             if (preg_match($pattern, $docContent) !== 1) {
-                file_put_contents($path, $content, FILE_APPEND);
+                file_put_contents($this->docPath, $content, FILE_APPEND);
             }
         }
 
-        public function buildOutput($analysis)
+        public function buildHeader($headers)
+        {
+            $headerContent = '';
+
+            foreach ($headers as $key => $header) {
+                if ($key === 'namespace') {
+                    $namespace = " in\n" . substr($header, 0, strlen($header)-1) . "\n";
+                } else if ($key === 'className') {
+                    if (isset($namespace)) {
+                        $headerContent .= $header . $namespace . "\n---------------------\n\n";
+                    } else {
+                        $headerContent .= $header . "\n\n---------------------\n\n";
+                    }
+                }
+            }
+
+            return $headerContent;
+        }
+
+        public function  buildFooter($file)
+        {
+            $footerContent = "\n---END OF FILE : " . $file . "---\n\n\n";
+
+            return $footerContent;
+        }
+
+        public function buildMethodAnalysis($analysis)
         {
             $finalContent = '';
 
-            foreach($analysis as $key => $analys) {
+            foreach ($analysis as $key => $analys) {
                 if ($key === 0) {
                     $finalContent .= "/**\n";
                 } else if ($key === count($analysis) - 1) {
-                    $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n\n";
+                    if (preg_match('#public|protected|private#', $analys) === 1) {
+                        $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n";
+                    } else if (preg_match('#function#', $analys) === 1) {
+                        $finalContent .= " */\n" . substr($analys, strpos($analys, 'f')) . " {}\n\n";
+                    }
                 } else {
                     $finalContent .= " * " . trim($analys) . "\n";
                 }
@@ -57,7 +96,7 @@
             return $finalContent;
         }
 
-        public function createDoc($fileContent, $path, $startKey = NULL, $endKey = NULL)
+        public function createDoc($fileContent, $file, $startKey = NULL, $endKey = NULL, $count = 0)
         {
             if (!empty($this->pattern)) {
                 $pattern = $this->pattern;
@@ -70,20 +109,30 @@
             $mediumContent = '';
             $startKeys = array();
             $endKeys = array();
+            $headers = array();
 
             foreach($contents as $key => $content) {
-                if (preg_match('#^/(\*)+$#', $contents[$key]) === 1) {
+                if (preg_match('#^/(\*)+$#', $content) === 1) {
                     array_push($startKeys, $key);
                 }
 
-                if (preg_match('#^(\*)+/$#', $contents[$key]) === 1) {
+                if (preg_match('#^(\*)+/$#', $content) === 1) {
                     array_push($endKeys, $key + 1);
+                }
+
+                if (preg_match('#^(?:abstract|final)\s(?:class)|interface+#i', $content) === 1) {
+                    $headers['className'] = $content;
+                }
+
+                if(preg_match('#^namespace+#i', $content) === 1) {
+                    $headers['namespace'] = $content;
                 }
             }
 
             if (is_null($startKey) && is_null($endKey)) {
                 foreach ($startKeys as $key => $value) {
-                    $this->createDoc($fileContent, $path, $value, $endKeys[$key]);
+                    $this->createDoc($fileContent, $file, $value, $endKeys[$key], $count);
+                    $count++;
                 }
             }
 
@@ -91,21 +140,37 @@
                 $mediumContent .= $contents[$i];
             }
 
-            $analysis = preg_split('#\*+#', $mediumContent);
 
-            $finalContent = $this->buildOutput($analysis);
+            $analysis = preg_split('#\*#', $mediumContent);
 
+            // headers
+            if (!empty($headers)) {
+                if ($count === 0) {
+                    $headerContent = $this->buildHeader($headers);
+                    $this->appendContent($headerContent);
+                }
+            }
+
+            $finalContent = $this->buildMethodAnalysis($analysis);
+
+            // analysis
             if (count($analysis) > 1) {
-                $this->appendContent($finalContent, $path);
+                $this->appendContent($finalContent);
+            }
+
+            // footer
+            if (count($startKeys) === $count) {
+                $footerContent = $this->buildFooter($file);
+                $this->appendContent($footerContent);
             }
         }
 
-        public function create($path = 'doc.php')
+        public function create()
         {
             foreach ($this->filePaths as $v) {
                 if (file_exists($v)) {
                     if (FALSE !== ($content = file_get_contents($v))) {
-                        $this->createDoc($content, $path);
+                        $this->createDoc($content, $v);
                     } else {
                         Throw New \FilesystemException('File ' . $v . ' can\'t be read');
                     }
