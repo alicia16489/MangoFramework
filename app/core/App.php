@@ -17,6 +17,8 @@ class App
     self::$container->loaders();
 
     self::$container['Blueprints']->analyse();
+
+    var_dump(self::$container['Blueprints']->type);
   }
 
 }

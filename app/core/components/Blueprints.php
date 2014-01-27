@@ -65,6 +65,13 @@ class Blueprints extends \core\App
 
   private function isLogic()
   {
-    var_dump($this->request);
+    $class = '\ressources\logic\\'.$this->ressource;
+
+    if(class_exists ($class))
+      $ressource = new $class();
+    else
+      return;
+
+
   }
 }
