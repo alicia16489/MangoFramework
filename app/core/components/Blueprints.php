@@ -72,7 +72,27 @@ class Blueprints extends \core\App
   }
 
   public function isSubLogic(){
+    $class = 'ressources\logic\\'.$this->ressource;
+    $ressource = new $class();
 
+    foreach($ressource->routes as $route => $value)
+    {
+      if(is_array($value) && isset($value['cond'])){
+        if($this->routeMatch($route,$value['cond'])){
+          echo $value['method'];
+        }
+      }
+      else{
+        if($this->routeMatch($route)){
+          if(is_array($value))
+            echo $value['method'];
+          else
+            echo $value;
+        }
+      }
+    }
+
+    var_dump($ressource);
   }
 
   public function isRest()
@@ -87,13 +107,48 @@ class Blueprints extends \core\App
     return false;
   }
 
-  private function complexe()
+  private function isComplexe()
   {
 
   }
 
   private function getOptions()
   {
+
+  }
+
+  public function routeMatch($route, $paterns = NULL)
+  {
+    $pathInfo = $this->request->properties['REQUEST_OPTION'];
+    $split = explode("/",$route);
+
+    // build regex
+    $regex = "#^\/";
+    foreach($split as $key => $part)
+    {
+      if($key > 1)
+        $regex .= "\/";
+
+      if($part != ""){
+        if($part[0] == ":"){
+          if(!is_null($paterns) && isset($paterns[$part]))
+            $regex .= $paterns[$part];
+          else
+            $regex .= "[a-zA-Z0-9]+";
+
+        }
+        else{
+          $regex .= $part;
+        }
+
+      }
+    }
+
+    $regex .= "\/?$#";
+
+    echo $regex;
+
+    return preg_match($regex,$pathInfo);
 
   }
 }

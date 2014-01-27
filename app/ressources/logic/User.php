@@ -8,8 +8,4 @@ class User
 
   }
 
-  public function get($id)
-  {
-    echo "Ressource : User , method : get, id :".$id;
-  }
 }
