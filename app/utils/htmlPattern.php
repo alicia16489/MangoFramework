@@ -1,5 +1,7 @@
 <?php
 
+    // this class is an example for documentation generator class
+
     namespace utils;
 
     Abstract Class htmlPattern

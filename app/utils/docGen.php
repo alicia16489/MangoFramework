@@ -6,7 +6,7 @@
 
     Class docGen
     {
-        protected $filePaths = array("./htmlPattern.php");
+        protected $filePaths = array();
 
         public function __construct($filePaths, $docPattern = NULL)
         {
@@ -68,16 +68,15 @@
             $contents = preg_split($pattern, $fileContent);
             $contents = array_map('trim', $contents);
             $mediumContent = '';
-            $finalContent = '';
             $startKeys = array();
             $endKeys = array();
 
             foreach($contents as $key => $content) {
-                if ($contents[$key] === '/**') {
+                if (preg_match('#^/(\*)+$#', $contents[$key]) === 1) {
                     array_push($startKeys, $key);
                 }
 
-                if ($contents[$key] === '*/') {
+                if (preg_match('#^(\*)+/$#', $contents[$key]) === 1) {
                     array_push($endKeys, $key + 1);
                 }
             }
@@ -92,7 +91,7 @@
                 $mediumContent .= $contents[$i];
             }
 
-            $analysis = preg_split('#[*]#', $mediumContent);
+            $analysis = preg_split('#\*+#', $mediumContent);
 
             $finalContent = $this->buildOutput($analysis);
 
