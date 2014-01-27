@@ -12,13 +12,13 @@ class User
 
   public function get()
   {
-    echo "Ressource logic : User , method : index ";
+    echo "Ressource logic : User , method : get ";
   }
 
-/*  public function myMethod($id,$name)
+  public function myMethod($id,$name)
   {
     echo "myMethod ! ".$id." ".$name;
-  }*/
+  }
 
   public function myGet()
   {
