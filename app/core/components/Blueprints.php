@@ -40,6 +40,8 @@ class Blueprints extends \core\App
     $class = get_class($object);
     if (!method_exists($object, $method))
       throw new ressourceException('Method "' . $method . '" missing, logic ressource : ' . $class);
+
+    $this->method = $method;
   }
 
   public function getMethod()

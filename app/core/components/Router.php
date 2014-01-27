@@ -36,6 +36,7 @@ class Router extends Mux
     $routePatern = $this->blueprints->route;
     $this->blueprints->ressource = '\ressources\logic\\' . $this->blueprints->ressource;
 
+   echo $this->blueprints->getMethod();
     $this->add($routePatern, [$this->blueprints->ressource, $this->blueprints->getMethod()]);
 
     $this->prepare($_SERVER['PATH_INFO']);

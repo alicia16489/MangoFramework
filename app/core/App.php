@@ -17,10 +17,13 @@ class App
 
       self::$container['Router']->errorRouting();
 
+      // IS HOME ?
       if (self::$container['Blueprints']->pathInfo != '/') {
 
+        // DEFAULT STATE
         self::$container['Router']->prepare('/error/405');
 
+        // LOGIC
         if (self::$container['Blueprints']->exist['logic']) {
 
           if (self::$container['Blueprints']->isLogic()) {
@@ -34,13 +37,16 @@ class App
             self::$container['Blueprints']->type = "logic";
           }
         }
+        // END LOGIC
 
+        // PHYSICAL
         if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
 
           if (self::$container['Blueprints']->isRest()) {
             self::$container['Router']->restRouting();
           }
         }
+        // END PHYSICAL
 
       } else {
         self::$container['Router']->prepare('/error/404');

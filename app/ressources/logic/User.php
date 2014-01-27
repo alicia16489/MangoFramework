@@ -7,7 +7,7 @@ class User
       "cond" => array(
         ":id" => "\d+"
       )),
-    //"/user/:id" => "myGet"
+    "/user/:id" => "myGet"
   );
 
   public function get()
