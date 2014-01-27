@@ -7,32 +7,41 @@ use Pux\Executor;
 class Router extends Mux
 {
   private $route;
-  private $ressource;
-  private $method;
-  private $options;
+  private $blueprints;
 
   public function __construct(Blueprints $blueprints)
   {
     $this->route = '/'.strtolower($blueprints->ressource);
-    $this->ressource = strtolower($blueprints->ressource);
-    $this->method = $blueprints->method;
-    $this->options = $blueprints->options;
+    $this->blueprints = $blueprints;
+  }
+
+  public function logicRouting(){
+    $this->blueprints->ressource = '\ressources\logic\\'.$this->blueprints->ressource;
+
+    $this->add($this->route , [$this->blueprints->ressource,'get']);
+    $this->add($this->route."/" , [$this->blueprints->ressource,'get']);
+
+    $this->prepare( $_SERVER['PATH_INFO'] );
   }
 
   public function restRouting()
   {
-    $this->ressource = '\ressources\physical\\'.$this->ressource;
+    $this->blueprints->ressource = '\ressources\physical\\'.$this->blueprints->ressource;
 
-    if(!empty($this->options['id']))
-      $this->route .= "/:id";
+    $this->add($this->route."/" , [$this->blueprints->ressource,'index']);
+    $this->add($this->route , [$this->blueprints->ressource,'index']);
+    $this->add($this->route.'/:id' , [$this->blueprints->ressource,$this->blueprints->restMethod]);
 
+    $this->prepare( $_SERVER['PATH_INFO'] );
+  }
+
+  public function prepare($path)
+  {
+    $this->route = $this->dispatch($path);
   }
 
   public function execute()
   {
-    $this->add($this->route, [$this->ressource,$this->method]);
-
-    $route = $this->dispatch( $_SERVER['PATH_INFO'] );
-    Executor::execute($route);
+    Executor::execute($this->route);
   }
 }

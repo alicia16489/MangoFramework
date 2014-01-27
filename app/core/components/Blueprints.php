@@ -6,54 +6,88 @@ class Blueprints extends \core\App
 {
   private $request;
   public $ressource;
+  public $type;
+  public $exist = array();
+  public $restMethod;
   public $method;
   public $options;
 
-  private $restPaterns = array(
-    "index" => "#^\/[a-zA-Z]+\/?$#",
-    "get" => "#^\/[a-zA-Z]+\/\d+$#",
-    "post" => "#^\/[a-zA-Z]+\/?$#",
-    "put" => "#^\/[a-zA-Z]+\/\d+$#",
-    "delete" => "#^\/[a-zA-Z]+\/\d+$#"
+  private $paterns = array(
+    "rest" => array(
+      "#^\/[a-zA-Z0-9_]+\/?$#",
+      "#^\/[a-zA-Z0-9_]+\/\d+$#"
+    ),
+    "logic" => "#^\/[a-zA-Z0-9_]+\/?$#" ,
+    "complexe" => array(
+
+    )
   );
 
   public function __construct(Request $req)
   {
     $this->request = $req;
-    $this->method = strtolower($req->properties['REQUEST_METHOD']);
     $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
+    $this->restMethod = $this->method = strtolower($this->request->properties['REQUEST_METHOD']);;
+    $this->existAsLogic();
+    $this->existAsPhysical();
   }
 
-  public function isRessource()
+  private function existAsPhysical()
   {
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
+
+    if(in_array($this->ressource, $physicalList)){
+      $class = '\ressources\physical\\'.$this->ressource;
+
+      if(class_exists ($class)){
+        $this->exist['physical'] = true;
+        return;
+      }
+    }
+    $this->exist['physical'] = false;
+  }
+
+  private function existAsLogic()
+  {
     $logicList = self::$container['RessourceMap']->ressources['logic'];
 
-    if(in_array($this->ressource, $physicalList) || in_array($this->ressource,$logicList))
+    if(in_array($this->ressource,$logicList)){
+      $class = '\ressources\logic\\'.$this->ressource;
+
+      if(class_exists ($class)){
+        $this->exist['logic'] = true;
+        return;
+      }
+    }
+
+      $this->exist['logic'] = false;
+  }
+
+  public function isLogic()
+  {
+    if(preg_match($this->paterns['logic'],$this->request->properties['REQUEST_OPTION']) && !$this->exist['physical'])
       return true;
 
     return false;
   }
 
+  public function isSubLogic(){
+
+  }
+
   public function isRest()
   {
-    foreach($this->restPaterns as $method => $patern)
+    foreach($this->paterns['rest'] as $method => $patern)
     {
       if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
-        if($method == $this->method || ($this->method == "get" && $method == "index")){
-          $this->method = $method;
-
-          if($method == "get" || $method == "put" || $method == "delete")
-            $this->options['id'] = $this->request->properties['REQUEST_OPTION_PARTS'][2];
-
-          return true;
-        }
+        return true;
       }
     }
+
     return false;
   }
 
-  private function isComplexe()
+  private function complexe()
   {
 
   }

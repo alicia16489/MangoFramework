@@ -12,24 +12,28 @@ class App
   {
     self::init();
 
-    if(self::$container['Blueprints']->ressource != '/'){
+    if (self::$container['Request']->properties['REQUEST_OPTION'] != '/') {
 
-      if(self::$container['Blueprints']->isRessource()){
+      if (self::$container['Blueprints']->exist['logic']) {
 
-        if(self::$container['Blueprints']->isRest()){
+        if (self::$container['Blueprints']->isLogic()) {
 
-          self::$container['Router']->restRouting();
-          self::$container['Router']->execute();
+          self::$container['Router']->logicRouting();
+          self::$container['Blueprints']->type = "logic";
+        } elseif (self::$container['Blueprints']->isSubLogic()) {
+
         }
-
-
       }
-      else{
-        // error response
-        echo "ressource not found";
+
+      if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
+
+        if (self::$container['Blueprints']->isRest()) {
+          self::$container['Router']->restRouting();
+        }
       }
-    }
-    else{
+
+      self::$container['Router']->execute();
+    } else {
       // error response
     }
   }
@@ -39,6 +43,7 @@ class App
     self::autoloader();
     self::$container = Container::getInstance();
     self::$container->loaders();
+
 
   }
 
