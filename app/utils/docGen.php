@@ -19,14 +19,45 @@
 
         public function appendContent($content, $path)
         {
-            $pattern = "#[" . $content . "]#";
+            $searchTrim = array(' ', "\t", "\n", "\r", "\0", "\x0B");
+            $contentTrim = str_replace($searchTrim, '', $content);
+            $contentTrim = str_replace('*', '\*', $contentTrim);
+            $contentTrim = str_replace('{', '\{', $contentTrim);
+            $contentTrim = str_replace('}', '\}', $contentTrim);
+            $contentTrim = str_replace(')', '\)', $contentTrim);
+            $contentTrim = str_replace('(', '\(', $contentTrim);
+            $contentTrim = str_replace(']', '\]', $contentTrim);
+            $contentTrim = str_replace('[', '\[', $contentTrim);
+            $contentTrim = str_replace('|', '\|', $contentTrim);
+            $contentTrim = str_replace('$', '\$', $contentTrim);
 
-            if (!preg_match($pattern, file_get_contents($path))) {
+            $pattern = "#" . $contentTrim . "#i";
+
+            $docContent = str_replace($searchTrim, '', file_get_contents($path));
+
+            if (preg_match($pattern, $docContent) !== 1) {
                 file_put_contents($path, $content, FILE_APPEND);
             }
         }
 
-        public function getAnalysis($fileContent, $startKey = NULL, $endKey = NULL)
+        public function buildOutput($analysis)
+        {
+            $finalContent = '';
+
+            foreach($analysis as $key => $analys) {
+                if ($key === 0) {
+                    $finalContent .= "/**\n";
+                } else if ($key === count($analysis) - 1) {
+                    $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n\n";
+                } else {
+                    $finalContent .= " * " . trim($analys) . "\n";
+                }
+            }
+
+            return $finalContent;
+        }
+
+        public function createDoc($fileContent, $path, $startKey = NULL, $endKey = NULL)
         {
             if (!empty($this->pattern)) {
                 $pattern = $this->pattern;
@@ -36,8 +67,8 @@
 
             $contents = preg_split($pattern, $fileContent);
             $contents = array_map('trim', $contents);
-            $finalContent = '';
             $mediumContent = '';
+            $finalContent = '';
             $startKeys = array();
             $endKeys = array();
 
@@ -53,7 +84,7 @@
 
             if (is_null($startKey) && is_null($endKey)) {
                 foreach ($startKeys as $key => $value) {
-                    $this->getAnalysis($fileContent, $value, $endKeys[$key]);
+                    $this->createDoc($fileContent, $path, $value, $endKeys[$key]);
                 }
             }
 
@@ -63,27 +94,19 @@
 
             $analysis = preg_split('#[*]#', $mediumContent);
 
-            foreach($analysis as $key => $analys) {
-                if ($key === 0) {
-                    $finalContent .= "/**\n";
-                } else if ($key === count($analysis) - 1) {
-                    $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n\n";
-                } else {
-                    $finalContent .= " * " . trim($analys) . "\n";
-                }
-            }
+            $finalContent = $this->buildOutput($analysis);
 
             if (count($analysis) > 1) {
-                $this->appendContent($finalContent, 'doc.php');
+                $this->appendContent($finalContent, $path);
             }
         }
 
-        public function create()
+        public function create($path = 'doc.php')
         {
             foreach ($this->filePaths as $v) {
                 if (file_exists($v)) {
                     if (FALSE !== ($content = file_get_contents($v))) {
-                        $this->getAnalysis($content);
+                        $this->createDoc($content, $path);
                     } else {
                         Throw New \FilesystemException('File ' . $v . ' can\'t be read');
                     }
