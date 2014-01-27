@@ -14,21 +14,21 @@ class Container extends \Pimple
 
     return self::$container;
   }
-  
+
   public function __construct()
   {
     $this['dependancies'] = array(
-      'Config' => __NAMESPACE__.'\components\Config',
-      'Request' => __NAMESPACE__.'\components\Request',
-      'Blueprints' => __NAMESPACE__.'\components\Blueprints',
-      'Router' => __NAMESPACE__.'\components\Router',
-      'Response' => __NAMESPACE__.'\components\Response',
-      'RessourceMap' => __NAMESPACE__.'\components\RessourceMap'
+      'Config' => __NAMESPACE__ . '\components\Config',
+      'Request' => __NAMESPACE__ . '\components\Request',
+      'Blueprints' => __NAMESPACE__ . '\components\Blueprints',
+      'Router' => __NAMESPACE__ . '\components\Router',
+      'Response' => __NAMESPACE__ . '\components\Response',
+      'RessourceMap' => __NAMESPACE__ . '\components\RessourceMap'
     );
 
-    foreach($this['dependancies'] as $key => $path){
-      if(!class_exists($path)){
-        throw new \Exception('Missing components : '.$key.' at path : '.$path);
+    foreach ($this['dependancies'] as $key => $path) {
+      if (!class_exists($path)) {
+        throw new \Exception('Missing components : ' . $key . ' at path : ' . $path);
       }
     }
   }

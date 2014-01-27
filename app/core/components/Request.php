@@ -14,8 +14,8 @@ class Request
     $env['SERVER_PORT'] = $_SERVER['SERVER_PORT'];
     $env['SERVER_NAME'] = $_SERVER['SERVER_NAME'];
     $env['REQUEST_METHOD'] = $_SERVER['REQUEST_METHOD'];
-    $env['REQUEST_OPTION'] = (empty($_SERVER['PATH_INFO']))? '/' : $_SERVER['PATH_INFO'];
-    $env['REQUEST_OPTION_PARTS'] = explode("/",$env['REQUEST_OPTION']);
+    $env['REQUEST_OPTION'] = (empty($_SERVER['PATH_INFO'])) ? '/' : $_SERVER['PATH_INFO'];
+    $env['REQUEST_OPTION_PARTS'] = explode("/", $env['REQUEST_OPTION']);
 
     $this->properties = $env;
 
