@@ -4,7 +4,8 @@ namespace core\components;
 
 class Blueprints extends \core\App
 {
-  private $request;
+  public $route;
+  public $pathInfo;
   public $ressource;
   public $type;
   public $exist = array();
@@ -14,20 +15,20 @@ class Blueprints extends \core\App
 
   private $paterns = array(
     "rest" => array(
-      "#^\/[a-zA-Z0-9_]+\/?$#",
-      "#^\/[a-zA-Z0-9_]+\/\d+$#"
+      "#^\/[a-zA-Z0-9]+\/?$#",
+      "#^\/[a-zA-Z0-9]+\/\d+$#"
     ),
-    "logic" => "#^\/[a-zA-Z0-9_]+\/?$#" ,
+    "logic" => "#^\/[a-zA-Z0-9]+\/?$#" ,
     "complexe" => array(
 
     )
   );
 
-  public function __construct(Request $req)
+  public function __construct(Request $request)
   {
-    $this->request = $req;
-    $this->ressource = ucfirst($req->properties['REQUEST_OPTION_PARTS'][1]);
-    $this->restMethod = $this->method = strtolower($this->request->properties['REQUEST_METHOD']);;
+    $this->pathInfo = $request->properties['REQUEST_OPTION'];
+    $this->ressource = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]);
+    $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);;
     $this->existAsLogic();
     $this->existAsPhysical();
   }
@@ -65,41 +66,59 @@ class Blueprints extends \core\App
 
   public function isLogic()
   {
-    if(preg_match($this->paterns['logic'],$this->request->properties['REQUEST_OPTION']) && !$this->exist['physical'])
-      return true;
+    if(preg_match($this->paterns['logic'],$this->pathInfo)){
+      $class = 'ressources\logic\\'.$this->ressource;
+      $ressource = new $class();
+
+      if(method_exists($ressource,'get')){
+        return true;
+      }
+    }
 
     return false;
   }
 
   public function isSubLogic(){
-    $class = 'ressources\logic\\'.$this->ressource;
-    $ressource = new $class();
 
-    foreach($ressource->routes as $route => $value)
-    {
-      if(is_array($value) && isset($value['cond'])){
-        if($this->routeMatch($route,$value['cond'])){
-          echo $value['method'];
+    if(!preg_match($this->paterns['logic'],$this->pathInfo)){
+      $class = 'ressources\logic\\'.$this->ressource;
+      $ressource = new $class();
+
+      if(property_exists($class,"routes")){
+        foreach($ressource->routes as $route => $value)
+        {
+          if(is_array($value) && isset($value['cond'])){
+            if($this->routeMatch($route,$value['cond'])){
+              $this->method = $value['method'];
+              $this->route = $route;
+              return true;
+            }
+          }
+          else{
+            if($this->routeMatch($route)){
+              if(is_array($value))
+                $this->method = $value['method'];
+              else
+                $this->method = $value;
+
+              $this->route = $route;
+
+              return true;
+            }
+          }
         }
       }
-      else{
-        if($this->routeMatch($route)){
-          if(is_array($value))
-            echo $value['method'];
-          else
-            echo $value;
-        }
-      }
+
     }
 
-    var_dump($ressource);
+    return false;
   }
 
   public function isRest()
   {
     foreach($this->paterns['rest'] as $method => $patern)
     {
-      if(preg_match($patern,$this->request->properties['REQUEST_OPTION'])){
+      if(preg_match($patern,$this->pathInfo)){
         return true;
       }
     }
@@ -119,7 +138,6 @@ class Blueprints extends \core\App
 
   public function routeMatch($route, $paterns = NULL)
   {
-    $pathInfo = $this->request->properties['REQUEST_OPTION'];
     $split = explode("/",$route);
 
     // build regex
@@ -146,9 +164,7 @@ class Blueprints extends \core\App
 
     $regex .= "\/?$#";
 
-    echo $regex;
-
-    return preg_match($regex,$pathInfo);
+    return preg_match($regex,$this->pathInfo);
 
   }
 }

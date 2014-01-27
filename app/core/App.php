@@ -11,8 +11,11 @@ class App
   public static function run()
   {
     self::init();
+    self::$container['Router']->errorRouting();
 
-    if (self::$container['Request']->properties['REQUEST_OPTION'] != '/') {
+    if (self::$container['Blueprints']->pathInfo != '/') {
+
+      self::$container['Router']->prepare('/error/405');
 
       if (self::$container['Blueprints']->exist['logic']) {
 
@@ -20,8 +23,11 @@ class App
 
           self::$container['Router']->logicRouting();
           self::$container['Blueprints']->type = "logic";
-        } elseif (self::$container['Blueprints']->isSubLogic()) {
+        }
+        elseif (self::$container['Blueprints']->isSubLogic()) {
 
+          self::$container['Router']->subLogicRouting();
+          self::$container['Blueprints']->type = "logic";
         }
       }
 
@@ -32,10 +38,13 @@ class App
         }
       }
 
-      self::$container['Router']->execute();
     } else {
-      // error response
+      self::$container['Router']->prepare('/error/404');
     }
+
+    self::$container['Router']->execute();
+
+    // send response
   }
 
   public static function init()

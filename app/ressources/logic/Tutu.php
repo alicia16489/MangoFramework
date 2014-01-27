@@ -8,7 +8,8 @@ class Tutu
     "/tutu/toto/:id/name/:name" => array("method" => "myMethod",
                                                                                 "cond" => array(
                                                                                   ":id" => "\d+"
-                                                                                ))
+                                                                                )),
+    "tutu/:id" => "myGet"
   );
 
   public function get()
@@ -19,5 +20,10 @@ class Tutu
   public function myMethod()
   {
 
+  }
+
+  public function myget()
+  {
+    echo "myGet";
   }
 }
