@@ -2,6 +2,7 @@
 
 namespace core;
 
+use core\components\ressourceException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
@@ -11,38 +12,44 @@ class App
   public static function run()
   {
     self::init();
-    self::$container['Router']->errorRouting();
 
-    if (self::$container['Blueprints']->pathInfo != '/') {
+    try {
 
-      self::$container['Router']->prepare('/error/405');
+      self::$container['Router']->errorRouting();
 
-      if (self::$container['Blueprints']->exist['logic']) {
+      if (self::$container['Blueprints']->pathInfo != '/') {
 
-        if (self::$container['Blueprints']->isLogic()) {
+        self::$container['Router']->prepare('/error/405');
 
-          self::$container['Router']->logicRouting();
-          self::$container['Blueprints']->type = "logic";
+        if (self::$container['Blueprints']->exist['logic']) {
+
+          if (self::$container['Blueprints']->isLogic()) {
+
+            self::$container['Router']->logicRouting();
+            self::$container['Blueprints']->type = "logic";
+          } elseif (self::$container['Blueprints']->isSubLogic()) {
+
+            echo "isSubLogic <br>";
+            self::$container['Router']->subLogicRouting();
+            self::$container['Blueprints']->type = "logic";
+          }
         }
-        elseif (self::$container['Blueprints']->isSubLogic()) {
 
-          self::$container['Router']->subLogicRouting();
-          self::$container['Blueprints']->type = "logic";
+        if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
+
+          if (self::$container['Blueprints']->isRest()) {
+            self::$container['Router']->restRouting();
+          }
         }
+
+      } else {
+        self::$container['Router']->prepare('/error/404');
       }
 
-      if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
-
-        if (self::$container['Blueprints']->isRest()) {
-          self::$container['Router']->restRouting();
-        }
-      }
-
-    } else {
-      self::$container['Router']->prepare('/error/404');
+      self::$container['Router']->execute();
+    } catch (ressourceException $e) {
+      var_dump($e);
     }
-
-    self::$container['Router']->execute();
 
     // send response
   }

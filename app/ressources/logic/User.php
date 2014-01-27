@@ -15,10 +15,10 @@ class User
     echo "Ressource logic : User , method : index ";
   }
 
-  public function myMethod($id,$name)
+/*  public function myMethod($id,$name)
   {
     echo "myMethod ! ".$id." ".$name;
-  }
+  }*/
 
   public function myGet()
   {
