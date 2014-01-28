@@ -7,10 +7,10 @@ class User
     //"/user/:id" => "myGet"
   );
 
-/*  public function get()
+  public function get()
   {
     echo "Ressource logic : User , method : get ";
-  }*/
+  }
 
   public function myMethod($id,$name)
   {

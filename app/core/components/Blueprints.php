@@ -17,7 +17,7 @@ class Blueprints extends \core\App
   private $method;
   public $options;
 
-  private $paterns = array(
+  private $patterns = array(
     "rest" => array(
       "#^\/[a-zA-Z0-9]+\/?$#",
       "#^\/[a-zA-Z0-9]+\/\d+$#"
@@ -82,7 +82,7 @@ class Blueprints extends \core\App
 
   public function isLogic()
   {
-    if (preg_match($this->paterns['logic'], $this->pathInfo)) {
+    if (preg_match($this->patterns['logic'], $this->pathInfo)) {
       $class = 'ressources\logic\\' . $this->ressource;
       $ressource = new $class();
 
@@ -96,12 +96,15 @@ class Blueprints extends \core\App
 
   public function isSubLogic()
   {
-    if (!preg_match($this->paterns['logic'], $this->pathInfo)) {
+    if (!preg_match($this->patterns['logic'], $this->pathInfo)) {
       $class = 'ressources\logic\\' . $this->ressource;
       $ressource = new $class();
 
       if (property_exists($class, "routes")) {
         foreach ($ressource->routes as $route => $value) {
+          if($route[0] != '/'){
+            $route = '/'.$route;
+          }
           if (is_array($value) && isset($value['cond'])) {
             if ($this->routeMatch($route, $value['cond'])) {
               $this->setMethod($value['method'], $ressource);
@@ -132,12 +135,12 @@ class Blueprints extends \core\App
   {
     $route = '/'.strtolower($this->ressource);
     $param = '/:id';
-    $patern = array(':id' => '\d+');
+    $pattern = array(':id' => '\d+');
 
-    if($this->routeMatch($route,$patern)){
+    if($this->routeMatch($route,$pattern)){
       return true;
     }
-    elseif($this->routeMatch($route.$param,$patern)){
+    elseif($this->routeMatch($route.$param,$pattern)){
       return true;
     }
 
@@ -181,6 +184,5 @@ class Blueprints extends \core\App
     $regex .= "\/?$#";
 
     return preg_match($regex, $this->pathInfo);
-
   }
 }
