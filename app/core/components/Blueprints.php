@@ -96,7 +96,6 @@ class Blueprints extends \core\App
 
   public function isSubLogic()
   {
-
     if (!preg_match($this->paterns['logic'], $this->pathInfo)) {
       $class = 'ressources\logic\\' . $this->ressource;
       $ressource = new $class();

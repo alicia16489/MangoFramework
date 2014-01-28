@@ -21,7 +21,7 @@ class App
       if (self::$container['Blueprints']->pathInfo != '/') {
 
         // DEFAULT STATE
-        self::$container['Router']->prepare('/error/405');
+        //self::$container['Router']->prepare('/error/405');
 
         // LOGIC
         if (self::$container['Blueprints']->exist['logic']) {

@@ -1,5 +1,6 @@
 <?php
 namespace ressources\physical;
+use \core\App;
 class User
 {
   public function index()
@@ -12,6 +13,7 @@ class User
   public function get($id)
   {
     echo "Ressource : User , method : get, id :".$id;
+    var_dump(App::$container);
   }
 
   public function put($id)

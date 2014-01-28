@@ -66,6 +66,7 @@ class Router extends Mux
 
   public function execute()
   {
-    Executor::execute($this->route);
+    if(!empty($this->route))
+      Executor::execute($this->route);
   }
 }
