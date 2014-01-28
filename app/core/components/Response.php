@@ -327,7 +327,7 @@
             $this->errorData = NULL;
 
             $params = array(
-                "code" => 400,
+                "code" => 200,
                 "encode" => TRUE,
                 "replace" => FALSE,
                 "die" => TRUE,
