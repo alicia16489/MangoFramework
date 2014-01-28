@@ -4,14 +4,14 @@
 
     namespace utils;
 
-    Abstract Class htmlPattern
+    Abstract Class HtmlPattern
     {
         /**
          * Mapped events.
          *
          * @var array
          */
-        public $tag = array(
+        public static $tag = array(
             'doctype' => array(
                 '<DOCTYPE html>'
             ),
@@ -81,7 +81,7 @@
             ),
         );
 
-        protected $meta = array(
+        public static $meta = array(
             'meta-name' => array(
                 'charset' => 'utf-8',
                 'content-Type' => 'text/html',
@@ -93,7 +93,7 @@
          *
          * @var array
          */
-        protected $style = array(
+        public static $style = array(
             'class-name-or-id-name' => array(
                 'border' => '1px solid black',
                 'color' => '#FF0000',
@@ -123,7 +123,7 @@
                     }
                 }
 
-                $this->${$name} = array_merge($this->${$name}, $tab);
+                self::${$name} = array_merge(self::${$name}, $tab);
             } else {
                 Throw new \Exception('Invalid var type : $meta');
             }
