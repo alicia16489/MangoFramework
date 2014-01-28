@@ -23,6 +23,8 @@
             // Informational
             100 => '100 Continue',
             101 => '101 Switching Protocols',
+            102 => 'Processing',
+            118 => 'Connection timed out',
             // Success
             200 => 'OK',
             201 => 'Created',
@@ -31,6 +33,9 @@
             204 => 'No Content',
             205 => 'Reset Content',
             206 => 'Partial Content',
+            207 => 'Multi-Status',
+            210 => 'Content Different',
+            226 => 'IM Used',
             // Redirection
             300 => 'Multiple Choices',
             301 => 'Moved Permanently',
@@ -39,6 +44,8 @@
             304 => 'Not Modified',
             305 => 'Use Proxy',
             307 => 'Temporary Redirect',
+            308 => 'Permanent Redirect',
+            310 => 'Too many Redirect',
             // Client Error
             400 => 'Bad Request',
             401 => 'Unauthorized',
@@ -57,13 +64,29 @@
             415 => 'Unsupported Media Type',
             416 => 'Requested Range Not Satisfiable',
             417 => 'Expectation Failed',
+            418 => 'I\'m a teapot', //RFC 2324
+            422 => 'Unprocessable Entity',
+            423 => 'Locked',
+            424 => 'Failed Dependency',
+            425 => 'Reserved for WebDAV advanced collections expired proposal',
+            426 => 'Upgrade required',
+            428 => 'Precondition Required',
+            429 => 'Too Many Requests',
+            431 => 'Request Header Fields Too Large',
+            449 => 'Retry With',
+            450 => 'Blocked by Windows Parental Controls',
+            456 => 'Unrecoverable Error',
+            499 => 'client has closed connection',
             // Server Error
             500 => 'Internal Server Error',
             501 => 'Not Implemented',
             502 => 'Bad Gateway',
             503 => 'Service Unavailable',
             504 => 'Gateway Timeout',
-            505 => 'HTTP Version Not Supported'
+            505 => 'HTTP Version Not Supported',
+            509 => 'Bandwidth Limit Exceeded',
+            510 => 'Not extended',
+            520 => 'Web server is returning an unknown error',
         );
 
         public function __construct() {}
@@ -89,7 +112,7 @@
             return $this;
         }
 
-        public function getStatus($messageOnly = FALSE, $code = NULL)
+        public function getStatus($code = NULL, $messageOnly = FALSE)
         {
             if (is_null($code)) {
                 $code = $this->status;
@@ -261,13 +284,15 @@
 
         public function sendHeader()
         {
+            header('HTTP/1.0 '.$this->getStatus());
+
             foreach($this->headers as $key => $value) {
                 if (is_array($value)) {
                     foreach ($value as $v) {
-                        header($key . ': ' . $v, false);
+                        header($key . ': ' . $v, FALSE);
                     }
                 } else {
-                    header($key . ': ' . $value);
+                    header($key . ': ' . $value, TRUE);
                 }
             }
         }
@@ -302,7 +327,7 @@
             $this->errorData = NULL;
 
             $params = array(
-                "code" => 200,
+                "code" => 400,
                 "encode" => TRUE,
                 "replace" => FALSE,
                 "die" => TRUE,

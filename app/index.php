@@ -28,7 +28,7 @@
     );
 
     // set response type (json html or xml)
-    core\App::$container['Response']->setType('html');
+    core\App::$container['Response']->setType('json');
 
     // set pretty print or not to have a beautiful JSON print
     core\App::$container['Response']->setPrettyPrint(TRUE);
@@ -53,4 +53,4 @@
 
     $docGen = new utils\docGen(array('utils/htmlPattern.php', 'utils/docGen.php'));
     $docGen->create();
-    var_dump($docGen->analysis);
+    //var_dump($docGen->analysis);
