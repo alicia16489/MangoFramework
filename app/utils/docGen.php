@@ -33,7 +33,7 @@
         public function appendContent($content)
         {
             $searchTrim = array(' ', "\t", "\n", "\r", "\0", "\x0B");
-            $searchClean = array('*', '{', '}', '(', ')', '[', ']', '|', '$', '.', '#', '?');
+            $searchClean = array('*', '{', '}', '(', ')', '[', ']', '|', '$', '.', '#', '?', '^');
 
             $contentClean = $this->cleanPattern($searchTrim, $content);
 
@@ -68,24 +68,53 @@
             return $headerContent;
         }
 
-        public function  buildFooter($file)
-        {
-            $footerContent = "\n---END OF FILE : " . $file . "---\n\n\n";
-
-            return $footerContent;
-        }
-
-        public function buildMethodAnalysis($analysis)
+        public function buildMethodAnalysis($analysis, $count)
         {
             $finalContent = '';
+            $method = NULL;
+            $attr = NULL;
+
+            if ($count === 0 && !is_null($attr) && $attr === TRUE) {
+                $finalContent .= "\n---ATTRIBUTES---\n\n";
+            } else if ($count === 0 && !is_null($method) && $method === TRUE) {
+                $finalContent .= "\n---METHODS---\n\n";
+            } else if ($count > 0 && !is_null($method) && $method === TRUE && $attr === FALSE) {
+                $finalContent .= "\n---METHODS---\n\n";
+            }
 
             foreach ($analysis as $key => $analys) {
                 if ($key === 0) {
                     $finalContent .= "/**\n";
                 } else if ($key === count($analysis) - 1) {
-                    if (preg_match('#public|protected|private#', $analys) === 1) {
+                    if (preg_match('#(public|protected|private|static|var)\s\$[a-zA-Z]+#', $analys)) {
+                        if (empty($attr)) {
+                            $attr = TRUE;
+                        }
+
+                        if (preg_match('#array#', $analys) === 1) {
+                            $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . ")\n\n";
+                        } else {
+                            $finalContent .= " */\n" . substr($analys, strpos($analys, 'p'), strlen($analys)-1) . "\n\n";
+                        }
+                    } else if (preg_match('#(public|protected|private|static)\s(function)\s[a-zA-Z]+#', $analys) === 1) {
+                        if (empty($method)) {
+                            if (empty($attr)) {
+                                $attr = FALSE;
+                            }
+
+                            $method = TRUE;
+                        }
+
                         $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n";
-                    } else if (preg_match('#function#', $analys) === 1) {
+                    } else if (preg_match('#(function)\s[a-zA-Z]+#', $analys) === 1) {
+                        if (empty($method)) {
+                            if (empty($attr)) {
+                                $attr = FALSE;
+                            }
+
+                            $method = TRUE;
+                        }
+
                         $finalContent .= " */\n" . substr($analys, strpos($analys, 'f')) . " {}\n\n";
                     }
                 } else {
@@ -94,6 +123,13 @@
             }
 
             return $finalContent;
+        }
+
+        public function  buildFooter($file)
+        {
+            $footerContent = "\n---END OF FILE : " . $file . "---\n\n\n";
+
+            return $footerContent;
         }
 
         public function createDoc($fileContent, $file, $startKey = NULL, $endKey = NULL, $count = 0)
@@ -140,7 +176,6 @@
                 $mediumContent .= $contents[$i];
             }
 
-
             $analysis = preg_split('#\*#', $mediumContent);
 
             // headers
@@ -151,7 +186,7 @@
                 }
             }
 
-            $finalContent = $this->buildMethodAnalysis($analysis);
+            $finalContent = $this->buildMethodAnalysis($analysis, $count);
 
             // analysis
             if (count($analysis) > 1) {

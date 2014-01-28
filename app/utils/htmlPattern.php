@@ -6,6 +6,11 @@
 
     Abstract Class htmlPattern
     {
+        /**
+         * Mapped events.
+         *
+         * @var array
+         */
         public $tag = array(
             'doctype' => array(
                 '<DOCTYPE html>'
@@ -83,6 +88,11 @@
             )
         );
 
+        /**
+         * Style properties.
+         *
+         * @var array
+         */
         protected $style = array(
             'class-name-or-id-name' => array(
                 'border' => '1px solid black',

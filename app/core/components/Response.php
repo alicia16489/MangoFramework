@@ -11,6 +11,8 @@
         protected $type = 'json';
         protected $data = NULL;
         protected $defaultData;
+        public $encodedErrorData = TRUE;
+        protected $errorData = NULL;
         public $prettyPrint = FALSE;
         protected $validType = array(
             "json",
@@ -142,7 +144,7 @@
             if (in_array($type, $this->validType)) {
                 $this->type = $type;
             } else {
-                Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
+                $this->defaultData = "Invalid response format : must be 'json', 'xml' or 'html'";
             }
         }
 
@@ -270,6 +272,12 @@
             }
         }
 
+        private function isDataError($data)
+        {
+            $this->errorData = TRUE;
+            return $this->jsonEncodeUTF8($data);
+        }
+
         public function send($die = TRUE, $erasePrevBuffer = TRUE)
         {
             if ($erasePrevBuffer === TRUE) {
@@ -292,6 +300,8 @@
         // Should be on of App.php's method..
         public function sendResponse($customParams = NULL)
         {
+            $this->errorData = NULL;
+
             $params = array(
                 "code" => 200,
                 "encode" => TRUE,
@@ -314,12 +324,24 @@
             if (in_array($this->type, $this->validType)) {
                 $type = $this->type;
             } else {
-                Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
+                $data = "Invalid response format : must be 'json', 'xml' or 'html'";
             }
 
-            $encodedData = (($params['encode'] === TRUE) ? (($type === 'json' || $type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, $params['xmlFile'])) : $type);
+            if ($params['encode'] === TRUE) {
+                if ($type === 'json') {
+                    $encodedData =  $this->jsonEncodeUTF8($data);
+                } else if ($type === 'html') {
+                    if (!is_array($data)) {
+                        $encodedData = $data;
+                    } else {
+                        $encodedData = $this->isDataError('Invalid var type : $data can\'t be an array in html response mode');
+                    }
+                } else if ($type === 'xml') {
+                    $encodedData = $this->xmlEncode($data, NULL, $params['xmlFile']);
+                }
+            }
 
-            if ($this->type === 'json') {
+            if ($this->type === 'json' || ($this->errorData === TRUE && $this->encodedErrorData === TRUE)) {
                 $contentType = 'application/json';
             } else if ($this->type === 'html') {
                 $contentType = 'text/html';
