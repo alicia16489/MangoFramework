@@ -53,6 +53,7 @@ class App
       }
 
       self::$container['Router']->execute();
+
     } catch (ressourceException $e) {
       var_dump($e);
     }

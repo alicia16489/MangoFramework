@@ -130,10 +130,15 @@ class Blueprints extends \core\App
 
   public function isRest()
   {
-    foreach ($this->paterns['rest'] as $method => $patern) {
-      if (preg_match($patern, $this->pathInfo)) {
-        return true;
-      }
+    $route = '/'.strtolower($this->ressource);
+    $param = '/:id';
+    $patern = array(':id' => '\d+');
+
+    if($this->routeMatch($route,$patern)){
+      return true;
+    }
+    elseif($this->routeMatch($route.$param,$patern)){
+      return true;
     }
 
     return false;
