@@ -3,11 +3,19 @@ namespace ressources\physical;
 use \core\App;
 class User
 {
+  public function before()
+  {
+    echo "BEFORE : User";
+  }
+
+  public function after()
+  {
+    echo "AFTER : User";
+  }
+
   public function index()
   {
     echo "Ressource : User , method : index ";
-
-    return array("salut");
   }
 
   public function get($id)

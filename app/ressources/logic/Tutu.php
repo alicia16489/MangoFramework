@@ -17,6 +17,11 @@ class Tutu
     echo "get logic";
   }
 
+  public function after()
+  {
+    echo "AFTER : tutu";
+  }
+
   public function myMethod()
   {
     echo "here";

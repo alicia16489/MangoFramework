@@ -7,10 +7,20 @@ class User
     //"/user/:id" => "myGet"
   );
 
-  public function get()
+  public function before()
+  {
+    echo "BEFORE : logic User";
+  }
+
+  public function after()
+  {
+    echo "AFTER : logic User";
+  }
+
+/*  public function get()
   {
     echo "Ressource logic : User , method : get ";
-  }
+  }*/
 
   public function myMethod($id,$name)
   {

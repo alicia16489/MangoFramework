@@ -1,9 +1,10 @@
 <?php
 
 namespace core\components;
-
 use Pux\Mux;
 use Pux\Executor;
+
+class RouterException extends \Exception{};
 
 class Router extends Mux
 {
@@ -53,7 +54,26 @@ class Router extends Mux
     $this->put($routePatern . '/:id', [$this->blueprints->ressource, $this->blueprints->restMethod]);
     $this->delete($routePatern . '/:id', [$this->blueprints->ressource, $this->blueprints->restMethod]);
 
+
     $this->prepare($_SERVER['PATH_INFO']);
+  }
+
+  public function beforeRouting(){
+    $this->add('/before-wxx45wx4',[$this->blueprints->ressource,'before']);
+    try
+    {
+      Executor::execute($this->dispatch('/before-wxx45wx4'));
+    }
+    catch(\Exception $e){}
+  }
+
+  public function afterRouting(){
+    $this->add('/after-wxx45wx4',[$this->blueprints->ressource,'after']);
+    try
+    {
+      Executor::execute($this->dispatch('/after-wxx45wx4'));
+    }
+    catch(\Exception $e){}
   }
 
   public function prepare($path)
@@ -66,7 +86,18 @@ class Router extends Mux
 
   public function execute()
   {
-    if(!empty($this->route))
-      Executor::execute($this->route);
+    $ressource = new $this->blueprints->ressource();
+    if(method_exists($ressource,$this->route[2][1])){
+      $this->beforeRouting();
+
+      if(!empty($this->route))
+        Executor::execute($this->route);
+
+      $this->afterRouting();
+    }
+    else{
+      throw new RouterException('');
+    }
+
   }
 }

@@ -3,6 +3,7 @@
 namespace core;
 
 use core\components\ressourceException;
+use core\components\RouterException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
@@ -14,8 +15,6 @@ class App
     self::init();
 
     try {
-
-      self::$container['Router']->errorRouting();
 
       // IS HOME ?
       if (self::$container['Blueprints']->pathInfo != '/') {
@@ -52,7 +51,17 @@ class App
         self::$container['Router']->prepare('/error/404');
       }
 
-      self::$container['Router']->execute();
+      if(self::$container['Blueprints']->exist['logic'] || self::$container['Blueprints']->exist['physical']){
+        try
+        {
+          self::$container['Router']->execute();
+        }
+        catch(RouterException $e)
+        {
+          // no method
+        }
+      }
+
 
     } catch (ressourceException $e) {
       var_dump($e);
