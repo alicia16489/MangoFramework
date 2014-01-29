@@ -114,8 +114,9 @@
                 if ($key === 0) {
                     $finalContent .= "/**\n";
                 } else if ($key === count($analysis) - 1) {
-                    if (preg_match('#(public|protected|private|static|var)\s\$[a-zA-Z]+#', $analys)) {
-                        if (preg_match('#array#', $analys) === 1) {
+                    if (preg_match('#(public|protected|private|static|var)\s\$[a-zA-Z]+#', $analys, $attr)) {
+
+                        if (preg_match('#array\($#', $analys) === 1) {
                             $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . ")\n\n";
                         } else {
                             $finalContent .= " */\n" . substr($analys, strpos($analys, 'p'), strlen($analys)-1) . "\n\n";
@@ -124,6 +125,45 @@
                         $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n";
                     } else if (preg_match('#(function)\s[a-zA-Z]+#', $analys) === 1) {
                         $finalContent .= " */\n" . substr($analys, strpos($analys, 'f')) . " {}\n\n";
+                    }
+                } else {
+                    $finalContent .= " * " . trim($analys) . "\n";
+                }
+            }
+
+            return $finalContent;
+        }
+
+        /**
+         * Build the structure to represent the analysis of each parsed file
+         * in the comming documentation file
+         *
+         * @type: method
+         * @param: array $analysis contain the analysis of each parsed file
+         * @return: string $finalContent structured analysis to push in an array
+         */
+        public function buildAnalysisToArray($analysis)
+        {
+            $finalContent = '';
+
+            foreach ($analysis as $key => $analys) {
+                if ($key === 0) {
+                    if (preg_match('#function#', $analysis[count($analysis) - 1])) {
+                        $finalContent .= "method";
+                    } else {
+                        $finalContent .= "attribute";
+                    }
+                } else if ($key === count($analysis) - 1) {
+                    if (preg_match('#((public|protected|private)|(static)|(var))\s\$[a-zA-Z]+#', $analys)) {
+                        if (preg_match('#array\($#', $analys) === 1) {
+                            $finalContent .= " *" . substr($analys, strpos($analys, 'p')) . ")";
+                        } else {
+                            $finalContent .= " *" . substr($analys, strpos($analys, 'p'), strlen($analys)-1);
+                        }
+                    } else if (preg_match('#^(public|protected|private|static)\s(function)\s[a-zA-Z]+#', $analys) === 1) {
+                        $finalContent .= " *" . substr($analys, strpos($analys, 'p')) . "";
+                    } else if (preg_match('#^(function)\s[a-zA-Z]+#', $analys) === 1) {
+                        $finalContent .= " *" . substr($analys, strpos($analys, 'f')) . "";
                     }
                 } else {
                     $finalContent .= " * " . trim($analys) . "\n";
@@ -205,28 +245,31 @@
 
             $analysis = preg_split('#\*#', $mediumContent);
 
+            $formattedAnalysis = preg_split('#\*#', $this->buildAnalysisToArray($analysis));
+            $formattedAnalysis = array_map('trim', $formattedAnalysis);
+
             // headers
             if (!empty($headers)) {
                 if ($count === 0) {
-                    $headerContent = $this->buildHeader($headers);
+                    //$headerContent = $this->buildHeader($headers);
                     $this->analysis->fullContent[(int)$this->fileNumber]["header"] = $headers;
-                    $this->appendContent($headerContent);
+                    //$this->appendContent($headerContent);
                 }
             }
 
-            $finalContent = $this->buildAnalysis($analysis);
+            //$finalContent = $this->buildAnalysis($analysis);
 
             // analysis
             if (count($analysis) > 1) {
-                $this->appendContent($finalContent);
-                $this->analysis->fullContent[(int)$this->fileNumber]["analysis"][$count] = $analysis;
+                //$this->appendContent($finalContent);
+                $this->analysis->fullContent[(int)$this->fileNumber]["analysis"][$count] = $formattedAnalysis;
             }
 
             // footer
             if (count($startKeys) === $count) {
-                $footerContent = $this->buildFooter($file);
+                //$footerContent = $this->buildFooter($file);
                 $this->analysis->fullContent[(int)$this->fileNumber]['footer'] = trim($file);
-                $this->appendContent($footerContent);
+                //$this->appendContent($footerContent);
             }
         }
 

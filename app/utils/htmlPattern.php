@@ -125,9 +125,9 @@
         );
 
         /**
-         * Merge an array with one of htmlPattern class
+         *  Merge an array with one of htmlPattern class
          *
-         * type: method public
+         * @type: method public
          * @param: array $tab
          * @param: string $name
          * @return: void
