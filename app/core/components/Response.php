@@ -24,6 +24,7 @@
             100 => '100 Continue',
             101 => '101 Switching Protocols',
             102 => 'Processing',
+            103 => 'Checkpoint',
             118 => 'Connection timed out',
             // Success
             200 => 'OK',
@@ -34,6 +35,8 @@
             205 => 'Reset Content',
             206 => 'Partial Content',
             207 => 'Multi-Status',
+            208 => 'Already Reported',
+            209 => 'Content Returned',
             210 => 'Content Different',
             226 => 'IM Used',
             // Redirection
@@ -43,12 +46,14 @@
             303 => 'See Other',
             304 => 'Not Modified',
             305 => 'Use Proxy',
+            306 => 'Switch Proxy',
             307 => 'Temporary Redirect',
             308 => 'Permanent Redirect',
             310 => 'Too many Redirect',
             // Client Error
             400 => 'Bad Request',
             401 => 'Unauthorized',
+            402 => 'Payment Required',
             403 => 'Forbidden',
             404 => 'Not Found',
             405 => 'Method Not Allowed',
@@ -86,6 +91,7 @@
             505 => 'HTTP Version Not Supported',
             509 => 'Bandwidth Limit Exceeded',
             510 => 'Not extended',
+            511 => 'Network Authentication Required',
             520 => 'Web server is returning an unknown error',
         );
 
@@ -164,11 +170,7 @@
 
         public function setType($type)
         {
-            if (in_array($type, $this->validType)) {
-                $this->type = $type;
-            } else {
-                $this->defaultData = "Invalid response format : must be 'json', 'xml' or 'html'";
-            }
+            $this->type = $type;
         }
 
         public function setData($data, $type = 'default')
@@ -348,7 +350,7 @@
             if (in_array($this->type, $this->validType)) {
                 $type = $this->type;
             } else {
-                $data = "Invalid response format : must be 'json', 'xml' or 'html'";
+                $data = $this->isDataError("Invalid response format : must be 'json', 'xml' or 'html'");
             }
 
             if ($params['encode'] === TRUE) {
@@ -356,12 +358,15 @@
                     $encodedData =  $this->jsonEncodeUTF8($data);
                 } else if ($type === 'html') {
                     if (!is_array($data)) {
+                        die($data);
                         $encodedData = $data;
                     } else {
                         $encodedData = $this->isDataError('Invalid var type : $data can\'t be an array in html response mode');
                     }
                 } else if ($type === 'xml') {
                     $encodedData = $this->xmlEncode($data, NULL, $params['xmlFile']);
+                } else {
+                    $encodedData = $data;
                 }
             }
 

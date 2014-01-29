@@ -209,7 +209,7 @@
             if (!empty($headers)) {
                 if ($count === 0) {
                     $headerContent = $this->buildHeader($headers);
-                    $this->analysis->fullContent[(int)$this->fileNumber]["header"] = trim($this->buildHeader($headers));
+                    $this->analysis->fullContent[(int)$this->fileNumber]["header"] = $headers;
                     $this->appendContent($headerContent);
                 }
             }
@@ -219,13 +219,13 @@
             // analysis
             if (count($analysis) > 1) {
                 $this->appendContent($finalContent);
-                $this->analysis->fullContent[(int)$this->fileNumber]["analysis"][$count] = trim($this->buildAnalysis($analysis));
+                $this->analysis->fullContent[(int)$this->fileNumber]["analysis"][$count] = $analysis;
             }
 
             // footer
             if (count($startKeys) === $count) {
                 $footerContent = $this->buildFooter($file);
-                $this->analysis->fullContent[(int)$this->fileNumber]['footer'] = trim($this->buildFooter($file));
+                $this->analysis->fullContent[(int)$this->fileNumber]['footer'] = trim($file);
                 $this->appendContent($footerContent);
             }
         }

@@ -1,7 +1,5 @@
 <?php
 
-    // this class is an example for documentation generator class
-
     namespace utils;
 
     Abstract Class HtmlPattern
@@ -9,9 +7,10 @@
         /**
          * Mapped events.
          *
-         * @var array
+         * @type: attribute Array()
+         * @name: $tag
          */
-        public static $tag = array(
+        public $tag = array(
             'doctype' => array(
                 '<DOCTYPE html>'
             ),
@@ -50,6 +49,30 @@
             'td' => array(
                 '<td>',
                 '</td>'
+            ),
+            'h1' => array(
+                '<h1>',
+                '</h1>'
+            ),
+            'h2' => array(
+                '<h2>',
+                '</h2>'
+            ),
+            'h3' => array(
+                '<h3>',
+                '</h3>'
+            ),
+            'h4' => array(
+                '<h4>',
+                '</h4>'
+            ),
+            'h5' => array(
+                '<h5>',
+                '</h5>'
+            ),
+            'h6' => array(
+                '<h6>',
+                '</h6>'
             ),
             'section' => array(
                 '<section>',
@@ -91,7 +114,8 @@
         /**
          * Style properties.
          *
-         * @var array
+         * @type: attribute static Array()
+         * @name: $style
          */
         public static $style = array(
             'class-name-or-id-name' => array(
@@ -103,7 +127,7 @@
         /**
          * Merge an array with one of htmlPattern class
          *
-         * @type: method
+         * type: method public
          * @param: array $tab
          * @param: string $name
          * @return: void
@@ -132,7 +156,7 @@
         /**
          * Do nothing
          *
-         * @type: method
+         * @type: method public
          * @param: void
          * @return: void
          */
