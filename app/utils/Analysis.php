@@ -40,14 +40,14 @@
                                         $property = $type[0];
                                     }
 
-                                    if (preg_match('#^((@type.+)(attribute)).*$#', $info, $varType) === 1) {
+                                    if (preg_match('#^((@?type.+)((attribute).*))$#', $info, $attrType) === 1) {
                                         $delimitDescrKey = $fouKey - 1;
-                                        $this->builtContent[$mainKey]['analysis']['attribute'][$thiKey]['type'] = ((preg_match('#^@.+#', $varType[0]) !== FALSE) ? substr($varType[0], 1) : $varType[0]);
+                                        $this->builtContent[$mainKey]['analysis']['attribute'][$thiKey]['type'] = $attrType[3];
                                     }
 
-                                    if (preg_match('#^((@?type.+)(method)).*$#', $info, $methodType) === 1) {
+                                    if (preg_match('#^((@?type.+)((method).*))$#', $info, $methodType) === 1) {
                                         $delimitDescrKey = $fouKey - 1;
-                                        $this->builtContent[$mainKey]['analysis']['method'][$thiKey]['type'] = ((preg_match('#^@.+#', $methodType[0]) === 1) ? substr($methodType[0], 1) : $methodType[0]);
+                                        $this->builtContent[$mainKey]['analysis']['method'][$thiKey]['type'] = ltrim($methodType[3]);
                                     }
 
                                     if (preg_match('#^((@?name)(.)?(.+))$#', $info, $name) === 1) {
