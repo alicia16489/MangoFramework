@@ -34,6 +34,7 @@ class App
     self::autoloader();
     self::$container = Container::getInstance();
     self::$container->loaders();
+    self::$container['Builder']->physical('user');
   }
 
   public static function autoloader()
