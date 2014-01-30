@@ -7,7 +7,7 @@
         /**
          * Mapped events.
          *
-         * @type: attribute Array()
+         * @type: attribute public Array()
          * @name: $tag
          */
         public $tag = array(
@@ -114,7 +114,7 @@
         /**
          * Style properties.
          *
-         * @type: attribute static Array()
+         * @type: attribute public static Array()
          * @name: $style
          */
         public static $style = array(

@@ -7,7 +7,6 @@
         protected $filePaths = array();
         public $prettyMode = FALSE;
         public $docPath = 'doc.php';
-        public $analysis;
 
         public function __construct($filePaths)
         {
@@ -16,8 +15,6 @@
             } else {
                 Throw New \Exception('Invalid var type : $filePath must be an array and not be empty');
             }
-
-            $this->analysis = new Analysis();
         }
 
         /**
@@ -160,16 +157,13 @@
                         } else {
                             $finalContent .= " *" . substr($analys, strpos($analys, 'p'), strlen($analys)-1);
                         }
-                    } else if (preg_match('#^(public|protected|private|static)\s(function)\s[a-zA-Z]+#', $analys) === 1) {
-                        $finalContent .= " *" . substr($analys, strpos($analys, 'p')) . "";
-                    } else if (preg_match('#^(function)\s[a-zA-Z]+#', $analys) === 1) {
-                        $finalContent .= " *" . substr($analys, strpos($analys, 'f')) . "";
+                    } else if (preg_match('#function [a-zA-Z0-9]+#', $analys) === 1) {
+                        $finalContent .= " *" . substr($analys, strpos($analys, 'p'));
                     }
                 } else {
                     $finalContent .= " * " . trim($analys) . "\n";
                 }
             }
-
             return $finalContent;
         }
 
@@ -223,11 +217,11 @@
                     array_push($endKeys, $key + 1);
                 }
 
-                if (preg_match('#^(((?:abstract|final)\s(?:class))|interface|class).+#i', $content) === 1) {
+                if (preg_match('#^(((?:abstract|final|trait)\s(?:class))|interface|class).+#i', $content) === 1) {
                     $headers['className'] = $content;
                 }
 
-                if (preg_match('#^namespace+#i', $content) === 1) {
+                if (preg_match('#^namespace.+$#i', $content) === 1) {
                     $headers['namespace'] = $content;
                 }
             }
@@ -251,25 +245,18 @@
             // headers
             if (!empty($headers)) {
                 if ($count === 0) {
-                    //$headerContent = $this->buildHeader($headers);
-                    $this->analysis->fullContent[(int)$this->fileNumber]["header"] = $headers;
-                    //$this->appendContent($headerContent);
+                    $this->fullContent[(int)$this->fileNumber]["header"] = $headers;
                 }
             }
 
-            //$finalContent = $this->buildAnalysis($analysis);
-
             // analysis
             if (count($analysis) > 1) {
-                //$this->appendContent($finalContent);
-                $this->analysis->fullContent[(int)$this->fileNumber]["analysis"][$count] = $formattedAnalysis;
+                $this->fullContent[(int)$this->fileNumber]["analysis"][$count] = $formattedAnalysis;
             }
 
             // footer
             if (count($startKeys) === $count) {
-                //$footerContent = $this->buildFooter($file);
-                $this->analysis->fullContent[(int)$this->fileNumber]['footer'] = trim($file);
-                //$this->appendContent($footerContent);
+                $this->fullContent[(int)$this->fileNumber]['footer'] = trim($file);
             }
         }
 
@@ -295,6 +282,6 @@
                 }
             }
 
-            $this->analysis->build();
+            $this->run();
         }
     }
