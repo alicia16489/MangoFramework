@@ -5,6 +5,7 @@
     Class DocGen Extends Analysis
     {
         protected $filePaths = array();
+
         public $prettyMode = FALSE;
         public $docPath = 'doc.php';
 
@@ -69,69 +70,6 @@
         }
 
         /**
-         * Build the structure to represent the header of each parsed file
-         * in the comming documentation file
-         *
-         * @type: method
-         * @param: array $headers contain the namespace and class name of each file parsed
-         * @return: string $headerContent structured header to append
-         */
-        public function buildHeader($headers)
-        {
-            $headerContent = '';
-
-            foreach ($headers as $key => $header) {
-                if ($key === 'namespace') {
-                    $namespace = " in\n" . substr($header, 0, strlen($header)-1) . "\n";
-                } else if ($key === 'className') {
-                    if (isset($namespace)) {
-                        $headerContent .= $header . $namespace . "\n---------------------\n\n";
-                    } else {
-                        $headerContent .= $header . "\n\n---------------------\n\n";
-                    }
-                }
-            }
-
-            return $headerContent;
-        }
-
-        /**
-         * Build the structure to represent the analysis of each parsed file
-         * in the comming documentation file
-         *
-         * @type: method
-         * @param: array $analysis contain the analysis of each parsed file
-         * @return: string $finalContent structured analysis to append
-         */
-        public function buildAnalysis($analysis)
-        {
-            $finalContent = '';
-
-            foreach ($analysis as $key => $analys) {
-                if ($key === 0) {
-                    $finalContent .= "/**\n";
-                } else if ($key === count($analysis) - 1) {
-                    if (preg_match('#(public|protected|private|static|var)\s\$[a-zA-Z]+#', $analys, $attr)) {
-
-                        if (preg_match('#array\($#', $analys) === 1) {
-                            $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . ")\n\n";
-                        } else {
-                            $finalContent .= " */\n" . substr($analys, strpos($analys, 'p'), strlen($analys)-1) . "\n\n";
-                        }
-                    } else if (preg_match('#(public|protected|private|static)\s(function)\s[a-zA-Z]+#', $analys) === 1) {
-                        $finalContent .= " */\n" . substr($analys, strpos($analys, 'p')) . " {}\n\n";
-                    } else if (preg_match('#(function)\s[a-zA-Z]+#', $analys) === 1) {
-                        $finalContent .= " */\n" . substr($analys, strpos($analys, 'f')) . " {}\n\n";
-                    }
-                } else {
-                    $finalContent .= " * " . trim($analys) . "\n";
-                }
-            }
-
-            return $finalContent;
-        }
-
-        /**
          * Build the structure to represent the analysis of each parsed file
          * in the comming documentation file
          *
@@ -165,21 +103,6 @@
                 }
             }
             return $finalContent;
-        }
-
-        /**
-         * Build the structure to represent the footer of each parsed file
-         * in the comming documentation file
-         *
-         * @type: method
-         * @param: string $file contain the file name of each parsed file
-         * @return: string $footerContent structured footer to append
-         */
-        public function buildFooter($file)
-        {
-            $footerContent = "\n---END OF FILE : " . $file . "---\n\n\n";
-
-            return $footerContent;
         }
 
         /**
@@ -261,14 +184,18 @@
         }
 
         /**
-         * Foreach all file set to parse and call createDoc
+         * Foreach all file set to parse to create the documentation file
          *
          * @type: method
          * @param: string $file contain the file name of each parsed file
          * @return: string $footerContent structured footer to append
          */
-        public function create()
+        public function create($docType = NULL)
         {
+            if (!is_null($docType)) {
+                $this->docType = $docType;
+            }
+
             foreach ($this->filePaths as $key => $v) {
                 if (file_exists($v)) {
                     if (FALSE !== ($content = file_get_contents($v))) {
@@ -282,15 +209,6 @@
                 }
             }
 
-            $this->run();
+            $this->process();
         }
-
-        /**
-         * Foreach all file set to parse and call createDoc
-         *
-         * @type: method
-         * @param: string $file contain the file name of each parsed file
-         * @return: string $footerContent structured footer to append
-         */
-         static final public function TESTcreate(){}
     }

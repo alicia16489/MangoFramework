@@ -1,4 +1,11 @@
 <?php
+   $mtime = microtime();
+$mtime = explode(" ",$mtime);
+$mtime = $mtime[1] + $mtime[0];
+$starttime = $mtime;
+
+
+
 
     require_once "../vendors/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php";
     require '../vendors/autoload.php';
@@ -53,3 +60,9 @@
 
     $docGen = new utils\docGen(array('utils/htmlPattern.php', 'utils/docGen.php'));
     $docGen->create();
+$mtime = microtime();
+$mtime = explode(" ",$mtime);
+$mtime = $mtime[1] + $mtime[0];
+$endtime = $mtime;
+$totaltime = ($endtime - $starttime);
+echo "This page was created in ".$totaltime." seconds";
