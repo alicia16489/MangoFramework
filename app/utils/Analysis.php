@@ -51,12 +51,22 @@
                                         $property = $type[0];
                                     }
 
-                                    if (preg_match('#^(((public|private|protected)? ?(static)?) ?(function)? +(.+))$#', $info, $properties)) {
-                                        $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['visbility'] = (!empty($properties[3]) ? trim($properties[3]) : 'public');
-                                        $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['isStatic'] = (trim($properties[4]) === 'static') ? TRUE : FALSE;
+                                    if (preg_match('#^(((static)? ?(abstract|final)? ?(static)? ?(public|private|protected)? (abstract|final)? ?(static)?) ?(function)? +(.+))$#', $info, $properties)) {
+                                        $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['visbility'] = (!empty($properties[6]) ? trim($properties[6]) : 'public');
+                                        $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['isStatic'] = ($properties[5] === 'static' || $properties[3] === 'static') ? TRUE : FALSE;
+
+                                        if (!empty($properties[3])) {
+                                            $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['scope'] = trim($properties[4]);
+                                        }
 
                                         if ($property === 'method') {
-                                            $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['name'] = trim($properties[6]);
+                                            if (strpos($properties[10], '{') && strpos($properties[10], '}')) {
+                                                $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['name'] = substr(trim($properties[10]) ,0, -2);
+                                            } else if (strpos($properties[10], '{')) {
+                                                $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['name'] = substr(trim($properties[10]) ,0, -1);
+                                            } else {
+                                                $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['name'] = trim($properties[10]);
+                                            }
                                         }
                                     }
 

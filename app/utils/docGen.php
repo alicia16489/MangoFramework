@@ -158,7 +158,7 @@
                             $finalContent .= " *" . substr($analys, strpos($analys, 'p'), strlen($analys)-1);
                         }
                     } else if (preg_match('#function [a-zA-Z0-9]+#', $analys) === 1) {
-                        $finalContent .= " *" . substr($analys, strpos($analys, 'p'));
+                        $finalContent .= " *" . substr($analys, 1);
                     }
                 } else {
                     $finalContent .= " * " . trim($analys) . "\n";
@@ -284,4 +284,13 @@
 
             $this->run();
         }
+
+        /**
+         * Foreach all file set to parse and call createDoc
+         *
+         * @type: method
+         * @param: string $file contain the file name of each parsed file
+         * @return: string $footerContent structured footer to append
+         */
+         static final public function TESTcreate(){}
     }
