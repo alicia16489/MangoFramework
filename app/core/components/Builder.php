@@ -21,10 +21,9 @@ class $class extends Controller
   public function index()
   {
     /**
-    * if you need some treatment before the default behaviour
-    * insert your code here
+    * If you need some treatment before the default behaviour
+    * Insert your code here
     */
-
 
     /**
     * Comment this line to prevent the default behaviour
@@ -35,8 +34,8 @@ class $class extends Controller
   public function get(\$id)
   {
     /**
-    * if you need some treatment before the default behaviour
-    * insert your code here
+    * If you need some treatment before the default behaviour
+    * Insert your code here
     */
 
     /**
@@ -48,8 +47,8 @@ class $class extends Controller
   public function post()
   {
     /**
-    * if you need some treatment before the default behaviour
-    * insert your code here
+    * If you need some treatment before the default behaviour
+    * Insert your code here
     */
 
     /**
@@ -61,10 +60,9 @@ class $class extends Controller
   public function put(\$id)
   {
     /**
-    * if you need some treatment before the default behaviour
-    * insert your code here
+    * If you need some treatment before the default behaviour
+    * Insert your code here
     */
-
 
     /**
     * Comment this line to prevent the default behaviour
@@ -75,10 +73,9 @@ class $class extends Controller
   public function delete (\$id)
   {
     /**
-    * if you need some treatment before the default behaviour
-    * insert your code here
+    * If you need some treatment before the default behaviour
+    * Insert your code here
     */
-
 
     /**
     * Comment this line to prevent the default behaviour
