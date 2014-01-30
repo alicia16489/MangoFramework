@@ -45,7 +45,7 @@
     // if not all old or/and next content in buffer will be append
     $params = array(
         'die' => TRUE,
-        'erasePrevBuffer' => FALSE,
+        'eraseBuffer' => FALSE,
     );
 
     // RESPONSE

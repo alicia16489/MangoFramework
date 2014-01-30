@@ -339,7 +339,7 @@
                 "replace" => FALSE,
                 "die" => TRUE,
                 "xmlFile" => NULL,
-                "erasePrevBuffer" => TRUE
+                "eraseBuffer" => TRUE
             );
 
             // set default or custom if set
@@ -374,9 +374,9 @@
                     }
                 } else if ($type === 'xml') {
                     $encodedData = $this->xmlEncode($data, NULL, $params['xmlFile']);
-                } else {
-                    $encodedData = $data;
                 }
+            } else {
+                $encodedData = $data;
             }
 
             // set MIME Type
@@ -397,6 +397,6 @@
             $this->setStatus($params['code'])
                  ->setHeader('content-Type', $contentType . ' ; charset=utf-8')
                  ->write($encodedData, $params['replace'])
-                 ->send($params['die'], $params['erasePrevBuffer']);
+                 ->send($params['die'], $params['eraseBuffer']);
         }
     }
