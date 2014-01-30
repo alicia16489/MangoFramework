@@ -80,7 +80,7 @@
                                     }
 
                                     if (preg_match('#^((@?name)(.)?(.+))$#', $info, $name) === 1) {
-                                        $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['name'] = trim($name[2]);
+                                        $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['name'] = trim($name[4]);
                                     }
 
                                     if (preg_match('#^@?param( ?: ?)?(([a-zA-Z]+) (\$[a-zA-Z0-9]+)(.+)?)$#', $info, $param) === 1) {
@@ -98,7 +98,11 @@
                                     if (!empty($delimitDescrKey)) {
                                         $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['description'] = '';
                                         for ($i = 1; $i < $delimitDescrKey; $i++) {
-                                            $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['description'] .= " " . $analys[$i];
+                                            if ($i === 1) {
+                                                $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['description'] .= $analys[$i];
+                                            } else {
+                                                $this->builtContent[$mainKey]['analysis'][$property][$thiKey]['description'] .= " " . $analys[$i];
+                                            }
                                         }
                                     }
                                 }
