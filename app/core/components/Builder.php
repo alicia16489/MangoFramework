@@ -85,7 +85,6 @@ class $class extends Controller
 }
 EOT;
 
-
     fwrite($handle,$text);
   }
 
