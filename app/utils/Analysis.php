@@ -10,11 +10,13 @@
         private $builtArray = array();
         private $reflectionClass;
 
+        // comming soon
         private function buildTemplatePDF()
         {
 
         }
 
+        // comming soon
         private function buildTemplateXML()
         {
 
@@ -29,7 +31,7 @@
             // second step => build menu
             // ...
 
-            // third step => build content of each content
+            // third step => build content
             // ...
 
             // fourth step => build footer

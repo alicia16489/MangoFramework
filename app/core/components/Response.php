@@ -11,9 +11,11 @@
         protected $type = 'json';
         protected $data = NULL;
         protected $defaultData;
-        public $encodedErrorData = TRUE;
         protected $errorData = NULL;
+
+        public $encodedErrorData = TRUE;
         public $prettyPrint = FALSE;
+
         protected $validType = array(
             "json",
             "xml",
@@ -97,7 +99,7 @@
 
         public function __construct() {}
 
-        public function status($code, $add = FALSE)
+        public function setStatus($code, $add = FALSE)
         {
             if (array_key_exists($code, self::$statusCodes)){
                 $this->status = $code;
@@ -118,24 +120,9 @@
             return $this;
         }
 
-        public function getStatus($code = NULL, $messageOnly = FALSE)
-        {
-            if (is_null($code)) {
-                $code = $this->status;
-            }
 
-            if ($messageOnly === TRUE) {
-                if (array_key_exists($code, self::$statusCodes)) {
-                    return self::$statusCodes[$code];
-                } else {
-                    Throw New \Exception('Invalid status code');
-                }
-            } else {
-                return $code;
-            }
-        }
 
-        public function header($key, $value = NULL)
+        public function setHeader($key, $value = NULL)
         {
             if (is_array($key)) {
                 foreach($key as $k => $v) {
@@ -144,26 +131,6 @@
             } else {
                 $this->headers[$key] = $value;
             }
-
-            return $this;
-        }
-
-        public function getHeader()
-        {
-            return $this->headers;
-        }
-
-        public function getLength()
-        {
-            return $this->length;
-        }
-
-        public function unsetResponse()
-        {
-            $this->status = 200;
-            $this->headers = array();
-            $this->length = 0;
-            $this->body = '';
 
             return $this;
         }
@@ -185,6 +152,43 @@
         public function setPrettyPrint($bool)
         {
             $this->prettyPrint = $bool;
+        }
+
+        public function getStatus($code = NULL, $messageOnly = FALSE)
+        {
+            if (is_null($code)) {
+                $code = $this->status;
+            }
+
+            if ($messageOnly === TRUE) {
+                if (array_key_exists($code, self::$statusCodes)) {
+                    return self::$statusCodes[$code];
+                } else {
+                    Throw New \Exception('Invalid status code');
+                }
+            } else {
+                return $code;
+            }
+        }
+
+        public function getHeader()
+        {
+            return $this->headers;
+        }
+
+        public function getLength()
+        {
+            return $this->length;
+        }
+
+        public function unsetResponse()
+        {
+            $this->status = 200;
+            $this->headers = array();
+            $this->length = 0;
+            $this->body = '';
+
+            return $this;
         }
 
         public function is($type = 'empty')
@@ -213,6 +217,35 @@
                 default:
                     Throw new \Exception('Invalid var value');
             }
+        }
+
+        public function cache($expires)
+        {
+            if ($expires === FALSE) {
+                $this->headers['Expires'] = 'Thu, 20 Aug 1992 02:17:31 GMT';
+                $this->headers['Cache-Control'] = array(
+                    'no-store, no-cache, must-revalidate',
+                    'post-check=0, pre-check=0',
+                    'max-age=0'
+                );
+
+                $this->headers['Pragma'] = 'no-cache';
+            } else {
+                $expires = is_int($expires) ? $expires : strtotime($expires);
+                $this->headers['Expires'] = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
+                $this->headers['Cache-Control'] = 'max-age='.($expires - time());
+            }
+
+            return $this;
+        }
+
+        public function write($body, $replace = FALSE)
+        {
+            (($replace === TRUE) ? $this->body .= $body : $this->body = $body);
+
+            $this->length = strlen($this->body);
+
+            return $this;
         }
 
         public function xmlEncode($data, $simpleXmlElement = NULL, $file = NULL)
@@ -244,35 +277,6 @@
             }
         }
 
-        public function write($body, $replace = FALSE)
-        {
-            (($replace === TRUE) ? $this->body .= $body : $this->body = $body);
-
-            $this->length = strlen($this->body);
-
-            return $this;
-        }
-
-        public function cache($expires)
-        {
-            if ($expires === FALSE) {
-                $this->headers['Expires'] = 'Thu, 20 Aug 1992 02:17:31 GMT';
-                $this->headers['Cache-Control'] = array(
-                    'no-store, no-cache, must-revalidate',
-                    'post-check=0, pre-check=0',
-                    'max-age=0'
-                );
-
-                $this->headers['Pragma'] = 'no-cache';
-            } else {
-                $expires = is_int($expires) ? $expires : strtotime($expires);
-                $this->headers['Expires'] = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
-                $this->headers['Cache-Control'] = 'max-age='.($expires - time());
-            }
-
-            return $this;
-        }
-
         public function jsonEncodeUTF8($data)
         {
             if ($this->prettyPrint === TRUE) {
@@ -282,6 +286,12 @@
             }
 
             return $json;
+        }
+
+        private function isDataError($data)
+        {
+            $this->errorData = TRUE;
+            return $this->jsonEncodeUTF8($data);
         }
 
         public function sendHeader()
@@ -297,12 +307,6 @@
                     header($key . ': ' . $value, TRUE);
                 }
             }
-        }
-
-        private function isDataError($data)
-        {
-            $this->errorData = TRUE;
-            return $this->jsonEncodeUTF8($data);
         }
 
         public function send($die = TRUE, $erasePrevBuffer = TRUE)
@@ -328,6 +332,7 @@
         {
             $this->errorData = NULL;
 
+            // default param
             $params = array(
                 "code" => 200,
                 "encode" => TRUE,
@@ -337,22 +342,26 @@
                 "erasePrevBuffer" => TRUE
             );
 
+            // set default or custom if set
             if (!is_null($this->data) && !empty($this->data)) {
                 $data = $this->data;
             } else {
                 $data = $this->defaultData;
             }
 
+            // merge default param with custom if set
             if (is_array($customParams) && !is_null($customParams)) {
                 $params = array_merge($params, $customParams);
             }
 
+            // set type of response formats
             if (in_array($this->type, $this->validType)) {
                 $type = $this->type;
             } else {
                 $data = $this->isDataError("Invalid response format : must be 'json', 'xml' or 'html'");
             }
 
+            // encode data
             if ($params['encode'] === TRUE) {
                 if ($type === 'json') {
                     $encodedData =  $this->jsonEncodeUTF8($data);
@@ -370,6 +379,7 @@
                 }
             }
 
+            // set MIME Type
             if ($this->type === 'json' || ($this->errorData === TRUE && $this->encodedErrorData === TRUE)) {
                 $contentType = 'application/json';
             } else if ($this->type === 'html') {
@@ -378,8 +388,14 @@
                 $contentType = 'application/xml';
             }
 
-            $this->status($params['code'])
-                 ->header('content-Type', $contentType . ' ; charset=utf-8')
+            // stop response if error
+            if ($this->errorData === TRUE || $type === 'xml') {
+                $params['die'] = TRUE;
+            }
+
+            // send response
+            $this->setStatus($params['code'])
+                 ->setHeader('content-Type', $contentType . ' ; charset=utf-8')
                  ->write($encodedData, $params['replace'])
                  ->send($params['die'], $params['erasePrevBuffer']);
         }
