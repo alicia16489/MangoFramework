@@ -17,7 +17,7 @@ class App
 
       self::$container['Router']->errorRouting();
 
-      // IS HOME ?
+      // IS HOME ? -- config home route ?!
       if (self::$container['Blueprints']->pathInfo != '/') {
 
         // DEFAULT STATE
@@ -49,7 +49,7 @@ class App
         // END PHYSICAL
 
       } else {
-        self::$container['Router']->prepare('/error/404');
+       // self::$container['Router']->prepare('/error/404');
       }
 
       self::$container['Router']->execute();
