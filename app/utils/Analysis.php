@@ -39,7 +39,7 @@
     \$htmlTag = $htmlTag;
 
     foreach(\$builtArrayInject as \$mainKey => \$fileParsed) {
-        echo 'file : ' . \$mainKey = \$mainKey + 1 . '<br />';
+        echo 'file : ' . \$mainKey = \$builtArrayInject[\$mainKey]['infos']['filePath'] . '<br />';
     }
 EOT;
             var_dump($this->builtArray);
