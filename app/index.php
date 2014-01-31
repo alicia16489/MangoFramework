@@ -17,7 +17,6 @@
     // start app
     core\App::run();
 
-
     // TEST THE RESPONSE
     //var_dump(core\App::$container['Response']);
 
@@ -33,15 +32,15 @@
     );
 
     // set response type (json html or xml)
-    core\App::$container['Response']->setType('json');
+    //core\App::$container['Response']->setType('html');
 
     // set pretty print or not to have a beautiful JSON print
-   core\App::$container['Response']->setPrettyPrint(TRUE);
+   //core\App::$container['Response']->setPrettyPrint(TRUE);
 
     // encoded in json if an error append
     //core\App::$container['Response']->encodedErrorData = FALSE;
 
-    // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
+    // with die at TRUE and eraseBuffer at TRUE the buffer will contain only this response
     // if not all old or/and next content in buffer will be append
     $params = array(
         'die' => TRUE,
@@ -49,12 +48,12 @@
     );
 
     // RESPONSE
-    core\App::$container['Response']->sendResponse($params);
+    //core\App::$container['Response']->sendResponse($params);
 
     // test if response was successful
     //var_dump(array(core\App::$container['Response']->getStatus() => core\App::$container['Response']->is("successful")));
 
-    var_dump(core\App::$container['Response']);
+    //var_dump(core\App::$container['Response']);
 
     $docGen = new utils\docGen(array('utils/htmlPattern.php', 'utils/docGen.php'));
     $docGen->create();
@@ -64,4 +63,4 @@
     $mtime = $mtime[1] + $mtime[0];
     $endtime = $mtime;
     $totaltime = ($endtime - $starttime);
-    echo "\nThis page was created in ".$totaltime." seconds\n";
+    //echo "\nThis page was created in ".$totaltime." seconds\n";

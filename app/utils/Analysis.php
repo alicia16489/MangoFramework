@@ -25,28 +25,32 @@
         // Waiting for template
         private function buildTemplateHTML()
         {
-            // first step => build header
-            // ...
+            $builtArray = var_export($this->builtArray, TRUE);
+            $htmlTag = var_export($this->tag, TRUE);
+            $cssProperties = var_export($this->style, TRUE);
+            $meta = var_export($this->meta, TRUE);
 
-            // second step => build menu
-            // ...
+            $docHtmlContent = <<<EOT
+<?php
 
-            // third step => build content
-            // ...
+    \$builtArrayInject = $builtArray;
+    \$meta = $meta;
+    \$cssProperties = $cssProperties;
+    \$htmlTag = $htmlTag;
 
-            // fourth step => build footer
-            // ...
+    foreach(\$builtArrayInject as \$mainKey => \$fileParsed) {
+        echo 'file : ' . \$mainKey = \$mainKey + 1 . '<br />';
+    }
+EOT;
+            var_dump($this->builtArray);
+            file_put_contents('doc.php', $docHtmlContent);
         }
 
         private function buildArray()
         {
             foreach ($this->fullContent as $mainKey => $fullContent) {
                 // using powerful reflection class
-                if (!empty($fullContent['header']['namespace'])) {
-                    $this->reflectionClass = new \ReflectionClass(substr($fullContent['footer'], 0, strpos($fullContent['footer'], '/')) . '\\' . ucfirst(substr($fullContent['footer'], strpos($fullContent['footer'], '/') + 1, strpos($fullContent['footer'], '.') - 6)));
-                } else {
-                    $this->reflectionClass = new \ReflectionClass(ucfirst(substr($fullContent['footer'], strpos($fullContent['footer'], '/') + 1, strpos($fullContent['footer'], '.') - 6)));
-                }
+                $this->reflectionClass = new \ReflectionClass($fullContent['header']['fullClassName']);
 
                 // infos
                 if ($this->reflectionClass->isTrait()) {
@@ -55,12 +59,12 @@
 
                 } else {
                     $this->builtArray[$mainKey]['infos']['shortClassName'] = $this->reflectionClass->getShortName();
-                    $this->builtArray[$mainKey]['infos']['longClassName'] = (!empty($fullContent['header']['className'])) ? $fullContent['header']['className'] : NULL;
+                    $this->builtArray[$mainKey]['infos']['longClassName'] = (!empty($fullContent['header']['longClassName'])) ? $fullContent['header']['longClassName'] : NULL;
                     $this->builtArray[$mainKey]['infos']['classType'] = (($this->reflectionClass->isAbstract() === TRUE) ? 'abstract' : (($this->reflectionClass->isFinal() === TRUE) ? 'final' : 'normal'));
                     if($this->reflectionClass->getParentClass() !== FALSE) {
                         $this->builtArray[$mainKey]['infos']['parentClassName'] = substr($this->reflectionClass->getParentClass()->name, strrpos($this->reflectionClass->getParentClass()->name, '\\') + 1);
                     }
-                    $this->builtArray[$mainKey]['infos']['isChild'] = (!empty($fullContent['header']['className'])) ? $fullContent['header']['className'] : NULL;
+                    $this->builtArray[$mainKey]['infos']['isChild'] = (!empty($this->reflectionClass->getParentClass()->name)) ? TRUE : NULL;
                 }
 
                 $this->builtArray[$mainKey]['infos']['namespace'] = $this->reflectionClass->getNamespaceName();
@@ -101,8 +105,7 @@
                                     }
 
                                     if (preg_match('#^((@?type.+)((attribute) +(public|private|protected) +(static +)?(.*)))$#', $info, $attrType) === 1) {
-                                        $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['type'] = trim($attrType[7]);
-
+                                        $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['type'] = (trim($attrType[7] === 'Array()') ? strtolower(substr(trim($attrType[7]) , 0, -2)) : trim($attrType[7]));
                                     }
 
                                     if (preg_match('#^@?type.+$#', $info, $methodType) === 1) {
@@ -159,3 +162,5 @@
             }
         }
     }
+
+?>

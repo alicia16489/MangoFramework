@@ -102,10 +102,12 @@
                 '<summary>',
                 '</summary>'
             ),
+            // add new tag with id class data or other
         );
 
-        public static $meta = array(
+        public $meta = array(
             'meta-name' => array(
+                'name' => 'meta-name',
                 'charset' => 'utf-8',
                 'content-Type' => 'text/html',
             )
@@ -117,8 +119,9 @@
          * @type: attribute public static Array()
          * @name: $style
          */
-        public static $style = array(
+        public $style = array(
             'class-name-or-id-name' => array(
+                'ID' => 'class-name_or-id',
                 'border' => '1px solid black',
                 'color' => '#FF0000',
             ),

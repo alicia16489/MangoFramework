@@ -140,14 +140,22 @@
                     array_push($endKeys, $key + 1);
                 }
 
-                if (preg_match('#^(((?:abstract|final|trait)\s(?:class))|interface|class).+#i', $content) === 1) {
-                    $headers['className'] = $content;
+                if (preg_match('#^(((abstract|final|trait) +(class))|interface|class) +([\w\d]+)( +(extends|implement) +([\w\d]+))?( ?\{?)$#i', $content, $headerC) === 1) {
+                    $headers['className'] = $headerC[5];
+                    $headers['longClassName'] = $headerC[0];
                 }
 
-                if (preg_match('#^namespace.+$#i', $content) === 1) {
-                    $headers['namespace'] = $content;
+                if (preg_match('#^namespace +(.+)[;]{1}$#i', $content, $headerN) === 1) {
+                    $headers['namespace'] = $headerN[1];
                 }
             }
+
+            if (!empty($headers['namespace']) && !empty($headers['className'])) {
+                $headers['fullClassName'] = $headers['namespace'] . '\\' . $headers['className'];
+            } else if (!empty($headers['className'])) {
+                $headers['fullClassName'] = $headers['className'];
+            }
+
 
             if (is_null($startKey) && is_null($endKey)) {
                 foreach ($startKeys as $key => $value) {
