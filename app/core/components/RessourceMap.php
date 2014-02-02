@@ -16,16 +16,16 @@ class RessourceMap
 
   private function getPhysical()
   {
-    if(!file_exists("./ressources/physical/list.php"))
-      throw new Exception("Missing physical ressource list from ORM migrate command, path : ".$this::physicalListPath);
+    if (!file_exists("./ressources/physical/list.php"))
+      throw new Exception("Missing physical ressource list from ORM migrate command, path : " . $this::physicalListPath);
 
-    if(!is_readable("./ressources/physical/list.php"))
-      throw new Exception("File not readable, premission denied, path : ".$this::physicalListPath);
+    if (!is_readable("./ressources/physical/list.php"))
+      throw new Exception("File not readable, premission denied, path : " . $this::physicalListPath);
 
     $physicalList = include($this::physicalListPath);
 
-    if(!is_array($physicalList))
-      throw new Exception($this::physicalListPath." do not return a array.");
+    if (!is_array($physicalList))
+      throw new Exception($this::physicalListPath . " do not return a array.");
 
     return $physicalList;
   }
@@ -34,13 +34,12 @@ class RessourceMap
   {
     $files = array();
     $dir = $this::logicListPath;
-    if(false !== ($dh = opendir($dir))){
+    if (false !== ($dh = opendir($dir))) {
       while (false !== ($filename = readdir($dh))) {
-        if($filename != "." && $filename != "..")
-          $files[] = str_replace(".php","",$filename);
+        if ($filename != "." && $filename != "..")
+          $files[] = str_replace(".php", "", $filename);
       }
-    }
-    else{
+    } else {
       // Exception
     }
 
