@@ -7,7 +7,7 @@ Class Database {
     private static $capsule;
     private $connection;
     private static $instance;
-    private static $schemaMaanger;
+    private $schemaManager;
 
     public static function getInstance()
     {
@@ -21,25 +21,26 @@ Class Database {
     }
     private function __construct(Capsule $capsule)
     {
-        self::$config = include('./config/database.php');
+        $this->config = include('./config/database.php');
         self::$capsule = $capsule;
-        $defaultDB = self::$config['default'];
-        if (!empty(self::$config['connections'][$defaultDB])) {
+        $defaultDB = $this->config['default'];
+        if (!empty($this->config['connections'][$defaultDB])) {
             try {
-                $capsule->addConnection(self::$config['connections'][$defaultDB]);
+                $capsule->addConnection($this->config['connections'][$defaultDB]);
             }
             catch (\PDOException $e) {
                 echo $e->getMessage();
             }
 
             $capsule->bootEloquent();
-            self::$connection = $capsule->getConnection();
-            self::$schemaManager = $this->connection->getDoctrineSchemaManager();
-            var_dump(self::$schemaManager);
+            $this->connection = $capsule->getConnection();
+            $this->schemaManager = $this->connection->getDoctrineSchemaManager();
+            var_dump($this->schemaManager);
             die();
         }
         else {
             //throw Exception
+            echo 42;
         }
     }
 
@@ -60,7 +61,7 @@ Class Database {
 
     public function getSchemaManager()
     {
-
+        return $this->schemaManager;
     }
 
 }
