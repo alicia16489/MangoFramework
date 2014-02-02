@@ -1,22 +1,30 @@
 <?php
+use \Pimple;
+use Illuminate\Database\Capsule\Manager as Capsule;
+$container = new \Phpmig\Pimple\Pimple();
+$capsule = new \Illuminate\Database\Capsule\Manager();
+$config = include('./app/config/database.php');
+$config = $config['connections']['mysql'];
+$capsule->addConnection($config);
+$container['config'] = $config;
 
-require_once "./vendors/symfony/class-loader/Symfony/Component/ClassLoader/UniversalClassLoader.php";
-require './vendors/autoload.php';
+$container['db'] = $container->share(function($c) {
+    return new PDO("mysql:host=" . $c['config']['host'] . ";dbname=" . $c['config']['database'], $c['config']['username'], $c['config']['password']);
+});
 
-use Symfony\Component\ClassLoader\UniversalClassLoader;
-use \Phpmig\Adapter;
-use core\Container;
+$container['schema'] = $container->share(function($c) {
+    /* Bootstrap Eloquent */
+    $capsule = new Capsule;
+    $capsule->addConnection($c['config']);
+    $capsule->setAsGlobal();
+    /* Bootstrap end */
 
-$loader = new UniversalClassLoader();
-$loader->useIncludePath(true);
-$loader->registerNamespaces(array(
-   'core' => __DIR__.'./app/core'
-));
-
-$container = core\Container::getInstance();
-
-// replace this with a better Phpmig\Adapter\AdapterInterface
-$container['phpmig.adapter'] = new Adapter\PDO\Sql($container['db'], 'migrations');
+    return Capsule::schema();
+});
+// replace this with a better Phpmig\Adapter\AdapterInterfaceo
+$container['phpmig.adapter'] = $container->share(function() use ($container) {
+    return new Phpmig\Adapter\PDO\Sql($container['db'], 'migrations');
+});
 
 $container['phpmig.migrations_path'] = __DIR__ . DIRECTORY_SEPARATOR . 'migrations';
 
