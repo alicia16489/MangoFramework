@@ -1,6 +1,7 @@
 <?php
 namespace ressources\physical;
 use \core\App;
+
 class User
 {
   public function before()
