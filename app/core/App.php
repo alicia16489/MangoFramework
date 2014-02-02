@@ -67,8 +67,6 @@ class App
     self::autoloader();
     self::$container = Container::getInstance();
     self::$container->loaders();
-
-
   }
 
   public static function autoloader()
