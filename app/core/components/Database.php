@@ -20,7 +20,7 @@ Class Database {
     }
     private function __construct(Capsule $capsule)
     {
-        self::$config = include('../../config/database.php');
+        self::$config = include('./config/database.php');
         self::$capsule = $capsule;
         $defaultDB = self::$config['default'];
         if (!empty(self::$config['connections'][$defaultDB])) {

@@ -34,10 +34,7 @@ class Container extends \Pimple implements \ArrayAccess
       }
     }
 
-    $db = Database::getInstance();
-    $this['db'] = $db->getConnection();
-    $this['config'] = $db->getConfig();
-    $this['schema'] = $db->getSchema();
+
   }
 
   public function loaders()
