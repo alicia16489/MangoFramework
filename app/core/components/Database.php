@@ -7,6 +7,7 @@ Class Database {
     private static $capsule;
     private $connection;
     private static $instance;
+    private static $schemaMaanger;
 
     public static function getInstance()
     {
@@ -33,6 +34,9 @@ Class Database {
 
             $capsule->bootEloquent();
             self::$connection = $capsule->getConnection();
+            self::$schemaManager = $this->connection->getDoctrineSchemaManager();
+            var_dump(self::$schemaManager);
+            die();
         }
         else {
             //throw Exception
@@ -53,4 +57,10 @@ Class Database {
     {
         return $this->config;
     }
+
+    public function getSchemaManager()
+    {
+
+    }
+
 }
