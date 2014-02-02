@@ -3,12 +3,12 @@
 use \Illuminate\Database\Capsule\Manager as Capsule;
 Class Database {
 
-    private static $config;
+    private $config;
     private static $capsule;
-    private static $connection;
+    private $connection;
     private static $instance;
 
-    public function getInstance()
+    public static function getInstance()
     {
         if (!is_null(self::$instance)) {
             return self::$instance;
@@ -35,17 +35,22 @@ Class Database {
             self::$connection = $capsule->getConnection();
         }
         else {
-
+            //throw Exception
         }
     }
 
-    public static function getConnection()
+    public function getConnection()
     {
-       return self::$connection;
+       return $this->connection;
     }
 
     public function getSchema()
     {
         return Capsule::schema();
+    }
+
+    public function getConfig()
+    {
+        return $this->config;
     }
 }

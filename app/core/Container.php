@@ -2,6 +2,8 @@
 
 namespace core;
 
+use core\components\Database;
+
 class Container extends \Pimple implements \ArrayAccess
 {
   private static $container;
@@ -18,7 +20,6 @@ class Container extends \Pimple implements \ArrayAccess
   public function __construct()
   {
     $this['dependancies'] = array(
-      'Config' => __NAMESPACE__.'\components\Config',
       'Request' => __NAMESPACE__.'\components\Request',
       'Blueprints' => __NAMESPACE__.'\components\Blueprints',
       'Router' => __NAMESPACE__.'\components\Router',
@@ -27,13 +28,16 @@ class Container extends \Pimple implements \ArrayAccess
       'Database' => __NAMESPACE__.'\components\Database'
     );
 
-      $this['db'] =
-
     foreach($this['dependancies'] as $key => $path){
-      if(!class_exists($path)){
+      if(!class_exists($path, true)){
         throw new \Exception('Missing components : '.$key.' at path : '.$path);
       }
     }
+
+    $db = Database::getInstance();
+    $this['db'] = $db->getConnection();
+    $this['config'] = $db->getConfig();
+    $this['schema'] = $db->getSchema();
   }
 
   public function loaders()
