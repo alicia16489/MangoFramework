@@ -2,7 +2,9 @@
 
 namespace core;
 
-class Container extends \Pimple
+use core\components\Database;
+
+class Container extends \Pimple implements \ArrayAccess
 {
   private static $container;
 
@@ -19,18 +21,24 @@ class Container extends \Pimple
   {
     $this['dependancies'] = array(
       'Config' => __NAMESPACE__ . '\components\Config',
-      'Request' => __NAMESPACE__ . '\components\Request',
-      'Blueprints' => __NAMESPACE__ . '\components\Blueprints',
-      'Router' => __NAMESPACE__ . '\components\Router',
-      'Response' => __NAMESPACE__ . '\components\Response',
-      'RessourceMap' => __NAMESPACE__ . '\components\RessourceMap'
+      'Request' => __NAMESPACE__.'\components\Request',
+      'Blueprints' => __NAMESPACE__.'\components\Blueprints',
+      'Router' => __NAMESPACE__.'\components\Router',
+      'Response' => __NAMESPACE__.'\components\Response',
+      'RessourceMap' => __NAMESPACE__.'\components\RessourceMap',
+      'Database' => __NAMESPACE__.'\components\Database'
     );
 
-    foreach ($this['dependancies'] as $key => $path) {
-      if (!class_exists($path)) {
-        throw new \Exception('Missing components : ' . $key . ' at path : ' . $path);
+    foreach($this['dependancies'] as $key => $path){
+      if(!class_exists($path, true)){
+        throw new \Exception('Missing components : '.$key.' at path : '.$path);
       }
     }
+
+    $db = Database::getInstance();
+    $this['db'] = $db->getConnection();
+    $this['config'] = $db->getConfig();
+    $this['schema'] = $db->getSchema();
   }
 
   public function loaders()
@@ -64,6 +72,11 @@ class Container extends \Pimple
     $this['RessourceMap'] = function ($c) {
       return new $c['dependancies']['RessourceMap']();
     };
+    //Database
+    $this['Database'] = function ($c) {
+          return new $c['dependancies']['Database']();
+      };
+
   }
 
 }
