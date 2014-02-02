@@ -1,9 +1,10 @@
-<?php namespace core\components;
+<?php
 
+namespace core\components;
 use \Illuminate\Database\Capsule\Manager as Capsule;
 Class Database {
 
-    private $config;
+    private static $config;
     private static $capsule;
     private $connection;
     private static $instance;

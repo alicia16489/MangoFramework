@@ -4,7 +4,7 @@ namespace core;
 
 use core\components\Database;
 
-class Container extends \Pimple
+class Container extends \Pimple implements \ArrayAccess
 {
   private static $container;
 
@@ -16,7 +16,7 @@ class Container extends \Pimple
 
     return self::$container;
   }
-  
+
   public function __construct()
   {
     $this['dependencies'] = array(
@@ -67,7 +67,7 @@ class Container extends \Pimple
     $this['RessourceMap'] = function ($c) {
       return new $c['dependencies']['RessourceMap']();
     };
-
+    //Database
     $this['Database'] = $this->share(function (){
         return Database::getInstance();
     });
