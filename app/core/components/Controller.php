@@ -2,7 +2,7 @@
 
 namespace core\components;
 
-class Controller
+abstract class Controller
 {
   public function index()
   {
