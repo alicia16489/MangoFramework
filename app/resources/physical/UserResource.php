@@ -25,7 +25,7 @@ class UserResource extends Controller
     * If you need some treatment before the default behaviour
     * Insert your code here
     */
-echo "here";
+
     /**
     * Comment this line to prevent the default behaviour
     */
