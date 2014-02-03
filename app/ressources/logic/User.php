@@ -4,7 +4,7 @@ class User
 {
   public $routes = array(
     "/user/toto/:id/name/:name" => array("method" => "myMethod","cond" => array( ":id" => "\d+")),
-    //"/user/:id" => "myGet"
+    "/user/myget" => "myGet"
   );
 
   public function before()
@@ -27,9 +27,9 @@ class User
     echo "myMethod ! ".$id." ".$name;
   }
 
-  public function myGet()
+/*  public function myGet()
   {
     echo "myGet !!!!";
-  }
+  }*/
 
 }

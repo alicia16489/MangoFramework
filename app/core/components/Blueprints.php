@@ -2,7 +2,7 @@
 
 namespace core\components;
 
-class ressourceException extends \Exception
+class BlueprintException extends \Exception
 {
 }
 
@@ -15,7 +15,7 @@ class Blueprints extends \core\App
   public $lockRouter = false;
   public $exist = array();
   public $restMethod;
-  private $method;
+  public $method;
   public $options;
 
   private $patterns = array(
@@ -34,20 +34,6 @@ class Blueprints extends \core\App
     $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);;
     $this->existAsLogic();
     $this->existAsPhysical();
-  }
-
-  public function setMethod($method, $object)
-  {
-    $class = get_class($object);
-    if (!method_exists($object, $method))
-      throw new ressourceException('Method "' . $method . '" missing, logic ressource : ' . $class);
-
-    $this->method = $method;
-  }
-
-  public function getMethod()
-  {
-    return $this->method;
   }
 
   private function existAsPhysical()
@@ -108,19 +94,18 @@ class Blueprints extends \core\App
           }
           if (is_array($value) && isset($value['cond'])) {
             if ($this->routeMatch($route, $value['cond'])) {
-              $this->setMethod($value['method'], $ressource);
+              $this->method = $value['method'];
               $this->route = $route;
               return true;
             }
           } else {
             if ($this->routeMatch($route)) {
               if (is_array($value))
-                $this->setMethod($value['method'], $ressource);
+                $this->method = $value['method'];
               else
-                $this->setMethod($value, $ressource);
+                $this->method = $value;
 
               $this->route = $route;
-
               return true;
             }
           }

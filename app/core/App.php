@@ -3,6 +3,7 @@
 namespace core;
 
 use core\components\RouterException;
+use core\components\BlueprintException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
@@ -18,21 +19,25 @@ class App
 
       // LOGIC
       if (self::$container['Blueprints']->exist['logic']) {
+        self::$container['Blueprints']->type = 'logic';
 
-        if (self::$container['Blueprints']->isLogic()) {
+          if (self::$container['Blueprints']->isLogic()) {
 
-          self::$container['Router']->logicRouting();
-          self::$container['Blueprints']->lockRouter = true;
-        } elseif (self::$container['Blueprints']->isSubLogic()) {
+            self::$container['Router']->logicRouting();
+            self::$container['Blueprints']->lockRouter = true;
+          } elseif (self::$container['Blueprints']->isSubLogic()) {
 
-          self::$container['Router']->subLogicRouting();
-          self::$container['Blueprints']->lockRouter = true;
-        }
+            self::$container['Router']->subLogicRouting();
+            self::$container['Blueprints']->lockRouter = true;
+          }
+
       }
       // END LOGIC
 
       // PHYSICAL
       if (self::$container['Blueprints']->exist['physical'] && !self::$container['Blueprints']->lockRouter) {
+        if(empty(self::$container['Blueprints']->type))
+          self::$container['Blueprints']->type = 'physical';
 
         if (self::$container['Blueprints']->isRest()) {
 
@@ -50,11 +55,12 @@ class App
       try {
         self::$container['Router']->execute();
       } catch (RouterException $e) {
-        // no method for this ressource !
+        // bad route for this ressource !
+        var_dump($e);
       }
     }
     else {
-
+      // no ressource
     }
 
     // send response
