@@ -2,7 +2,7 @@
 
 namespace core\components;
 
-abstract class Rest
+abstract class Rest extends Controller
 {
   public function index()
   {

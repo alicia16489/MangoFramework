@@ -17,7 +17,7 @@ namespace resources\\physical;
 use core\components\Controller;
 use core\App;
 
-class $class extends Controller
+class $class extends Rest
 {
   public function index()
   {
