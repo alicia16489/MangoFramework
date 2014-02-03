@@ -1,6 +1,7 @@
 <?php
 
 namespace core\components;
+class RessourceMapException extends \Exception{}
 
 class RessourceMap
 {
@@ -17,15 +18,15 @@ class RessourceMap
   private function getPhysical()
   {
     if (!file_exists("./ressources/physical/list.php"))
-      throw new Exception("Missing physical ressource list from ORM migrate command, path : " . $this::physicalListPath);
+      throw new RessourceMapException("Missing physical ressource list from ORM migrate command, path : " . $this::physicalListPath);
 
     if (!is_readable("./ressources/physical/list.php"))
-      throw new Exception("File not readable, premission denied, path : " . $this::physicalListPath);
+      throw new RessourceMapException("File not readable, premission denied, path : " . $this::physicalListPath);
 
     $physicalList = include($this::physicalListPath);
 
     if (!is_array($physicalList))
-      throw new Exception($this::physicalListPath . " do not return a array.");
+      throw new RessourceMapException($this::physicalListPath . " do not return a array.");
 
     return $physicalList;
   }

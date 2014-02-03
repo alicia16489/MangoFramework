@@ -2,6 +2,7 @@
 
 namespace core;
 
+use core\components\RessourceMapException;
 use core\components\RouterException;
 use core\components\BlueprintException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
@@ -12,37 +13,40 @@ class App
 
   public static function run()
   {
+    try
+    {
+    self::autoloader();
     self::init();
 
     // IS HOME ? -- config home route ?!
-    if (self::$container['Blueprints']->pathInfo != '/') {
+    if (self::$container['Blueprint']->pathInfo != '/') {
 
       // LOGIC
-      if (self::$container['Blueprints']->exist['logic']) {
-        self::$container['Blueprints']->type = 'logic';
+      if (self::$container['Blueprint']->exist['logic']) {
+        self::$container['Blueprint']->type = 'logic';
 
-          if (self::$container['Blueprints']->isLogic()) {
+          if (self::$container['Blueprint']->isLogic()) {
 
             self::$container['Router']->logicRouting();
-            self::$container['Blueprints']->lockRouter = true;
-          } elseif (self::$container['Blueprints']->isSubLogic()) {
+            self::$container['Blueprint']->lockRouter = true;
+          } elseif (self::$container['Blueprint']->isSubLogic()) {
 
             self::$container['Router']->subLogicRouting();
-            self::$container['Blueprints']->lockRouter = true;
+            self::$container['Blueprint']->lockRouter = true;
           }
 
       }
       // END LOGIC
 
       // PHYSICAL
-      if (self::$container['Blueprints']->exist['physical'] && !self::$container['Blueprints']->lockRouter) {
-        if(empty(self::$container['Blueprints']->type))
-          self::$container['Blueprints']->type = 'physical';
+      if (self::$container['Blueprint']->exist['physical'] && !self::$container['Blueprint']->lockRouter) {
+        if(empty(self::$container['Blueprint']->type))
+          self::$container['Blueprint']->type = 'physical';
 
-        if (self::$container['Blueprints']->isRest()) {
+        if (self::$container['Blueprint']->isRest()) {
 
           self::$container['Router']->restRouting();
-          self::$container['Blueprints']->lockRouter = true;
+          self::$container['Blueprint']->lockRouter = true;
         }
       }
       // END PHYSICAL
@@ -51,7 +55,7 @@ class App
       // home
     }
 
-    if (self::$container['Blueprints']->exist['logic'] || self::$container['Blueprints']->exist['physical']) {
+    if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
       try {
         self::$container['Router']->execute();
       } catch (RouterException $e) {
@@ -61,14 +65,23 @@ class App
     }
     else {
       // no ressource
+      echo "no ressource";
     }
 
     // send response
+    }
+    catch(ContainerException $e)
+    {
+      var_dump($e);
+    }
+    catch(RessourceMapException $e)
+    {
+      var_dump($e);
+    }
   }
 
   public static function init()
   {
-    self::autoloader();
     self::$container = Container::getInstance();
     self::$container->loaders();
     self::$container['Database'];
@@ -76,11 +89,17 @@ class App
 
   public static function autoloader()
   {
-    require '../vendors/autoload.php';
+    if(file_exists('vendors/autoload.php'))
+      require_once 'vendors/autoload.php';
+    elseif(file_exists('../vendors/autoload.php'))
+      require_once '../vendors/autoload.php';
 
     $loader = new UniversalClassLoader();
     $loader->useIncludePath(true);
     $loader->register();
+    $loader->registerNamespaces(array(
+      "core" => "./app/",
+    ));
   }
 
 }

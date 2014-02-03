@@ -12,7 +12,7 @@ class Router extends Mux
   private $class;
   private $blueprints;
 
-  public function __construct(Blueprints $blueprints)
+  public function __construct(Blueprint $blueprints)
   {
     $this->blueprints = $blueprints;
   }
@@ -24,7 +24,7 @@ class Router extends Mux
 
   public function logicRouting()
   {
-    $routePatern = '/' . strtolower($this->blueprints->ressource);
+    $routePatern = '/' . str_replace('ressource','',strtolower($this->blueprints->ressource));
     $this->class = '\ressources\logic\\' . $this->blueprints->ressource;
 
     $this->add($routePatern, [$this->class, 'get']);
@@ -45,7 +45,7 @@ class Router extends Mux
 
   public function restRouting()
   {
-    $routePatern = '/' . strtolower($this->blueprints->ressource);
+    $routePatern = '/' . str_replace('ressource','',strtolower($this->blueprints->ressource));
     $this->class = '\ressources\physical\\' . $this->blueprints->ressource;
 
     $this->get($routePatern . "/", [$this->class, 'index']);

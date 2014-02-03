@@ -4,12 +4,12 @@ namespace core\components;
 
 class Builder
 {
-  public function physical($name)
+  public function physicalRessource($class)
   {
-    echo "build physical..";
-    $class = ucfirst($name);
 
-    $handle = fopen("./ressources/physical/".$class.".php","w");
+    if(!file_exists('./app/ressources/physical/'.$class.'Ressource.php')){
+      $handle = fopen('./app/ressources/physical/'.$class.'Ressource.php','w');
+      $class .= 'Ressource';
 $text = <<<EOT
 <?php
 
@@ -84,6 +84,51 @@ class $class extends Controller
     parent::delete(\$id);
   }
 }
+EOT;
+
+    fwrite($handle,$text);
+    }
+  }
+
+  public function physicalModel($class)
+  {
+
+    if(!file_exists('./app/models/'.$class.'.php')){
+
+      $handle = fopen('./app/models/'.$class.'.php','w');
+      $text = <<<EOT
+<?php
+
+namespace models;
+
+class $class
+{
+
+}
+EOT;
+
+      fwrite($handle,$text);
+    }
+  }
+
+  public function physicalList($array)
+  {
+    $handle = fopen('./app/ressources/physical/list.php','w');
+    $strArray = 'array(';
+
+    foreach($array as $key => $entity)
+    {
+      if($key != 0)
+        $strArray .= ',';
+      $strArray .= '"'.$entity.'"';
+    }
+
+    $strArray .= ')';
+
+    $text = <<<EOT
+<?php
+
+return $strArray;
 EOT;
 
     fwrite($handle,$text);

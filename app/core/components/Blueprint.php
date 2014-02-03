@@ -6,7 +6,7 @@ class BlueprintException extends \Exception
 {
 }
 
-class Blueprints extends \core\App
+class Blueprint extends \core\App
 {
   public $route;
   public $pathInfo;
@@ -30,7 +30,7 @@ class Blueprints extends \core\App
   public function __construct(Request $request)
   {
     $this->pathInfo = $request->properties['REQUEST_OPTION'];
-    $this->ressource = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]);
+    $this->ressource = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]).'Ressource';
     $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);;
     $this->existAsLogic();
     $this->existAsPhysical();
@@ -39,8 +39,9 @@ class Blueprints extends \core\App
   private function existAsPhysical()
   {
     $physicalList = self::$container['RessourceMap']->ressources['physical'];
+    $entity = str_replace('Ressource','',$this->ressource);
 
-    if (in_array($this->ressource, $physicalList)) {
+    if (in_array($entity, $physicalList)) {
       $class = '\ressources\physical\\' . $this->ressource;
 
       if (class_exists($class)) {
@@ -119,7 +120,7 @@ class Blueprints extends \core\App
 
   public function isRest()
   {
-    $route = '/'.strtolower($this->ressource);
+    $route = '/'.str_replace('ressource','',strtolower($this->ressource));
     $param = '/:id';
     $pattern = array(':id' => '\d+');
 

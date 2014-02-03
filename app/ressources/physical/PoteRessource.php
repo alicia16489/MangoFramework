@@ -4,7 +4,7 @@ namespace ressources\physical;
 use core\components\Controller;
 use core\App;
 
-class User extends Controller
+class PoteRessource extends Controller
 {
   public function index()
   {

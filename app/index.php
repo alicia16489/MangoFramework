@@ -1,5 +1,5 @@
 <?php
-require_once("./core/App.php");
+require_once './core/App.php';
 $time_start = microtime(true);
 
 core\App::run();

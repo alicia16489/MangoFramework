@@ -1,5 +1,3 @@
 <?php
 
-return array(
-  "User","Comment"
-);
+return array("Card","Post","Pote","Test","User");
