@@ -26,7 +26,8 @@ class Container extends \Pimple
       'Router' => __NAMESPACE__.'\components\Router',
       'Response' => __NAMESPACE__.'\components\Response',
       'RessourceMap' => __NAMESPACE__.'\components\RessourceMap',
-      'Database' => __NAMESPACE__.'\components\Database'
+      'Database' => __NAMESPACE__.'\components\Database',
+      'Builder' => __NAMESPACE__.'\components\Builder'
     );
 
     foreach($this['dependencies'] as $key => $path){
@@ -38,6 +39,11 @@ class Container extends \Pimple
 
   public function loaders()
   {
+    // Builder
+    $this['Builder'] = function ($c) {
+      return new $c['dependencies']['Builder']();
+    };
+
     // Config
     $this['Config'] = function ($c) {
       return new $c['dependencies']['Config']();

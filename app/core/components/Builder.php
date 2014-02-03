@@ -1,10 +1,23 @@
 <?php
 
-namespace ressources\physical;
+namespace core\components;
+
+class Builder
+{
+  public function physical($name)
+  {
+    echo "build physical..";
+    $class = ucfirst($name);
+
+    $handle = fopen("./ressources/physical/".$class.".php","w");
+$text = <<<EOT
+<?php
+
+namespace ressources\\physical;
 use core\components\Controller;
 use core\App;
 
-class User extends Controller
+class $class extends Controller
 {
   public function index()
   {
@@ -19,7 +32,7 @@ class User extends Controller
     parent::index();
   }
 
-  public function get($id)
+  public function get(\$id)
   {
     /**
     * If you need some treatment before the default behaviour
@@ -29,7 +42,7 @@ class User extends Controller
     /**
     * Comment this line to prevent the default behaviour
     */
-    parent::get($id);
+    parent::get(\$id);
   }
 
   public function post()
@@ -45,7 +58,7 @@ class User extends Controller
     parent::post();
   }
 
-  public function put($id)
+  public function put(\$id)
   {
     /**
     * If you need some treatment before the default behaviour
@@ -55,10 +68,10 @@ class User extends Controller
     /**
     * Comment this line to prevent the default behaviour
     */
-    parent::put($id);
+    parent::put(\$id);
   }
 
-  public function delete ($id)
+  public function delete (\$id)
   {
     /**
     * If you need some treatment before the default behaviour
@@ -68,6 +81,12 @@ class User extends Controller
     /**
     * Comment this line to prevent the default behaviour
     */
-    parent::delete($id);
+    parent::delete(\$id);
   }
+}
+EOT;
+
+    fwrite($handle,$text);
+  }
+
 }

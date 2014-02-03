@@ -13,53 +13,66 @@ class App
   {
     self::init();
 
-      // IS HOME ? -- config home route ?!
-      if (self::$container['Blueprints']->pathInfo != '/') {
+    // IS HOME ? -- config home route ?!
+    if (self::$container['Blueprints']->pathInfo != '/') {
 
-        // LOGIC
-        if (self::$container['Blueprints']->exist['logic']) {
+      // LOGIC
+      if (self::$container['Blueprints']->exist['logic']) {
 
-          if (self::$container['Blueprints']->isLogic()) {
+        if (self::$container['Blueprints']->isLogic()) {
 
-            self::$container['Router']->logicRouting();
-            self::$container['Blueprints']->type = "logic";
-          } elseif (self::$container['Blueprints']->isSubLogic()) {
+          self::$container['Router']->logicRouting();
+          self::$container['Blueprints']->type = "logic";
+        } elseif (self::$container['Blueprints']->isSubLogic()) {
 
-            echo "isSubLogic <br>";
-            self::$container['Router']->subLogicRouting();
-            self::$container['Blueprints']->type = "logic";
-          }
-        }
-        // END LOGIC
-
-        // PHYSICAL
-        if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
-
-          if (self::$container['Blueprints']->isRest()) {
-            self::$container['Router']->restRouting();
-          }
-        }
-        // END PHYSICAL
-
-      } else {
-       // home
-      }
-
-      if(self::$container['Blueprints']->exist['logic'] || self::$container['Blueprints']->exist['physical']){
-        try
-        {
-          self::$container['Router']->execute();
-        }
-        catch(RouterException $e)
-        {
-          // no method
+          echo "isSubLogic <br>";
+          self::$container['Router']->subLogicRouting();
+          self::$container['Blueprints']->type = "logic";
         }
       }
-    else{
+      // END LOGIC
 
+      // PHYSICAL
+      if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
+
+        if (self::$container['Blueprints']->isRest()) {
+          self::$container['Router']->restRouting();
+        }
+      }
+      // END PHYSICAL
+
+    } else {
+      // home
     }
 
-    // send response
+    if (self::$container['Blueprints']->exist['logic'] || self::$container['Blueprints']->exist['physical']) {
+      try {
+        self::$container['Router']->execute();
+      } catch (RouterException $e) {
+        // no method
+      }
+    } else {
+
+      try {
+        self::init();
+
+        if (self::$container['Blueprints']->ressource != '/') {
+          if (self::$container['Blueprints']->isRessource()) {
+            if (self::$container['Blueprints']->isRest()) {
+              var_dump(self::$container['Blueprints']);
+            }
+          } else {
+            // error response
+          }
+        } else {
+          // error response
+        }
+      } catch (\Exception $e) {
+        var_dump($e);
+      }
+
+      // send response
+    }
   }
 
   public static function init()
@@ -68,6 +81,7 @@ class App
     self::$container = Container::getInstance();
     self::$container->loaders();
     self::$container['Database'];
+    self::$container['Builder']->physical('user');
   }
 
   public static function autoloader()
