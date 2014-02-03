@@ -9,13 +9,15 @@ class Builder
 
     if(!file_exists('./app/resources/physical/'.$class.'Resource.php')){
       $handle = fopen('./app/resources/physical/'.$class.'Resource.php','w');
+      $model = $class;
       $class .= 'Resource';
 $text = <<<EOT
 <?php
 
 namespace resources\\physical;
-use core\components\Controller;
+use core\components\Rest;
 use core\App;
+use models\\$model;
 
 class $class extends Rest
 {
@@ -100,8 +102,9 @@ EOT;
 <?php
 
 namespace models;
+use Illuminate\Database\Eloquent\Model;
 
-class $class
+class $class extends Model
 {
 
 }

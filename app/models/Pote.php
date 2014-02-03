@@ -1,8 +1,9 @@
 <?php
 
 namespace models;
+use Illuminate\Database\Eloquent\Model;
 
-class Pote
+class Pote extends Model
 {
 
 }

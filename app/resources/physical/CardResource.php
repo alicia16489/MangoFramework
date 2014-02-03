@@ -1,10 +1,11 @@
 <?php
 
 namespace resources\physical;
-use core\components\Controller;
+use core\components\Rest;
 use core\App;
+use models\Card;
 
-class CardResource extends Controller
+class CardResource extends Rest
 {
   public function index()
   {

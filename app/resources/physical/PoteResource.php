@@ -1,10 +1,11 @@
 <?php
 
 namespace resources\physical;
-use core\components\Controller;
+use core\components\Rest;
 use core\App;
+use models\Pote;
 
-class PoteResource extends Controller
+class PoteResource extends Rest
 {
   public function index()
   {

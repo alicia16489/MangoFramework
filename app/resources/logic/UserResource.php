@@ -17,10 +17,10 @@ class UserResource
     echo "AFTER : logic User";
   }
 
-  public function get()
+/*  public function get()
   {
     echo "resource logic : User , method : get ";
-  }
+  }*/
 
   public function myMethod($id,$name)
   {

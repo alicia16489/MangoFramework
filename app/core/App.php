@@ -99,6 +99,7 @@ class App
     $loader->register();
     $loader->registerNamespaces(array(
       "core" => "./app/",
+      "models" => "../"
     ));
   }
 

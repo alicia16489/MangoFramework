@@ -1,10 +1,11 @@
 <?php
 
 namespace resources\physical;
-use core\components\Controller;
+use core\components\Rest;
 use core\App;
+use models\Post;
 
-class PostResource extends Controller
+class PostResource extends Rest
 {
   public function index()
   {

@@ -1,8 +1,9 @@
 <?php
 
 namespace models;
+use Illuminate\Database\Eloquent\Model;
 
-class User
+class User extends Model
 {
 
 }
