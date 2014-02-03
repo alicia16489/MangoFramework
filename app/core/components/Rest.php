@@ -2,7 +2,7 @@
 
 namespace core\components;
 
-abstract class restResource
+abstract class Rest
 {
   public function index()
   {
