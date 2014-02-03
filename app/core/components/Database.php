@@ -15,7 +15,7 @@ Class Database {
             return self::$instance;
         }
         else {
-            $capsule = new \Illuminate\Database\Capsule\Manager();
+            $capsule = new Capsule();
             return new self($capsule);
         }
     }
