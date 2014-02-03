@@ -12,6 +12,7 @@ class Blueprints extends \core\App
   public $pathInfo;
   public $ressource;
   public $type;
+  public $lockRouter = false;
   public $exist = array();
   public $restMethod;
   private $method;

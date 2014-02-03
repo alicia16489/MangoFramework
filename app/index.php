@@ -8,4 +8,4 @@ $time_end = microtime(true);
 $time = $time_end - $time_start;
 
 echo"<br>";
-echo $time;
+echo "end: ".$time;

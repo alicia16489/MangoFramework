@@ -6,7 +6,8 @@
         "corneltek/pux": "~1.3",
         "davedevelopment/phpmig": "*",
         "illuminate/database" : "*",
-        "doctrine/dbal": "2.3.4"
+        "doctrine/dbal": "2.3.4",
+        "symfony/console": "2.*"
     },
     "config": {
         "vendor-dir": "vendors"

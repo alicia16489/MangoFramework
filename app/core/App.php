@@ -22,21 +22,22 @@ class App
         if (self::$container['Blueprints']->isLogic()) {
 
           self::$container['Router']->logicRouting();
-          self::$container['Blueprints']->type = "logic";
+          self::$container['Blueprints']->lockRouter = true;
         } elseif (self::$container['Blueprints']->isSubLogic()) {
 
-          echo "isSubLogic <br>";
           self::$container['Router']->subLogicRouting();
-          self::$container['Blueprints']->type = "logic";
+          self::$container['Blueprints']->lockRouter = true;
         }
       }
       // END LOGIC
 
       // PHYSICAL
-      if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
+      if (self::$container['Blueprints']->exist['physical'] && !self::$container['Blueprints']->lockRouter) {
 
         if (self::$container['Blueprints']->isRest()) {
+
           self::$container['Router']->restRouting();
+          self::$container['Blueprints']->lockRouter = true;
         }
       }
       // END PHYSICAL
@@ -49,30 +50,14 @@ class App
       try {
         self::$container['Router']->execute();
       } catch (RouterException $e) {
-        // no method
+        // no method for this ressource !
       }
-    } else {
-
-      try {
-        self::init();
-
-        if (self::$container['Blueprints']->ressource != '/') {
-          if (self::$container['Blueprints']->isRessource()) {
-            if (self::$container['Blueprints']->isRest()) {
-              var_dump(self::$container['Blueprints']);
-            }
-          } else {
-            // error response
-          }
-        } else {
-          // error response
-        }
-      } catch (\Exception $e) {
-        var_dump($e);
-      }
-
-      // send response
     }
+    else {
+
+    }
+
+    // send response
   }
 
   public static function init()
@@ -81,7 +66,6 @@ class App
     self::$container = Container::getInstance();
     self::$container->loaders();
     self::$container['Database'];
-    self::$container['Builder']->physical('user');
   }
 
   public static function autoloader()

@@ -74,6 +74,7 @@ class Container extends \Pimple
       return new $c['dependencies']['RessourceMap']();
     };
 
+    // Database
     $this['Database'] = $this->share(function (){
         return Database::getInstance();
     });
