@@ -1,6 +1,6 @@
 <?php
-namespace ressources\logic;
-class UserRessource
+namespace resources\logic;
+class UserResource
 {
   public $routes = array(
     "/user/toto/:id/name/:name" => array("method" => "myMethod","cond" => array( ":id" => "\d+")),
@@ -19,7 +19,7 @@ class UserRessource
 
   public function get()
   {
-    echo "Ressource logic : User , method : get ";
+    echo "resource logic : User , method : get ";
   }
 
   public function myMethod($id,$name)

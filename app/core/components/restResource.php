@@ -2,7 +2,7 @@
 
 namespace core\components;
 
-class restRessource
+class restresource
 {
   public function index()
   {

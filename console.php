@@ -38,7 +38,7 @@ $console
         foreach($entityList as $key => $entity)
         {
           $entityList[$key] = $class = substr(ucfirst($entity),0,-1);
-          $builder->physicalRessource($entityList[$key]);
+          $builder->physicalresource($entityList[$key]);
           $builder->physicalModel($entityList[$key]);
         }
 

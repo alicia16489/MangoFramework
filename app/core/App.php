@@ -2,7 +2,7 @@
 
 namespace core;
 
-use core\components\RessourceMapException;
+use core\components\resourceMapException;
 use core\components\RouterException;
 use core\components\BlueprintException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
@@ -59,13 +59,13 @@ class App
       try {
         self::$container['Router']->execute();
       } catch (RouterException $e) {
-        // bad route for this ressource !
+        // bad route for this resource !
         var_dump($e);
       }
     }
     else {
-      // no ressource
-      echo "no ressource";
+      // no resource
+      echo "no resource";
     }
 
     // send response
@@ -74,7 +74,7 @@ class App
     {
       var_dump($e);
     }
-    catch(RessourceMapException $e)
+    catch(resourceMapException $e)
     {
       var_dump($e);
     }

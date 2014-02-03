@@ -1,10 +1,10 @@
 <?php
 
-namespace ressources\physical;
+namespace resources\physical;
 use core\components\Controller;
 use core\App;
 
-class UserRessource extends Controller
+class TestResource extends Controller
 {
   public function index()
   {

@@ -1,10 +1,10 @@
 <?php
 
-namespace ressources\physical;
+namespace resources\physical;
 use core\components\Controller;
 use core\App;
 
-class TestRessource extends Controller
+class UserResource extends Controller
 {
   public function index()
   {
@@ -25,7 +25,7 @@ class TestRessource extends Controller
     * If you need some treatment before the default behaviour
     * Insert your code here
     */
-
+echo "here";
     /**
     * Comment this line to prevent the default behaviour
     */

@@ -4,16 +4,16 @@ namespace core\components;
 
 class Builder
 {
-  public function physicalRessource($class)
+  public function physicalResource($class)
   {
 
-    if(!file_exists('./app/ressources/physical/'.$class.'Ressource.php')){
-      $handle = fopen('./app/ressources/physical/'.$class.'Ressource.php','w');
-      $class .= 'Ressource';
+    if(!file_exists('./app/resources/physical/'.$class.'Resource.php')){
+      $handle = fopen('./app/resources/physical/'.$class.'Resource.php','w');
+      $class .= 'Resource';
 $text = <<<EOT
 <?php
 
-namespace ressources\\physical;
+namespace resources\\physical;
 use core\components\Controller;
 use core\App;
 
@@ -113,7 +113,7 @@ EOT;
 
   public function physicalList($array)
   {
-    $handle = fopen('./app/ressources/physical/list.php','w');
+    $handle = fopen('./app/resources/physical/list.php','w');
     $strArray = 'array(';
 
     foreach($array as $key => $entity)

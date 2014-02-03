@@ -27,7 +27,7 @@ class Container extends \Pimple
       'Blueprint' => __NAMESPACE__.'\components\Blueprint',
       'Router' => __NAMESPACE__.'\components\Router',
       'Response' => __NAMESPACE__.'\components\Response',
-      'RessourceMap' => __NAMESPACE__.'\components\RessourceMap',
+      'resourceMap' => __NAMESPACE__.'\components\resourceMap',
       'Database' => __NAMESPACE__.'\components\Database'
     );
 
@@ -66,9 +66,9 @@ class Container extends \Pimple
       return new $c['dependencies']['Response']();
     };
 
-    // RessourceMap
-    $this['RessourceMap'] = function ($c) {
-      return new $c['dependencies']['RessourceMap']();
+    // resourceMap
+    $this['resourceMap'] = function ($c) {
+      return new $c['dependencies']['resourceMap']();
     };
 
     // Database
