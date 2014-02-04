@@ -30,7 +30,7 @@ $console
 
         $builder = new \core\components\Builder();
         $database = \core\components\Database::getInstance();
-        $tableList = $database->getSchemaManager()-> listTableNames();
+        $tableList = $database->getSchemaManager()->listTableNames();
         $indexToDel = array_search('migrations',$tableList);
         unset($tableList[$indexToDel]);
         $entityList = array_values($tableList);

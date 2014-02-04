@@ -1,6 +1,6 @@
 <?php
 
 return array(
-  'type' => 'json',
+  'type' => 'html',
   'prettyPrintJSON' => false,
 );

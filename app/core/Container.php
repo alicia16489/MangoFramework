@@ -20,7 +20,7 @@ class Container extends \Pimple
   
   public function __construct()
   {
-
+    $this['post'] = $_POST;
     $this['dependencies'] = array(
       'Config' => __NAMESPACE__.'\components\Config',
       'Request' => __NAMESPACE__.'\components\Request',
@@ -72,9 +72,9 @@ class Container extends \Pimple
     };
 
     // Database
-    $this['Database'] = $this->share(function (){
+    $this['Database'] = function (){
         return Database::getInstance();
-    });
+    };
   }
 
 }

@@ -63,7 +63,30 @@ abstract class Rest extends Resource
 
   public function post()
   {
+    $post = App::$container['post'];
+    $class = self::$class;
+    $object = new $class();
+    $table = str_replace('models\\','',strtolower($class).'s');
+    $schemaManager = App::$container['Database']->getSchemaManager();
+    $listTableColumns = $schemaManager->listTableColumns($table);
 
+    foreach($post as $column => $value)
+    {
+      if(!array_key_exists($column,$listTableColumns)){
+        self::$response->setData(array(
+          'state' => 'resource attribute not found',
+          'resource' => self::$resource,
+          'method' => self::getMethod(__METHOD__),
+          'attribute' => $column
+        ),'default');
+        return;
+      }
+      else{
+        $object->$column = $value;
+      }
+    }
+    var_dump($listTableColumns);
+    $object->save();
   }
 
   public function put($id)

@@ -1,3 +1,3 @@
 <?php
 
-return array("User");
+return array("Comment","User");
