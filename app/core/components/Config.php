@@ -4,7 +4,9 @@ namespace core\components;
 
 class Config
 {
-  public $homePath = '/';
-
-
+  public function getResponse()
+  {
+    $config = include('./config/response.php');
+    return $config;
+  }
 }

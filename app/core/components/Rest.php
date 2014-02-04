@@ -7,6 +7,7 @@ use models;
 abstract class Rest extends Controller
 {
   private static $class;
+  protected static $response;
 
   private function getClass()
   {
@@ -16,6 +17,7 @@ abstract class Rest extends Controller
   public function beforeRest()
   {
     self::$class = 'models\\'.str_replace('Resource','',str_replace('resources\physical\\','',get_called_class()));
+    self::$response = App::$container['Response'];
   }
 
   public function index()
@@ -32,7 +34,8 @@ abstract class Rest extends Controller
           $index[] = $object->getAttributes();
         }
 
-        var_dump($index);
+        // set the response data default
+        self::$response->setData($index,'default');
       }
     }
   }
