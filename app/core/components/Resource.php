@@ -13,4 +13,6 @@ abstract class Resource
     self::$resource = strtolower(str_replace('Resource','',str_replace('resources\physical\\','',get_called_class())));
     self::$response = App::$container['Response'];
   }
+
+
 }

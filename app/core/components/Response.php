@@ -79,7 +79,7 @@ class Response
         var_dump($e);
       }
     }
-    if(!empty($config['prettyPrintJSON']))
+    if($config['prettyPrintJSON'])
       $this->prettyPrint = $config['prettyPrintJSON'];
   }
 

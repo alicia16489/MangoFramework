@@ -52,28 +52,28 @@ class App
         }
         // END PHYSICAL
 
+        if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
+          try {
+            self::$container['Router']->execute();
+          } catch (RouterException $e) {
+            // bad route for this resource !
+            var_dump($e);
+          }
+        } else {
+          // no resource
+          echo "no resource";
+        }
+
+        // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
+        // if not all old or/and next content in buffer will be append
+        $params = array(
+          'die' => FALSE,
+          'erasePrevBuffer' => FALSE,
+        );
+
       } else {
         // home
       }
-
-      if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
-        try {
-          self::$container['Router']->execute();
-        } catch (RouterException $e) {
-          // bad route for this resource !
-          var_dump($e);
-        }
-      } else {
-        // no resource
-        echo "no resource";
-      }
-
-      // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
-      // if not all old or/and next content in buffer will be append
-      $params = array(
-        'die' => FALSE,
-        'erasePrevBuffer' => FALSE,
-      );
 
       // SEND RESPONSE
       self::$container['Response']->sendResponse($params);

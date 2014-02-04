@@ -1,3 +1,3 @@
 <?php
 
-return array("Card","Post","Pote","Test","User");
+return array("User");
