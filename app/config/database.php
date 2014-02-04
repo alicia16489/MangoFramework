@@ -8,7 +8,7 @@ return array(
             'host'      => 'localhost',
             'database'  => 'database1',
             'username'  => 'root',
-            'password'  => 'x5stZn/',
+            'password'  => 'x5stZny/',
             'charset'   => 'utf8',
             'collation' => 'utf8_unicode_ci',
             'prefix'    => '',
