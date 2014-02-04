@@ -66,6 +66,12 @@ class Router extends Mux
       Executor::execute($this->dispatch('/before-wxx45wx4'));
     }
     catch(\Exception $e){}
+    $this->add('/before:rest-wxx45wx4',[$this->class,'beforeRest']);
+    try
+    {
+      Executor::execute($this->dispatch('/before:rest-wxx45wx4'));
+    }
+    catch(\Exception $e){}
   }
 
   public function afterRouting(){

@@ -48,6 +48,9 @@ class App
           self::$container['Router']->restRouting();
           self::$container['Blueprint']->lockRouter = true;
         }
+        elseif(self::$container['Blueprint']->isRest()){
+
+        }
       }
       // END PHYSICAL
 
