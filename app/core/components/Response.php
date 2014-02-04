@@ -1,27 +1,34 @@
 <?php
 
 namespace core\components;
-use core\App;
 
 class Response
 {
-  protected $status = 200;
+  protected $status = NULL;
   protected $headers = array();
   protected $body;
   protected $length = NULL;
   protected $type = 'json';
-  protected $data;
-  protected $defaultData = 'no response';
+  protected $data = NULL;
+  protected $defaultData;
+  protected $errorData = NULL;
+
+  public $encodedErrorData = TRUE;
   public $prettyPrint = FALSE;
+
   protected $validType = array(
     "json",
     "xml",
-    "html"
+    "html",
+    "plain"
   );
   protected static $statusCodes = array(
     // Informational
     100 => '100 Continue',
     101 => '101 Switching Protocols',
+    102 => 'Processing',
+    103 => 'Checkpoint',
+    118 => 'Connection timed out',
     // Success
     200 => 'OK',
     201 => 'Created',
@@ -30,6 +37,11 @@ class Response
     204 => 'No Content',
     205 => 'Reset Content',
     206 => 'Partial Content',
+    207 => 'Multi-Status',
+    208 => 'Already Reported',
+    209 => 'Content Returned',
+    210 => 'Content Different',
+    226 => 'IM Used',
     // Redirection
     300 => 'Multiple Choices',
     301 => 'Moved Permanently',
@@ -37,10 +49,14 @@ class Response
     303 => 'See Other',
     304 => 'Not Modified',
     305 => 'Use Proxy',
+    306 => 'Switch Proxy',
     307 => 'Temporary Redirect',
+    308 => 'Permanent Redirect',
+    310 => 'Too many Redirect',
     // Client Error
     400 => 'Bad Request',
     401 => 'Unauthorized',
+    402 => 'Payment Required',
     403 => 'Forbidden',
     404 => 'Not Found',
     405 => 'Method Not Allowed',
@@ -56,37 +72,41 @@ class Response
     415 => 'Unsupported Media Type',
     416 => 'Requested Range Not Satisfiable',
     417 => 'Expectation Failed',
+    418 => 'I\'m a teapot', //RFC 2324
+    422 => 'Unprocessable Entity',
+    423 => 'Locked',
+    424 => 'Failed Dependency',
+    425 => 'Reserved for WebDAV advanced collections expired proposal',
+    426 => 'Upgrade required',
+    428 => 'Precondition Required',
+    429 => 'Too Many Requests',
+    431 => 'Request Header Fields Too Large',
+    449 => 'Retry With',
+    450 => 'Blocked by Windows Parental Controls',
+    456 => 'Unrecoverable Error',
+    499 => 'client has closed connection',
     // Server Error
     500 => 'Internal Server Error',
     501 => 'Not Implemented',
     502 => 'Bad Gateway',
     503 => 'Service Unavailable',
     504 => 'Gateway Timeout',
-    505 => 'HTTP Version Not Supported'
+    505 => 'HTTP Version Not Supported',
+    509 => 'Bandwidth Limit Exceeded',
+    510 => 'Not extended',
+    511 => 'Network Authentication Required',
+    520 => 'Web server is returning an unknown error',
   );
 
   public function __construct()
   {
-    $config = App::$container['Config']->getResponse();
-    if(!empty($config['type'])){
-      try
-      {
-        $this->setType($config['type']);
-      }
-      catch(\Exception $e)
-      {
-        $this->setType('html');
-        var_dump($e);
-      }
-    }
-    if($config['prettyPrintJSON'])
-      $this->prettyPrint = $config['prettyPrintJSON'];
   }
 
-  public function status($code, $add = FALSE)
+  public function setStatus($code, $add = FALSE)
   {
     if (array_key_exists($code, self::$statusCodes)) {
       $this->status = $code;
+
     } else {
       if ($add === TRUE) {
         if (is_array($code)) {
@@ -104,7 +124,45 @@ class Response
     return $this;
   }
 
-  public function getStatus($messageOnly = FALSE, $code = NULL)
+  public function setHeader($key, $value = NULL)
+  {
+    if (is_array($key)) {
+      foreach ($key as $k => $v) {
+        $this->headers[$k] = $v;
+      }
+    } else {
+      $this->headers[$key] = $value;
+    }
+
+    return $this;
+  }
+
+  public function setType($type)
+  {
+    $this->type = $type;
+
+    return $this;
+  }
+
+  public function setData($data, $type = 'default')
+  {
+    if ($type === 'default') {
+      $this->defaultData = $data;
+    } else {
+      $this->data = $data;
+    }
+
+    return $this;
+  }
+
+  public function setPrettyJSON($bool)
+  {
+    $this->prettyPrint = $bool;
+
+    return $this;
+  }
+
+  public function getStatus($code = NULL, $messageOnly = FALSE)
   {
     if (is_null($code)) {
       $code = $this->status;
@@ -121,19 +179,6 @@ class Response
     }
   }
 
-  public function header($key, $value = NULL)
-  {
-    if (is_array($key)) {
-      foreach ($key as $k => $v) {
-        $this->headers[$k] = $v;
-      }
-    } else {
-      $this->headers[$key] = $value;
-    }
-
-    return $this;
-  }
-
   public function getHeader()
   {
     return $this->headers;
@@ -144,37 +189,19 @@ class Response
     return $this->length;
   }
 
-  public function unsetResponse()
+  public function clear()
   {
-    $this->status = 200;
+    $this->status = NULL;
     $this->headers = array();
     $this->length = 0;
     $this->body = '';
+    $this->type = 'json';
+    $this->data = NULL;
+    $this->errorData = NULL;
+    $this->encodedErrorData = TRUE;
+    $this->prettyPrint = FALSE;
 
     return $this;
-  }
-
-  public function setType($type)
-  {
-    if (in_array($type, $this->validType)) {
-      $this->type = $type;
-    } else {
-      Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
-    }
-  }
-
-  public function setData($data, $type = 'default')
-  {
-    if ($type === 'default') {
-      $this->defaultData = $data;
-    } else {
-      $this->data = $data;
-    }
-  }
-
-  public function setPrettyPrint($bool)
-  {
-    $this->prettyPrint = $bool;
   }
 
   public function is($type = 'empty')
@@ -205,18 +232,51 @@ class Response
     }
   }
 
+  public function cache($expires)
+  {
+    if ($expires === FALSE) {
+      $this->headers['Expires'] = 'Thu, 20 Aug 1992 02:17:31 GMT';
+      $this->headers['Pragma'] = 'no-cache';
+      $this->headers['Cache-Control'] = array(
+        // only stock in nav, reload response from server, force cache to reconnect to server
+        'no-store, no-cache, must-revalidate', 'proxy-revalidate',
+        'no-transform', 'post-check=0, pre-check=0', 'max-age=0'
+      );
+    } else {
+      $expires = is_int($expires) ? $expires : strtotime($expires);
+      $this->headers['Expires'] = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
+      $this->headers['Cache-Control'] = 'max-age=' . ($expires - time());
+    }
+
+    return $this;
+  }
+
+  public function write($body, $replace = FALSE)
+  {
+    if ($replace === TRUE) {
+      $this->body = $body;
+    } else {
+      $this->body .= $body;
+    }
+
+
+    $this->length = strlen($this->body);
+
+    return $this;
+  }
+
   public function xmlEncode($data, $simpleXmlElement = NULL, $file = NULL)
   {
     if (is_null($simpleXmlElement)) {
-      $simpleXmlElement = new \SimpleXMLElement("<?xml version=\"1.0\"?><root></root>");
+      $simpleXmlElement = new \SimpleXMLElement("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><root></root>");
 
       $this->xmlEncode($data, $simpleXmlElement, $file);
 
       if (!is_null($file)) {
         $simpleXmlElement->asXML($file);
-      } else {
-        return $simpleXmlElement->asXML();
       }
+
+      return $simpleXmlElement->asXML();
     } else {
       foreach ($data as $key => $value) {
         if (is_array($value)) {
@@ -234,35 +294,6 @@ class Response
     }
   }
 
-  public function write($body, $replace = FALSE)
-  {
-    (($replace === TRUE) ? $this->body .= $body : $this->body = $body);
-
-    $this->length = strlen($this->body);
-
-    return $this;
-  }
-
-  public function cache($expires)
-  {
-    if ($expires === FALSE) {
-      $this->headers['Expires'] = 'Thu, 20 Aug 1992 02:17:31 GMT';
-      $this->headers['Cache-Control'] = array(
-        'no-store, no-cache, must-revalidate',
-        'post-check=0, pre-check=0',
-        'max-age=0'
-      );
-
-      $this->headers['Pragma'] = 'no-cache';
-    } else {
-      $expires = is_int($expires) ? $expires : strtotime($expires);
-      $this->headers['Expires'] = gmdate('D, d M Y H:i:s', $expires) . ' GMT';
-      $this->headers['Cache-Control'] = 'max-age=' . ($expires - time());
-    }
-
-    return $this;
-  }
-
   public function jsonEncodeUTF8($data)
   {
     if ($this->prettyPrint === TRUE) {
@@ -274,29 +305,44 @@ class Response
     return $json;
   }
 
-  public function sendHeader()
+  private function isDataError($data, $code = 400)
   {
+    $this->errorData = TRUE;
+    $this->code = $code;
+    return $this->jsonEncodeUTF8($data);
+  }
+
+  public function sendHeaders()
+  {
+    header(
+      $_SERVER['SERVER_PROTOCOL'] .
+      ' ' . $this->status .
+      ' ' . self::$statusCodes[$this->status],
+      TRUE,
+      $this->status
+    );
+
     foreach ($this->headers as $key => $value) {
       if (is_array($value)) {
         foreach ($value as $v) {
-          header($key . ': ' . $v, false);
+          header($key . ': ' . $v, FALSE);
         }
       } else {
-        header($key . ': ' . $value);
+        header($key . ': ' . $value, TRUE);
       }
     }
   }
 
-  public function send($die = TRUE, $erasePrevBuffer = TRUE)
+  public function send($die = TRUE, $eraseBuffer = TRUE)
   {
-    if ($erasePrevBuffer === TRUE) {
+    if ($eraseBuffer === TRUE) {
       if (ob_get_length() > 0) {
         ob_end_clean();
       }
     }
 
     if (!headers_sent()) {
-      $this->sendHeader();
+      $this->sendHeaders();
     }
 
     if ($die === FALSE) {
@@ -306,47 +352,78 @@ class Response
     }
   }
 
-  // Should be on of App.php's method..
   public function sendResponse($customParams = NULL)
   {
+    $this->errorData = NULL;
+
+    // default param
     $params = array(
       "code" => 200,
       "encode" => TRUE,
-      "replace" => FALSE,
+      "replace" => TRUE,
       "die" => TRUE,
       "xmlFile" => NULL,
-      "erasePrevBuffer" => TRUE
+      "eraseBuffer" => TRUE
     );
 
-    if (!empty($this->data)) {
+    $this->status = (!is_null($this->status) ? $this->status : $params['code']);
+
+    // set default or custom if set
+    if (!is_null($this->data) && !empty($this->data)) {
       $data = $this->data;
     } else {
       $data = $this->defaultData;
     }
 
+    // merge default param with custom if set
     if (is_array($customParams) && !is_null($customParams)) {
       $params = array_merge($params, $customParams);
     }
 
+    // set type of response formats
     if (in_array($this->type, $this->validType)) {
       $type = $this->type;
     } else {
-      Throw New \Exception("Invalid response format : must be 'json', 'xml' or 'html'");
+      $data = $this->isDataError("Invalid response format : must be 'json', 'xml' or 'html'");
     }
 
-    $encodedData = (($params['encode'] === TRUE) ? (($type === 'json' || $type === 'html') ? $this->jsonEncodeUTF8($data) : $this->xmlEncode($data, NULL, $params['xmlFile'])) : $type);
+    // encode data
+    if ($params['encode'] === TRUE) {
+      if ($type === 'json') {
+        $encodedData = $this->jsonEncodeUTF8($data);
+      } else if ($type === 'html' || $type === 'plain') {
+        if (!is_array($data)) {
+          $encodedData = $data;
+        } else {
+          $encodedData = $this->isDataError('Invalid var type : $data can\'t be an array in html response mode', 403);
+        }
+      } else if ($type === 'xml') {
+        $encodedData = $this->xmlEncode($data, NULL, $params['xmlFile']);
+      }
+    } else {
+      $encodedData = $data;
+    }
 
-    if ($this->type === 'json') {
+    // set MIME Type
+    if ($this->type === 'json' || ($this->errorData === TRUE && $this->encodedErrorData === TRUE)) {
       $contentType = 'application/json';
     } else if ($this->type === 'html') {
       $contentType = 'text/html';
+    } else if ($this->type === 'plain') {
+      $contentType = 'text/plain';
     } else if ($this->type === 'xml') {
       $contentType = 'application/xml';
     }
 
-    $this->status($params['code'])
-        ->header('content-Type', $contentType . ' ; charset=utf-8')
+    // stop response if error when xml response type
+    if ($this->errorData === TRUE || $type === 'xml') {
+      $params['die'] = TRUE;
+    }
+
+    // send response
+    $this->setStatus($this->status)
+        ->setHeader('content-Type', $contentType . ' ; charset=utf-8')
         ->write($encodedData, $params['replace'])
-        ->send($params['die'], $params['erasePrevBuffer']);
+        ->send($params['die'], $params['eraseBuffer']);
   }
 }

@@ -75,9 +75,28 @@ class App
         // home
       }
 
+
+      /**
+       * Make verif if is ajax request. If TRUE disable cache.
+       * Browser like I.E sometimes download the response in his cache
+       * and it never actualize the response again !!! Looks like that
+       *
+       * if (self::$container['Request']->isAjax()) {
+       *   self::$container['Response']->cache(FALSE);
+       * }
+       */
+
+      // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
+      // if not all old or/and next content in buffer will be append
+      $params = array(
+        'die' => FALSE,
+        'erasePrevBuffer' => FALSE,
+      );
+
       // SEND RESPONSE
       self::$container['Response']->sendResponse($params);
 
+      //self::stop();
     } catch (ContainerException $e) {
       var_dump($e);
     } catch (resourceMapException $e) {
@@ -114,13 +133,11 @@ class App
 
     // Enable ouput buffering
     ob_start();
-
-    //self::stop();
   }
 
   public static function stop($code = 200)
   {
-    self::$container['Response']->status($code)
+    self::$container['Response']->setStatus($code)
         ->write(ob_get_clean())
         ->send();
   }
