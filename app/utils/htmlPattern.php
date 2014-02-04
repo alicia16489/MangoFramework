@@ -1,11 +1,15 @@
 <?php
 
-    // this class is an example for documentation generator class
-
     namespace utils;
 
-    Abstract Class htmlPattern
+    Abstract Class HtmlPattern
     {
+        /**
+         * Mapped events.
+         *
+         * @type: attribute public Array()
+         * @name: $tag
+         */
         public $tag = array(
             'doctype' => array(
                 '<DOCTYPE html>'
@@ -46,6 +50,30 @@
                 '<td>',
                 '</td>'
             ),
+            'h1' => array(
+                '<h1>',
+                '</h1>'
+            ),
+            'h2' => array(
+                '<h2>',
+                '</h2>'
+            ),
+            'h3' => array(
+                '<h3>',
+                '</h3>'
+            ),
+            'h4' => array(
+                '<h4>',
+                '</h4>'
+            ),
+            'h5' => array(
+                '<h5>',
+                '</h5>'
+            ),
+            'h6' => array(
+                '<h6>',
+                '</h6>'
+            ),
             'section' => array(
                 '<section>',
                 '</section>'
@@ -74,17 +102,26 @@
                 '<summary>',
                 '</summary>'
             ),
+            // add new tag with id class data or other
         );
 
-        protected $meta = array(
+        public $meta = array(
             'meta-name' => array(
+                'name' => 'meta-name',
                 'charset' => 'utf-8',
                 'content-Type' => 'text/html',
             )
         );
 
-        protected $style = array(
+        /**
+         * Style properties.
+         *
+         * @type: attribute public static Array()
+         * @name: $style
+         */
+        public $style = array(
             'class-name-or-id-name' => array(
+                'ID' => 'class-name_or-id',
                 'border' => '1px solid black',
                 'color' => '#FF0000',
             ),
@@ -93,7 +130,7 @@
         /**
          * Merge an array with one of htmlPattern class
          *
-         * @type: method
+         * @type: method public
          * @param: array $tab
          * @param: string $name
          * @return: void
@@ -113,7 +150,7 @@
                     }
                 }
 
-                $this->${$name} = array_merge($this->${$name}, $tab);
+                self::${$name} = array_merge(self::${$name}, $tab);
             } else {
                 Throw new \Exception('Invalid var type : $meta');
             }
@@ -122,7 +159,7 @@
         /**
          * Do nothing
          *
-         * @type: method
+         * @type: method public
          * @param: void
          * @return: void
          */
