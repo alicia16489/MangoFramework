@@ -104,6 +104,23 @@ class App
       "core" => "./app/",
       "models" => "../"
     ));
+
+    // Flush output
+    if (ob_get_length() > 0) {
+        self::$container['Response']->write(ob_get_clean());
+    }
+
+    // Enable ouput buffering
+    ob_start();
+
+    //self::stop();
+  }
+
+  public static function stop($code = 200)
+  {
+    self::$container['Response']->status($code)
+                                ->write(ob_get_clean())
+                                ->send();
   }
 
 }
