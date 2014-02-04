@@ -10,8 +10,8 @@ class Response
   protected $body;
   protected $length = NULL;
   protected $type = 'json';
-  protected $data = NULL;
-  protected $defaultData;
+  protected $data;
+  protected $defaultData = 'no response';
   public $prettyPrint = FALSE;
   protected $validType = array(
     "json",
@@ -318,7 +318,7 @@ class Response
       "erasePrevBuffer" => TRUE
     );
 
-    if (!is_null($this->data) && !empty($this->data)) {
+    if (!empty($this->data)) {
       $data = $this->data;
     } else {
       $data = $this->defaultData;

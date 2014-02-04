@@ -1,6 +1,8 @@
 <?php
 namespace resources\logic;
-class UserResource
+use core\components\Resource;
+
+class UserResource extends Resource
 {
   public $routes = array(
     "/user/toto/:id/name/:name" => array("method" => "myMethod","cond" => array( ":id" => "\d+")),
@@ -9,12 +11,12 @@ class UserResource
 
   public function before()
   {
-    echo "BEFORE : logic User";
+
   }
 
   public function after()
   {
-    echo "AFTER : logic User";
+
   }
 
 /*  public function get()
@@ -29,7 +31,7 @@ class UserResource
 
   public function myGet()
   {
-    echo "myGet !!!!";
+    self::$response->setData('dfssd','default');
   }
 
 }

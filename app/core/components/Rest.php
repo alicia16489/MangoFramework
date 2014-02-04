@@ -4,20 +4,14 @@ namespace core\components;
 use core\App;
 use models;
 
-abstract class Rest extends Controller
+abstract class Rest extends Resource
 {
   private static $class;
-  protected static $response;
 
-  private function getClass()
-  {
-
-  }
-
-  public function beforeRest()
+  public function beforeMain()
   {
     self::$class = 'models\\'.str_replace('Resource','',str_replace('resources\physical\\','',get_called_class()));
-    self::$response = App::$container['Response'];
+    parent::beforeMain();
   }
 
   public function index()
