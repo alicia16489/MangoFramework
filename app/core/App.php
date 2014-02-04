@@ -68,6 +68,16 @@ class App
         echo "no resource";
       }
 
+        /**
+         * Make verif if is ajax request. If TRUE disable cache.
+         * Browser like I.E sometimes download the response in his cache
+         * and it never actualize the response again !!! Looks like that
+         *
+         * if (self::$container['Request']->isAjax()) {
+         *   self::$container['Response']->cache(FALSE);
+         * }
+         */
+
       // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
       // if not all old or/and next content in buffer will be append
       $params = array(
