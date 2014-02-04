@@ -72,9 +72,9 @@ class Container extends \Pimple
     };
 
     // Database
-    $this['Database'] = $this->share(function (){
+    $this['Database'] = function (){
         return Database::getInstance();
-    });
+    };
   }
 
 }

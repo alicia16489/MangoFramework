@@ -88,6 +88,7 @@ class App
       // SEND RESPONSE
       self::$container['Response']->sendResponse($params);
 
+      //self::stop();
     } catch (ContainerException $e) {
       var_dump($e);
     } catch (resourceMapException $e) {
@@ -124,13 +125,11 @@ class App
 
     // Enable ouput buffering
     ob_start();
-
-    //self::stop();
   }
 
   public static function stop($code = 200)
   {
-    self::$container['Response']->status($code)
+    self::$container['Response']->setStatus($code)
         ->write(ob_get_clean())
         ->send();
   }
