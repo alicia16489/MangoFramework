@@ -14,9 +14,16 @@ abstract class Rest extends Resource
     parent::beforeMain();
   }
 
+  private function getMethod($const)
+  {
+    $method = $const;
+    $pos = strrpos($method,'::');
+    $method = substr($method,$pos+2);
+    return $method;
+  }
+
   public function index()
   {
-    if(class_exists(self::$class)){
       $class = self::$class;
       $result = $class::All();
       $index = array();
@@ -31,12 +38,27 @@ abstract class Rest extends Resource
         // set the response data default
         self::$response->setData($index,'default');
       }
-    }
   }
 
   public function get($id)
   {
+    $class = self::$class;
+    $result = $class::find($id);
 
+    if(!is_object($result)){
+      $data = array(
+        'state' => 'Not Found',
+        'resource' => self::$resource,
+        'method' => self::getMethod(__METHOD__),
+        'id' => $id
+      );
+    }
+    else{
+      $data = $result->getAttributes();
+    }
+
+    // set the response data default
+    self::$response->setData($data,'default');
   }
 
   public function post()
