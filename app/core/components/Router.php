@@ -17,15 +17,10 @@ class Router extends Mux
     $this->blueprints = $blueprints;
   }
 
-  public function errorRouting()
-  {
-    $this->add('/error/:status', ['\core\components\Error', 'run']);
-  }
-
   public function logicRouting()
   {
     $routePatern = '/' . strtolower(str_replace('Controller','',$this->blueprints->controller));
-    $this->class = '\controllers\logic\\' . $this->blueprints->controller;
+    $this->class = '\controllers\\' . $this->blueprints->controller;
 
     $this->add($routePatern, [$this->class, 'get']);
     $this->add($routePatern . "/", [$this->class, 'get']);
@@ -36,7 +31,7 @@ class Router extends Mux
   public function subLogicRouting()
   {
     $routePatern = $this->blueprints->route;
-    $this->class = '\controllers\logic\\' . $this->blueprints->controller;
+    $this->class = '\controllers\\' . $this->blueprints->controller;
 
     $this->add($routePatern, [$this->class, $this->blueprints->method]);
 
@@ -46,7 +41,7 @@ class Router extends Mux
   public function restRouting()
   {
     $routePatern = '/' . strtolower(str_replace('Controller','',$this->blueprints->controller));
-    $this->class = '\controllers\physical\\' . $this->blueprints->controller;
+    $this->class = '\controllers\\' . $this->blueprints->controller;
 
     $this->get($routePatern . "/", [$this->class, 'index']);
     $this->get($routePatern, [$this->class, 'index']);

@@ -12,7 +12,7 @@ abstract class Rest extends Controller
 
     public function beforeMain()
     {
-        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\physical\\', '', get_called_class()));
+        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
         parent::beforeMain();
     }
 

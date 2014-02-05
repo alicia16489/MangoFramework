@@ -1,19 +1,28 @@
 <?php
 
-namespace controllers\physical;
+namespace controllers;
 use core\components\Rest;
 use core\App;
 use models\User;
 
 class UserController extends Rest
 {
+    public $routes = array(
+        "/user/toto/:id/name/:name" => array("method" => "myMethod","cond" => array( ":id" => "\d+")),
+        "/user/myget" => "myGet"
+    );
+
+    public function myGet()
+    {
+        echo "here";
+    }
+
   public function index()
   {
     /**
     * If you need some treatment before the default behaviour
     * Insert your code here
     */
-
 
     /**
     * Comment this line to prevent the default behaviour

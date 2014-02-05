@@ -43,7 +43,7 @@ class Blueprint
     $entity = str_replace('Controller','',$this->controller);
 
     if (in_array($entity, $physicalList)) {
-      $class = '\controllers\physical\\' . $this->controller;
+      $class = '\controllers\\' . $this->controller;
 
       if (class_exists($class)) {
         $this->exist['physical'] = true;
@@ -58,7 +58,7 @@ class Blueprint
     $logicList = App::$container['controllerMap']->controllers['logic'];
 
     if (in_array($this->controller, $logicList)) {
-      $class = '\controllers\logic\\' . $this->controller;
+      $class = '\controllers\\' . $this->controller;
 
       if (class_exists($class)) {
         $this->exist['logic'] = true;

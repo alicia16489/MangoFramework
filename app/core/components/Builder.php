@@ -4,101 +4,101 @@ namespace core\components;
 
 class Builder
 {
-  public function physicalController($class)
-  {
+    public function controller($class)
+    {
 
-    if(!file_exists('./app/controllers/physical/'.$class.'Controller.php')){
-      $handle = fopen('./app/controllers/physical/'.$class.'Controller.php','w');
-      $model = $class;
-      $class .= 'Controller';
-$text = <<<EOT
+        if (!file_exists('./app/controllers/' . $class . 'Controller.php')) {
+            $handle = fopen('./app/controllers/' . $class . 'Controller.php', 'w');
+            $model = $class;
+            $class .= 'Controller';
+            $text = <<<EOT
 <?php
 
-namespace controllers\\physical;
+namespace controllers;
 use core\components\Rest;
 use core\App;
 use models\\$model;
 
 class $class extends Rest
 {
-  public function index()
-  {
-    /**
-    * If you need some treatment before the default behaviour
-    * Insert your code here
-    */
+    public function index()
+    {
+        /**
+        * If you need some treatment before the default behaviour
+        * Insert your code here
+        */
 
-    /**
-    * Comment this line to prevent the default behaviour
-    */
-    parent::index();
-  }
+        /**
+        * Comment this line to prevent the default behaviour
+        */
+        parent::index();
+    }
 
-  public function get(\$id)
-  {
-    /**
-    * If you need some treatment before the default behaviour
-    * Insert your code here
-    */
+    public function get(\$id)
+    {
+        /**
+        * If you need some treatment before the default behaviour
+        * Insert your code here
+        */
 
-    /**
-    * Comment this line to prevent the default behaviour
-    */
-    parent::get(\$id);
-  }
+        /**
+        * Comment this line to prevent the default behaviour
+        */
+        parent::get(\$id);
+    }
 
-  public function post()
-  {
-    /**
-    * If you need some treatment before the default behaviour
-    * Insert your code here
-    */
+    public function post()
+    {
+        /**
+        * If you need some treatment before the default behaviour
+        * Insert your code here
+        */
 
-    /**
-    * Comment this line to prevent the default behaviour
-    */
-    parent::post();
-  }
+        /**
+        * Comment this line to prevent the default behaviour
+        */
+        parent::post();
+    }
 
-  public function put(\$id)
-  {
-    /**
-    * If you need some treatment before the default behaviour
-    * Insert your code here
-    */
+    public function put(\$id)
+    {
+        /**
+        * If you need some treatment before the default behaviour
+        * Insert your code here
+        */
 
-    /**
-    * Comment this line to prevent the default behaviour
-    */
-    parent::put(\$id);
-  }
+        /**
+        * Comment this line to prevent the default behaviour
+        */
+        parent::put(\$id);
+    }
 
-  public function delete (\$id)
-  {
-    /**
-    * If you need some treatment before the default behaviour
-    * Insert your code here
-    */
+    public function delete (\$id)
+    {
+        /**
+        * If you need some treatment before the default behaviour
+        * Insert your code here
+        */
 
-    /**
-    * Comment this line to prevent the default behaviour
-    */
-    parent::delete(\$id);
-  }
+        /**
+        * Comment this line to prevent the default behaviour
+        */
+        parent::delete(\$id);
+    }
 }
 EOT;
 
-    fwrite($handle,$text);
+            fwrite($handle, $text);
+        }
     }
-  }
 
-  public function physicalModel($class)
-  {
+    public function model($class)
+    {
 
-    if(!file_exists('./app/models/'.$class.'.php')){
+        if (!file_exists('./app/models/' . $class . '.php')) {
 
-      $handle = fopen('./app/models/'.$class.'.php','w');
-      $text = <<<EOT
+            $handle = fopen('./app/models/' . $class . '.php', 'w');
+            $text = <<<EOT
 <?php
 
 namespace models;
@@ -109,31 +109,30 @@ class User extends BaseModel{
 }
 EOT;
 
-      fwrite($handle,$text);
+            fwrite($handle, $text);
+        }
     }
-  }
 
-  public function physicalList($array)
-  {
-    $handle = fopen('./app/controllers/physical/list.php','w');
-    $strArray = 'array(';
-
-    foreach($array as $key => $entity)
+    public function modelList($array)
     {
-      if($key != 0)
-        $strArray .= ',';
-      $strArray .= '"'.$entity.'"';
-    }
+        $handle = fopen('./app/utils/list.php', 'w');
+        $strArray = 'array(';
 
-    $strArray .= ')';
+        foreach ($array as $key => $entity) {
+            if ($key != 0)
+                $strArray .= ',';
+            $strArray .= '"' . $entity . '"';
+        }
 
-    $text = <<<EOT
+        $strArray .= ')';
+
+        $text = <<<EOT
 <?php
 
 return $strArray;
 EOT;
 
-    fwrite($handle,$text);
-  }
+        fwrite($handle, $text);
+    }
 
 }

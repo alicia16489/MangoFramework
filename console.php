@@ -38,11 +38,11 @@ $console
         foreach($entityList as $key => $entity)
         {
           $entityList[$key] = $class = substr(ucfirst($entity),0,-1);
-          $builder->physicalcontroller($entityList[$key]);
-          $builder->physicalModel($entityList[$key]);
+          $builder->controller($entityList[$key]);
+          $builder->model($entityList[$key]);
         }
 
-        $builder->physicalList($entityList);
+        $builder->modelList($entityList);
       }
       elseif($input->getArgument('ormCommand') == 'build'){
 

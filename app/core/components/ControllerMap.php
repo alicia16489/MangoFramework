@@ -6,8 +6,8 @@ class controllerMapException extends \Exception{}
 class controllerMap
 {
   public $controllers = array();
-  const physicalListPath = "./controllers/physical/list.php";
-  const logicListPath = "./controllers/logic";
+  const physicalListPath = "./utils/list.php";
+  const logicListPath = "./controllers/";
 
   public function __construct()
   {
@@ -17,10 +17,10 @@ class controllerMap
 
   private function getPhysical()
   {
-    if (!file_exists("./controllers/physical/list.php"))
+    if (!file_exists($this::physicalListPath))
       throw new controllerMapException("Missing physical controller list from ORM migrate command, path : " . $this::physicalListPath);
 
-    if (!is_readable("./controllers/physical/list.php"))
+    if (!is_readable($this::physicalListPath))
       throw new controllerMapException("File not readable, premission denied, path : " . $this::physicalListPath);
 
     $physicalList = include($this::physicalListPath);
