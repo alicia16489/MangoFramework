@@ -24,8 +24,8 @@ class Router extends Mux
 
   public function logicRouting()
   {
-    $routePatern = '/' . strtolower(str_replace('Resource','',$this->blueprints->resource));
-    $this->class = '\resources\logic\\' . $this->blueprints->resource;
+    $routePatern = '/' . strtolower(str_replace('Controller','',$this->blueprints->controller));
+    $this->class = '\controllers\logic\\' . $this->blueprints->controller;
 
     $this->add($routePatern, [$this->class, 'get']);
     $this->add($routePatern . "/", [$this->class, 'get']);
@@ -36,7 +36,7 @@ class Router extends Mux
   public function subLogicRouting()
   {
     $routePatern = $this->blueprints->route;
-    $this->class = '\resources\logic\\' . $this->blueprints->resource;
+    $this->class = '\controllers\logic\\' . $this->blueprints->controller;
 
     $this->add($routePatern, [$this->class, $this->blueprints->method]);
 
@@ -45,8 +45,8 @@ class Router extends Mux
 
   public function restRouting()
   {
-    $routePatern = '/' . strtolower(str_replace('Resource','',$this->blueprints->resource));
-    $this->class = '\resources\physical\\' . $this->blueprints->resource;
+    $routePatern = '/' . strtolower(str_replace('Controller','',$this->blueprints->controller));
+    $this->class = '\controllers\physical\\' . $this->blueprints->controller;
 
     $this->get($routePatern . "/", [$this->class, 'index']);
     $this->get($routePatern, [$this->class, 'index']);
@@ -97,9 +97,9 @@ class Router extends Mux
       throw new RouterException('bad route');
 
     $class = $this->route[2][0];
-    $resource = new $class();
+    $controller = new $class();
 
-    if(method_exists($resource,$this->route[2][1])){
+    if(method_exists($controller,$this->route[2][1])){
       $this->beforeRouting();
       Executor::execute($this->route);
       $this->afterRouting();

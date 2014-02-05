@@ -1,16 +1,17 @@
 <?php
 
 namespace core\components;
+use core\App;
 
 class BlueprintException extends \Exception
 {
 }
 
-class Blueprint extends \core\App
+class Blueprint
 {
   public $route;
   public $pathInfo;
-  public $resource;
+  public $controller;
   public $type;
   public $lockRouter = false;
   public $exist = array();
@@ -30,7 +31,7 @@ class Blueprint extends \core\App
   public function __construct(Request $request)
   {
     $this->pathInfo = $request->properties['REQUEST_OPTION'];
-    $this->resource = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]).'Resource';
+    $this->controller = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]).'Controller';
     $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);;
     $this->existAsLogic();
     $this->existAsPhysical();
@@ -38,11 +39,11 @@ class Blueprint extends \core\App
 
   private function existAsPhysical()
   {
-    $physicalList = self::$container['resourceMap']->resources['physical'];
-    $entity = str_replace('Resource','',$this->resource);
+    $physicalList = App::$container['controllerMap']->controllers['physical'];
+    $entity = str_replace('Controller','',$this->controller);
 
     if (in_array($entity, $physicalList)) {
-      $class = '\resources\physical\\' . $this->resource;
+      $class = '\controllers\physical\\' . $this->controller;
 
       if (class_exists($class)) {
         $this->exist['physical'] = true;
@@ -54,10 +55,10 @@ class Blueprint extends \core\App
 
   private function existAsLogic()
   {
-    $logicList = self::$container['resourceMap']->resources['logic'];
+    $logicList = App::$container['controllerMap']->controllers['logic'];
 
-    if (in_array($this->resource, $logicList)) {
-      $class = '\resources\logic\\' . $this->resource;
+    if (in_array($this->controller, $logicList)) {
+      $class = '\controllers\logic\\' . $this->controller;
 
       if (class_exists($class)) {
         $this->exist['logic'] = true;
@@ -71,10 +72,10 @@ class Blueprint extends \core\App
   public function isLogic()
   {
     if (preg_match($this->patterns['logic'], $this->pathInfo)) {
-      $class = 'resources\logic\\' . $this->resource;
-      $resource = new $class();
+      $class = 'controllers\logic\\' . $this->controller;
+      $controller = new $class();
 
-      if (method_exists($resource, 'get')) {
+      if (method_exists($controller, 'get')) {
         return true;
       }
     }
@@ -85,11 +86,11 @@ class Blueprint extends \core\App
   public function isSubLogic()
   {
     if (!preg_match($this->patterns['logic'], $this->pathInfo)) {
-      $class = 'resources\logic\\' . $this->resource;
-      $resource = new $class();
+      $class = 'controllers\logic\\' . $this->controller;
+      $controller = new $class();
 
       if (property_exists($class, "routes")) {
-        foreach ($resource->routes as $route => $value) {
+        foreach ($controller->routes as $route => $value) {
           if($route[0] != '/'){
             $route = '/'.$route;
           }
@@ -120,7 +121,7 @@ class Blueprint extends \core\App
 
   public function isRest()
   {
-    $route = '/'.strtolower(str_replace('Resource','',$this->resource));
+    $route = '/'.strtolower(str_replace('Controller','',$this->controller));
     $param = '/:id';
     $pattern = array(':id' => '\d+');
 

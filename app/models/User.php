@@ -1,9 +1,8 @@
 <?php
 
 namespace models;
-use Illuminate\Database\Eloquent\Model;
+use core\components\BaseModel;
 
-class User extends Model
-{
-  //public $timestamps = false;
+class User extends BaseModel{
+    protected $softDelete = true;
 }

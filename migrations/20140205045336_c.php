@@ -2,18 +2,16 @@
 
 use Phpmig\Migration\Migration;
 
-class Users extends Migration
+class C extends Migration
 {
     /**
      * Do the migration
      */
     public function up()
     {
-      $this->get('schema')->create('users',function ($table){
-        $table->increments('id');
-        $table->string('email');
-        $table->softDeletes();
-      });
+        $this->get('schema')->table('users',function($table){
+            $table->dropColumn('created_at','updated_at');
+        });
     }
 
     /**

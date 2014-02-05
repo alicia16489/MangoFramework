@@ -1,8 +1,8 @@
 <?php
-namespace resources\logic;
-use core\components\Resource;
+namespace controllers\logic;
+use core\components\Controller;
 
-class UserResource extends Resource
+class UserController extends Controller
 {
   public $routes = array(
     "/user/toto/:id/name/:name" => array("method" => "myMethod","cond" => array( ":id" => "\d+")),
@@ -21,8 +21,11 @@ class UserResource extends Resource
 
 /*  public function get()
   {
-    echo "resource logic : User , method : get ";
+    echo "controller logic : User , method : get ";
   }*/
+
+
+
 
   public function myMethod($id,$name)
   {

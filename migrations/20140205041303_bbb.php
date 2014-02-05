@@ -2,16 +2,16 @@
 
 use Phpmig\Migration\Migration;
 
-class UpUsers extends Migration
+class Bbb extends Migration
 {
     /**
      * Do the migration
      */
     public function up()
     {
-      $this->get('schema')->table('users',function($table){
-        $table->timestamps();
-      });
+        $this->get('schema')->table('users',function($table){
+            $table->timestamps();
+        });
     }
 
     /**

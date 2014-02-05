@@ -4,17 +4,17 @@ namespace core\components;
 
 class Builder
 {
-  public function physicalResource($class)
+  public function physicalController($class)
   {
 
-    if(!file_exists('./app/resources/physical/'.$class.'Resource.php')){
-      $handle = fopen('./app/resources/physical/'.$class.'Resource.php','w');
+    if(!file_exists('./app/controllers/physical/'.$class.'Controller.php')){
+      $handle = fopen('./app/controllers/physical/'.$class.'Controller.php','w');
       $model = $class;
-      $class .= 'Resource';
+      $class .= 'Controller';
 $text = <<<EOT
 <?php
 
-namespace resources\\physical;
+namespace controllers\\physical;
 use core\components\Rest;
 use core\App;
 use models\\$model;
@@ -102,11 +102,10 @@ EOT;
 <?php
 
 namespace models;
-use Illuminate\Database\Eloquent\Model;
+use core\components\BaseModel;
 
-class $class extends Model
-{
-  public \$timestamps = false;
+class User extends BaseModel{
+    protected \$softDelete = true;
 }
 EOT;
 
@@ -116,7 +115,7 @@ EOT;
 
   public function physicalList($array)
   {
-    $handle = fopen('./app/resources/physical/list.php','w');
+    $handle = fopen('./app/controllers/physical/list.php','w');
     $strArray = 'array(';
 
     foreach($array as $key => $entity)

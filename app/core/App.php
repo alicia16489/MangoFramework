@@ -2,7 +2,7 @@
 
 namespace core;
 
-use core\components\resourceMapException;
+use core\components\controllerMapException;
 use core\components\RouterException;
 use core\components\BlueprintException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
@@ -43,7 +43,6 @@ class App
             self::$container['Blueprint']->type = 'physical';
 
           if (self::$container['Blueprint']->isRest()) {
-
             self::$container['Router']->restRouting();
             self::$container['Blueprint']->lockRouter = true;
           } elseif (self::$container['Blueprint']->isRest()) {
@@ -56,25 +55,17 @@ class App
           try {
             self::$container['Router']->execute();
           } catch (RouterException $e) {
-            // bad route for this resource !
+            // bad route for this controller !
             var_dump($e);
           }
         } else {
-          // no resource
-          echo "no resource";
+          // no controller
+          echo "no controller";
         }
-
-        // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
-        // if not all old or/and next content in buffer will be append
-        $params = array(
-          'die' => FALSE,
-          'erasePrevBuffer' => FALSE,
-        );
 
       } else {
         // home
       }
-
 
       /**
        * Make verif if is ajax request. If TRUE disable cache.
@@ -99,7 +90,7 @@ class App
       //self::stop();
     } catch (ContainerException $e) {
       var_dump($e);
-    } catch (resourceMapException $e) {
+    } catch (controllerMapException $e) {
       var_dump($e);
     }
   }
@@ -127,9 +118,9 @@ class App
     ));
 
     // Flush output
-    if (ob_get_length() > 0) {
+/*    if (ob_get_length() > 0) {
       self::$container['Response']->write(ob_get_clean());
-    }
+    }*/
 
     // Enable ouput buffering
     ob_start();

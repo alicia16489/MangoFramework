@@ -1,101 +1,172 @@
 <?php
 
 namespace core\components;
+use Illuminate\Database\QueryException;
+
 use core\App;
 use models;
 
-abstract class Rest extends Resource
+abstract class Rest extends Controller
 {
-  private static $class;
+    private static $class;
 
-  public function beforeMain()
-  {
-    self::$class = 'models\\'.str_replace('Resource','',str_replace('resources\physical\\','',get_called_class()));
-    parent::beforeMain();
-  }
+    public function beforeMain()
+    {
+        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\physical\\', '', get_called_class()));
+        parent::beforeMain();
+    }
 
-  private function getMethod($const)
-  {
-    $method = $const;
-    $pos = strrpos($method,'::');
-    $method = substr($method,$pos+2);
-    return $method;
-  }
+    private function getMethod($const)
+    {
+        $method = $const;
+        $pos = strrpos($method, '::');
+        $method = substr($method, $pos + 2);
+        return $method;
+    }
 
-  public function index()
-  {
-      $class = self::$class;
-      $result = $class::All();
-      $index = array();
+    public function index()
+    {
+        $class = self::$class;
+        $result = $class::All();
+        $index = array();
 
-      if(is_object($result)){
+        if (is_object($result)) {
 
-        foreach($result as $object)
-        {
-          $index[] = $object->getAttributes();
+            foreach ($result as $object) {
+                $index[] = $object->getAttributes();
+            }
+
+            // set the response data default
+            self::$response->setData($index, 'default');
+        }
+    }
+
+    public function get($id)
+    {
+        $class = self::$class;
+        $result = $class::find($id);
+
+        if (!is_object($result)) {
+            $data = array(
+                'state' => 'Not Found',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'id' => $id
+            );
+        } else {
+            $data = $result->getAttributes();
         }
 
         // set the response data default
-        self::$response->setData($index,'default');
-      }
-  }
-
-  public function get($id)
-  {
-    $class = self::$class;
-    $result = $class::find($id);
-
-    if(!is_object($result)){
-      $data = array(
-        'state' => 'Not Found',
-        'resource' => self::$resource,
-        'method' => self::getMethod(__METHOD__),
-        'id' => $id
-      );
-    }
-    else{
-      $data = $result->getAttributes();
+        self::$response->setData($data, 'default');
     }
 
-    // set the response data default
-    self::$response->setData($data,'default');
-  }
-
-  public function post()
-  {
-    $post = App::$container['post'];
-    $class = self::$class;
-    $object = new $class();
-    $table = str_replace('models\\','',strtolower($class).'s');
-    $schemaManager = App::$container['Database']->getSchemaManager();
-    $listTableColumns = $schemaManager->listTableColumns($table);
-
-    foreach($post as $column => $value)
+    public function post()
     {
-      if(!array_key_exists($column,$listTableColumns)){
-        self::$response->setData(array(
-          'state' => 'resource attribute not found',
-          'resource' => self::$resource,
-          'method' => self::getMethod(__METHOD__),
-          'attribute' => $column
-        ),'default');
-        return;
-      }
-      else{
-        $object->$column = $value;
-      }
+        $post = App::$container['post'];
+        $class = self::$class;
+        $object = new $class();
+        $table = str_replace('models\\', '', strtolower($class) . 's');
+        $schemaManager = App::$container['Database']->getSchemaManager();
+        $listTableColumns = $schemaManager->listTableColumns($table);
+
+        foreach ($post as $column => $value) {
+            if (!array_key_exists($column, $listTableColumns)) {
+                self::$response->setData(array(
+                    'state' => 'attribute not found',
+                    'controller' => self::$controller,
+                    'method' => self::getMethod(__METHOD__),
+                    'attribute' => $column
+                ), 'default');
+                return;
+            } else {
+                $object->$column = $value;
+            }
+        }
+
+        try {
+            $object->save();
+            self::$response->setData(array(
+                'state' => 'succeful',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'id' => $object->getAttributes()['id']
+            ));
+        } catch (QueryException $e) {
+            self::$response->setData(array(
+                'state' => 'unsucceful',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'Exception message' => $e->getMessage()
+            ));
+        }
     }
-    var_dump($listTableColumns);
-    $object->save();
-  }
 
-  public function put($id)
-  {
+    public function put($id)
+    {
+        $post = App::$container['post'];
+        $class = self::$class;
+        $result = $class::find($id);
+        $data = array();
 
-  }
+        if (!is_object($result)) {
+            $data = array(
+                'state' => 'Not Found',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'id' => $id
+            );
+        }
+        else{
+            $table = str_replace('models\\', '', strtolower($class) . 's');
+            $schemaManager = App::$container['Database']->getSchemaManager();
+            $listTableColumns = $schemaManager->listTableColumns($table);
 
-  public function delete ($id)
-  {
+            foreach ($post as $column => $value) {
+                echo "here";
+                if (!array_key_exists($column, $listTableColumns)) {
+                    self::$response->setData(array(
+                        'state' => 'attribute not found',
+                        'controller' => self::$controller,
+                        'method' => self::getMethod(__METHOD__),
+                        'attribute' => $column
+                    ), 'default');
+                    return;
+                } else {
+                    echo "here";
+                    $result->$column = $value;
+                }
+            }
 
-  }
+            var_dump($result);
+        }
+
+        self::$response->setData($data, 'default');
+    }
+
+    public function delete($id)
+    {
+        $class = self::$class;
+        $result = $class::find($id);
+
+        if (!is_object($result)) {
+            $data = array(
+                'state' => 'Not Found',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'id' => $id
+            );
+        }
+        else{
+            $result->delete();
+            $data = array(
+                'state' => 'succeful',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'id' => $id
+            );
+        }
+
+        self::$response->setData($data, 'default');
+    }
 }
