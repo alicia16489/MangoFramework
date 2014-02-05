@@ -86,7 +86,7 @@ class Blueprint
   public function isSubLogic()
   {
     if (!preg_match($this->patterns['logic'], $this->pathInfo)) {
-      $class = 'controllers\logic\\' . $this->controller;
+      $class = 'controllers\\' . $this->controller;
       $controller = new $class();
 
       if (property_exists($class, "routes")) {
