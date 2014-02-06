@@ -4,12 +4,12 @@ namespace core\components;
 
 class Error
 {
-  private $status;
+    private $status;
 
-  public function run($status)
-  {
+    public function run($status)
+    {
 
-  }
+    }
 
 
 }

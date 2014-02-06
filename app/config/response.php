@@ -1,7 +1,7 @@
 <?php
 
 return array(
-    'type' => 'json',
+    'type' => 'html',
     'prettyPrintJSON' => true,
     'eraseBuffer' => false
 );

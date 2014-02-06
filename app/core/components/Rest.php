@@ -1,6 +1,7 @@
 <?php
 
 namespace core\components;
+
 use Illuminate\Database\QueryException;
 
 use core\App;
@@ -116,14 +117,12 @@ abstract class Rest extends Controller
                 'method' => self::getMethod(__METHOD__),
                 'id' => $id
             );
-        }
-        else{
+        } else {
             $table = str_replace('models\\', '', strtolower($class) . 's');
             $schemaManager = App::$container['Database']->getSchemaManager();
             $listTableColumns = $schemaManager->listTableColumns($table);
 
             foreach ($post as $column => $value) {
-                echo "here";
                 if (!array_key_exists($column, $listTableColumns)) {
                     self::$response->setData(array(
                         'state' => 'attribute not found',
@@ -133,12 +132,17 @@ abstract class Rest extends Controller
                     ), 'default');
                     return;
                 } else {
-                    echo "here";
                     $result->$column = $value;
                 }
             }
 
-            var_dump($result);
+            $data = array(
+                'state' => 'succeful',
+                'controller' => self::$controller,
+                'method' => self::getMethod(__METHOD__),
+                'id' => $result->getAttributes()['id']
+            );
+            $result->save();
         }
 
         self::$response->setData($data, 'default');
@@ -156,8 +160,7 @@ abstract class Rest extends Controller
                 'method' => self::getMethod(__METHOD__),
                 'id' => $id
             );
-        }
-        else{
+        } else {
             $result->delete();
             $data = array(
                 'state' => 'succeful',

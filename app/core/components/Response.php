@@ -1,6 +1,7 @@
 <?php
 
 namespace core\components;
+
 use core\app;
 
 class Response
@@ -115,7 +116,7 @@ class Response
         if (!empty($config['prettyPrintJSON']))
             $this->prettyPrint = $config['prettyPrintJSON'];
 
-        if(!empty($config['eraseBuffer']))
+        if (!empty($config['eraseBuffer']))
             $this->eraseBuffer = $config['eraseBuffer'];
     }
 
@@ -422,7 +423,7 @@ class Response
 
         // set MIME Type
         //|| ($this->errorData === TRUE && $this->encodedErrorData === TRUE)
-        if ($this->type === 'json' ) {
+        if ($this->type === 'json') {
             $contentType = 'application/json';
         } else if ($this->type === 'html') {
             $contentType = 'text/html';
