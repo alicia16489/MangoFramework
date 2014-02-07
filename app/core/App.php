@@ -45,8 +45,9 @@ class App
                     if (self::$container['Blueprint']->isRest()) {
                         self::$container['Router']->restRouting();
                         self::$container['Blueprint']->lockRouter = true;
-                    } elseif (self::$container['Blueprint']->isComplexe()) {
-
+                    }
+                    elseif (self::$container['Blueprint']->isComplexe()) {
+                        self::$container['Router']->complexeRouting();
                     }
                 }
                 // END PHYSICAL

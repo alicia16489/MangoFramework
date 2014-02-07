@@ -59,6 +59,14 @@ class Router extends Mux
         $this->prepare($_SERVER['PATH_INFO']);
     }
 
+    public function complexeRouting()
+    {
+        $this->class = '\controllers\\' . $this->blueprints->controller;
+        $this->add('/complexe-wxx45wx4',[$this->class,'complexe']);
+
+        $this->prepare('/complexe-wxx45wx4');
+    }
+
     public function beforeRouting()
     {
         $this->add('/before-wxx45wx4', [$this->class, 'before']);

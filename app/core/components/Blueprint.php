@@ -139,12 +139,23 @@ class Blueprint
 
     public function isComplexe()
     {
-        $paterns = array(
-            '#^(~|=)[a-zA-Z0-9_\-.@(){}]+$#',
-            '#^(<|=|>)\d+$#'
-        );
+        $linkArr = array();
         $parts = array();
         $arr = $this->request->properties['REQUEST_OPTION_PARTS'];
+        $schemaManager = App::$container['Database']->getSchemaManager();
+        $listTableColumns = $schemaManager->listTableColumns($arr[1].'s');
+         //$listTableColumns['id']->getType();
+
+        $paterns = array(
+            'integer' => array(
+                '#^(<|<=|=|>=|>)?\d+$#' => 'compare',
+                '#^(in|out)\(\d+\-\d+\)$#' => 'interval'
+            ),
+            'string' => array(
+                '#^(~|=)[a-zA-Z0-9_\-.@(){}]+$#' => 'occur',
+                '#^(<|<=|=|>=|>)?\d+$#' => 'length'
+            )
+        );
         unset($arr[1]);
 
         foreach($arr as $key => $part)
@@ -156,15 +167,39 @@ class Blueprint
 
         $parts = array_values($arr);
         $nb = count($parts);
-        echo ($nb % 2);
         if(($nb % 2) == 0){
+            foreach($parts as $key => $part)
+            {
+                // column
+                if(($key % 2) == 0){
+                    if(array_key_exists($part,$listTableColumns)){
+                        $linkArr[$key]['column'] = $part;
+                        $linkArr[$key]['type'] = strtolower($listTableColumns[$part]->getType());
+                    }
+                    else{
+                        return false;
+                    }
+                }
+                // cond
+                elseif(($key % 2) == 1){
+                    $match = false;
+                    foreach($paterns[$linkArr[$key -1]['type']] as $patern => $action)
+                    {
+                        if(preg_match($patern,$part)){
+                            $linkArr[$key - 1]['cond'] = $part;
+                            $linkArr[$key - 1]['action'] = $action;
+                            $match = true;
+                        }
+                    }
 
+                    if(!$match)
+                        return false;
+                }
+            }
+
+            App::$container['ComplexeOptions'] = $linkArr;
+            return true;
         }
-    }
-
-    private function getOptions()
-    {
-
     }
 
     public function routeMatch($route, $paterns = NULL)

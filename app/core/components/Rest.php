@@ -7,7 +7,7 @@ use Illuminate\Database\QueryException;
 use core\App;
 use models;
 
-abstract class Rest extends Controller
+class Rest extends Controller
 {
     private static $class;
 
@@ -171,5 +171,62 @@ abstract class Rest extends Controller
         }
 
         self::$response->setData($data, 'default');
+    }
+
+    public function complexe()
+    {
+        $class = self::$class;
+        $options = App::$container['ComplexeOptions'];
+        $first = true;
+        var_dump(App::$container['ComplexeOptions']);
+        $DB = App::$container['Database']->getConnection();
+
+        $results = $DB->select('SELECT * FROM users where CHAR_LENGTH(name) > 3');
+        $model = $class::whereRaw('CHAR_LENGTH(name) > 3')->get();
+        //var_dump($model);
+
+        foreach($options as $option)
+        {
+            echo $option['action'];
+            if($option['action'] == 'occur' && $option['cond'][0] == '='){
+                if($first){
+                    $model = $class::where($option['column'],$option['cond'][0],substr($option['cond'],1));
+
+                }
+                else{
+                    $model = $model->where($option['column'],$option['cond'][0],substr($option['cond'],1));
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'occur' && $option['cond'][0] == '~'){
+                if($first){
+                    $model = $class::where($option['column'],'LIKE','%'.substr($option['cond'],1).'%');
+
+                }
+                else{
+                    $model = $model->where($option['column'],'LIKE','%'.substr($option['cond'],1).'%');
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'length'){
+                if($first){
+                    $model = $class::whereRaw('CHAR_LENGTH('.$option['column'].' '.$option['cond'][0].' '.substr($option['cond'],1));
+
+                }
+                else{
+
+                }
+                $first = false;
+            }
+        }
+
+        var_dump($model->getQuery());
+        $model = $model->get();
+
+        foreach ($model as $object)
+        {
+            var_dump($object);
+        }
+
     }
 }
