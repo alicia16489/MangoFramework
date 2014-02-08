@@ -1,7 +1,7 @@
 <?php
 
 namespace core\components;
-class controllerMapException extends \Exception
+class ControllerMapException extends \Exception
 {
 }
 

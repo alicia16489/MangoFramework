@@ -31,7 +31,7 @@ class Container extends \Pimple
             'Blueprint' => __NAMESPACE__ . '\components\Blueprint',
             'Router' => __NAMESPACE__ . '\components\Router',
             'Response' => __NAMESPACE__ . '\components\Response',
-            'controllerMap' => __NAMESPACE__ . '\components\controllerMap',
+            'ControllerMap' => __NAMESPACE__ . '\components\ControllerMap',
             'Database' => __NAMESPACE__ . '\components\Database'
         );
 
@@ -71,8 +71,8 @@ class Container extends \Pimple
         };
 
         // controllerMap
-        $this['controllerMap'] = function ($c) {
-            return new $c['dependencies']['controllerMap']();
+        $this['ControllerMap'] = function ($c) {
+            return new $c['dependencies']['ControllerMap']();
         };
 
         // Database
