@@ -4,73 +4,81 @@ namespace core;
 
 use core\components\Database;
 
+class ContainerException extends \Exception
+{
+}
+
 class Container extends \Pimple
 {
-  private static $container;
+    private static $container;
 
-  public static function getInstance()
-  {
-    if (is_null(self::$container)) {
-      self::$container = new self();
+    public static function getInstance()
+    {
+        if (is_null(self::$container)) {
+            self::$container = new self();
+        }
+
+        return self::$container;
     }
 
-    return self::$container;
-  }
-  
-  public function __construct()
-  {
-    $this['dependencies'] = array(
-      'Config' => __NAMESPACE__.'\components\Config',
-      'Request' => __NAMESPACE__.'\components\Request',
-      'Blueprints' => __NAMESPACE__.'\components\Blueprints',
-      'Router' => __NAMESPACE__.'\components\Router',
-      'Response' => __NAMESPACE__.'\components\Response',
-      'RessourceMap' => __NAMESPACE__.'\components\RessourceMap',
-      'Database' => __NAMESPACE__.'\components\Database'
-    );
+    public function __construct()
+    {
+        parse_str(file_get_contents("php://input"), $post_vars);
+        $this['post'] = $post_vars;
+        $this['dependencies'] = array(
+            'Config' => __NAMESPACE__ . '\components\Config',
+            'Request' => __NAMESPACE__ . '\components\Request',
+            'Blueprint' => __NAMESPACE__ . '\components\Blueprint',
+            'Router' => __NAMESPACE__ . '\components\Router',
+            'Response' => __NAMESPACE__ . '\components\Response',
+            'controllerMap' => __NAMESPACE__ . '\components\controllerMap',
+            'Database' => __NAMESPACE__ . '\components\Database'
+        );
 
-    foreach($this['dependencies'] as $key => $path){
-      if(!class_exists($path, true)){
-        throw new \Exception('Missing components : '.$key.' at path : '.$path);
-      }
+        foreach ($this['dependencies'] as $key => $path) {
+            if (!class_exists($path, true)) {
+                throw new ContainerException('Missing components : ' . $key . ' at path : ' . $path);
+            }
+        }
     }
-  }
 
-  public function loaders()
-  {
-    // Config
-    $this['Config'] = function ($c) {
-      return new $c['dependencies']['Config']();
-    };
+    public function loaders()
+    {
 
-    // Request
-    $this['Request'] = function ($c) {
-      return new $c['dependencies']['Request']();
-    };
+        // Config
+        $this['Config'] = function ($c) {
+            return new $c['dependencies']['Config']();
+        };
 
-    // Blueprints
-    $this['Blueprints'] = function ($c) {
-      return new $c['dependencies']['Blueprints']($c['Request']);
-    };
+        // Request
+        $this['Request'] = function ($c) {
+            return new $c['dependencies']['Request']();
+        };
 
-    // Router
-    $this['Router'] = function ($c) {
-      return new $c['dependencies']['Router']($c['Blueprints']);
-    };
+        // Blueprint
+        $this['Blueprint'] = function ($c) {
+            return new $c['dependencies']['Blueprint']($c['Request']);
+        };
 
-    // Response
-    $this['Response'] = function ($c) {
-      return new $c['dependencies']['Response']();
-    };
+        // Router
+        $this['Router'] = function ($c) {
+            return new $c['dependencies']['Router']($c['Blueprint']);
+        };
 
-    // RessourceMap
-    $this['RessourceMap'] = function ($c) {
-      return new $c['dependencies']['RessourceMap']();
-    };
+        // Response
+        $this['Response'] = function ($c) {
+            return new $c['dependencies']['Response']();
+        };
 
-    $this['Database'] = $this->share(function (){
-        return Database::getInstance();
-    });
-  }
+        // controllerMap
+        $this['controllerMap'] = function ($c) {
+            return new $c['dependencies']['controllerMap']();
+        };
+
+        // Database
+        $this['Database'] = function () {
+            return Database::getInstance();
+        };
+    }
 
 }

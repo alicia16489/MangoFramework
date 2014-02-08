@@ -1,7 +1,10 @@
-<?php namespace core\components;
+<?php
+namespace core\components;
 
 use \Illuminate\Database\Capsule\Manager as Capsule;
-Class Database {
+
+Class Database
+{
 
     private $config;
     private static $capsule;
@@ -13,32 +16,32 @@ Class Database {
     {
         if (!is_null(self::$instance)) {
             return self::$instance;
-        }
-        else {
-            $capsule = new \Illuminate\Database\Capsule\Manager();
+        } else {
+            $capsule = new Capsule();
             return new self($capsule);
         }
     }
+
     private function __construct(Capsule $capsule)
     {
-        $this->config = include('./config/database.php');
+        if (file_exists('./config/database.php'))
+            $this->config = include('./config/database.php');
+        elseif (file_exists('./app/config/database.php'))
+            $this->config = include('./app/config/database.php');
+
         self::$capsule = $capsule;
         $defaultDB = $this->config['default'];
         if (!empty($this->config['connections'][$defaultDB])) {
             try {
                 $capsule->addConnection($this->config['connections'][$defaultDB]);
-            }
-            catch (\PDOException $e) {
+            } catch (\PDOException $e) {
                 echo $e->getMessage();
             }
 
             $capsule->bootEloquent();
             $this->connection = $capsule->getConnection();
             $this->schemaManager = $this->connection->getDoctrineSchemaManager();
-            var_dump($this->schemaManager);
-            die();
-        }
-        else {
+        } else {
             //throw Exception
             echo 42;
         }
@@ -46,7 +49,7 @@ Class Database {
 
     public function getConnection()
     {
-       return $this->connection;
+        return $this->connection;
     }
 
     public function getSchema()

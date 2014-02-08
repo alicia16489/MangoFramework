@@ -2,92 +2,137 @@
 
 namespace core;
 
-use core\components\ressourceException;
+use core\components\controllerMapException;
 use core\components\RouterException;
+use core\components\BlueprintException;
 use Symfony\Component\ClassLoader\UniversalClassLoader;
 
 class App
 {
-  public static $container;
+    public static $container;
 
-  public static function run()
-  {
-    self::init();
+    public static function run()
+    {
+        try {
+            self::autoloader();
+            self::init();
 
-    try {
+            // IS HOME ? -- config home route ?!
+            if (self::$container['Blueprint']->pathInfo != '/') {
 
-      // IS HOME ?
-      if (self::$container['Blueprints']->pathInfo != '/') {
+                // LOGIC
+                if (self::$container['Blueprint']->exist['logic']) {
+                    self::$container['Blueprint']->type = 'logic';
 
-        // DEFAULT STATE
-        //self::$container['Router']->prepare('/error/405');
+                    if (self::$container['Blueprint']->isLogic()) {
 
-        // LOGIC
-        if (self::$container['Blueprints']->exist['logic']) {
+                        self::$container['Router']->logicRouting();
+                        self::$container['Blueprint']->lockRouter = true;
+                    } elseif (self::$container['Blueprint']->isSubLogic()) {
 
-          if (self::$container['Blueprints']->isLogic()) {
+                        self::$container['Router']->subLogicRouting();
+                        self::$container['Blueprint']->lockRouter = true;
+                    }
 
-            self::$container['Router']->logicRouting();
-            self::$container['Blueprints']->type = "logic";
-          } elseif (self::$container['Blueprints']->isSubLogic()) {
+                }
+                // END LOGIC
 
-            echo "isSubLogic <br>";
-            self::$container['Router']->subLogicRouting();
-            self::$container['Blueprints']->type = "logic";
-          }
+                // PHYSICAL
+                if (self::$container['Blueprint']->exist['physical'] && !self::$container['Blueprint']->lockRouter) {
+                    if (empty(self::$container['Blueprint']->type))
+                        self::$container['Blueprint']->type = 'physical';
+
+                    if (self::$container['Blueprint']->isRest()) {
+                        self::$container['Router']->restRouting();
+                        self::$container['Blueprint']->lockRouter = true;
+                    }
+                    elseif (self::$container['Blueprint']->isComplexe()) {
+                        self::$container['Router']->complexeRouting();
+                    }
+                }
+                // END PHYSICAL
+
+                if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
+                    try {
+                        self::$container['Router']->execute();
+                    } catch (RouterException $e) {
+                        // bad route for this controller !
+                        var_dump($e);
+                    }
+                } else {
+                    // no controller
+                    echo "no controller";
+                }
+
+            } else {
+                // home
+            }
+
+            /**
+             * Make verif if is ajax request. If TRUE disable cache.
+             * Browser like I.E sometimes download the response in his cache
+             * and it never actualize the response again !!! Looks like that
+             *
+             * if (self::$container['Request']->isAjax()) {
+             *   self::$container['Response']->cache(FALSE);
+             * }
+             */
+
+            // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
+            // if not all old or/and next content in buffer will be append
+            $params = array(
+                'die' => FALSE,
+                'erasePrevBuffer' => FALSE,
+            );
+
+            // SEND RESPONSE
+            self::$container['Response']->sendResponse($params);
+
+            //self::stop();
+        } catch (ContainerException $e) {
+            var_dump($e);
+        } catch (controllerMapException $e) {
+            var_dump($e);
         }
-        // END LOGIC
-
-        // PHYSICAL
-        if (self::$container['Blueprints']->exist['physical'] && self::$container['Blueprints']->type != "logic") {
-
-          if (self::$container['Blueprints']->isRest()) {
-            self::$container['Router']->restRouting();
-          }
-        }
-        // END PHYSICAL
-
-      } else {
-        self::$container['Router']->prepare('/error/404');
-      }
-
-      if(self::$container['Blueprints']->exist['logic'] || self::$container['Blueprints']->exist['physical']){
-        try
-        {
-          self::$container['Router']->execute();
-        }
-        catch(RouterException $e)
-        {
-          // no method
-        }
-      }
-
-
-    } catch (ressourceException $e) {
-      var_dump($e);
     }
 
-    // send response
-  }
+    public static function init()
+    {
+        self::$container = Container::getInstance();
+        self::$container->loaders();
+        self::$container['Database'];
+    }
 
-  public static function init()
-  {
-    self::autoloader();
-    self::$container = Container::getInstance();
-    self::$container->loaders();
-    self::$container['Database'];
+    public static function autoloader()
+    {
+        if (file_exists('vendors/autoload.php'))
+            require_once 'vendors/autoload.php';
+        elseif (file_exists('../vendors/autoload.php'))
+            require_once '../vendors/autoload.php';
 
+        $loader = new UniversalClassLoader();
+        $loader->useIncludePath(true);
+        $loader->register();
+        $loader->registerNamespaces(array(
+            "core" => "./app/",
+            "models" => "../"
+        ));
 
-  }
+        // Flush output
+        /*    if (ob_get_length() > 0) {
+              self::$container['Response']->write(ob_get_clean());
+            }*/
 
-  public static function autoloader()
-  {
-    require '../vendors/autoload.php';
+        // Enable ouput buffering
+        ob_start();
+    }
 
-    $loader = new UniversalClassLoader();
-    $loader->useIncludePath(true);
-    $loader->register();
-  }
+    public static function stop($code = 200)
+    {
+        self::$container['Response']->setStatus($code)
+            ->write(ob_get_clean())
+            ->send();
+    }
 
 }
 
