@@ -62,6 +62,7 @@ class App
                     self::$container['Blueprint']->type = 'physical';
 
                 if (self::$container['Blueprint']->isRest()) {
+                    self::$container['Router']->beforeRestRouting();
                     self::$container['Router']->restRouting();
                     self::$container['Blueprint']->lockRouter = true;
                 }
@@ -110,7 +111,7 @@ class App
         // SEND RESPONSE
         self::$container['Response']->sendResponse($params);
 
-        self::stop();
+        //self::stop();
     }
 
     public static function autoloader()

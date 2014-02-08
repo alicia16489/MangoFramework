@@ -78,6 +78,19 @@ class Router extends Mux
         }
     }
 
+    public function beforeRestRouting()
+    {
+        $this->class = '\controllers\\' . $this->blueprint->controller;
+        $this->add('/before:rest-1qr1q6e', [$this->class, 'beforeRest']);
+        try {
+            //Executor::execute($this->dispatch('/before:rest-1qr1q6e'));
+            $this->prepare('/before:rest-1qr1q6e');
+            $this->execute();
+            $this->route = '';
+        } catch (\Exception $e) {
+        }
+    }
+
     public function afterRouting()
     {
         $this->add('/after-wxx45wx4', [$this->class, 'after']);
