@@ -10,12 +10,20 @@ class UserController extends Rest
 {
     public $routes = array(
         "/user/toto/:id/name/:name" => array("method" => "myMethod", "cond" => array(":id" => "\d+")),
-        "/user/myget" => "myGet"
+        "/user/toto" => "toto",
+        "/user/:id" => "myGet"
     );
 
     public function myGet()
     {
         echo "here";
+        $this->routingTo('toto');
+
+    }
+
+    public function toto()
+    {
+        echo "HERE DUDE";
     }
 
     public function index()

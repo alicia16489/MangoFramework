@@ -15,7 +15,7 @@ class Response
     protected $defaultData;
     protected $errorData = NULL;
 
-    protected $eraseBuffer = FALSE;
+    public $eraseBuffer = FALSE;
     public $encodedErrorData = TRUE;
     public $prettyPrint = FALSE;
 
@@ -276,7 +276,6 @@ class Response
         } else {
             $this->body .= $body;
         }
-
 
         $this->length = strlen($this->body);
 

@@ -15,80 +15,11 @@ class App
     {
         try {
             self::autoloader();
+
             self::init();
+            self::routing();
+            self::response();
 
-            // IS HOME ? -- config home route ?!
-            if (self::$container['Blueprint']->pathInfo != '/') {
-
-                // LOGIC
-                if (self::$container['Blueprint']->exist['logic']) {
-                    self::$container['Blueprint']->type = 'logic';
-
-                    if (self::$container['Blueprint']->isLogic()) {
-
-                        self::$container['Router']->logicRouting();
-                        self::$container['Blueprint']->lockRouter = true;
-                    } elseif (self::$container['Blueprint']->isSubLogic()) {
-
-                        self::$container['Router']->subLogicRouting();
-                        self::$container['Blueprint']->lockRouter = true;
-                    }
-
-                }
-                // END LOGIC
-
-                // PHYSICAL
-                if (self::$container['Blueprint']->exist['physical'] && !self::$container['Blueprint']->lockRouter) {
-                    if (empty(self::$container['Blueprint']->type))
-                        self::$container['Blueprint']->type = 'physical';
-
-                    if (self::$container['Blueprint']->isRest()) {
-                        self::$container['Router']->restRouting();
-                        self::$container['Blueprint']->lockRouter = true;
-                    }
-                    elseif (self::$container['Blueprint']->isComplexe()) {
-                        self::$container['Router']->complexeRouting();
-                    }
-                }
-                // END PHYSICAL
-
-                if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
-                    try {
-                        self::$container['Router']->execute();
-                    } catch (RouterException $e) {
-                        // bad route for this controller !
-                        var_dump($e);
-                    }
-                } else {
-                    // no controller
-                    echo "no controller";
-                }
-
-            } else {
-                // home
-            }
-
-            /**
-             * Make verif if is ajax request. If TRUE disable cache.
-             * Browser like I.E sometimes download the response in his cache
-             * and it never actualize the response again !!! Looks like that
-             *
-             * if (self::$container['Request']->isAjax()) {
-             *   self::$container['Response']->cache(FALSE);
-             * }
-             */
-
-            // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
-            // if not all old or/and next content in buffer will be append
-            $params = array(
-                'die' => FALSE,
-                'erasePrevBuffer' => FALSE,
-            );
-
-            // SEND RESPONSE
-            self::$container['Response']->sendResponse($params);
-
-            //self::stop();
         } catch (ContainerException $e) {
             var_dump($e);
         } catch (controllerMapException $e) {
@@ -101,6 +32,85 @@ class App
         self::$container = Container::getInstance();
         self::$container->loaders();
         self::$container['Database'];
+    }
+
+    public static function routing()
+    {
+        // IS HOME ? -- config home route ?!
+        if (self::$container['Blueprint']->pathInfo != '/') {
+
+            // LOGIC
+            if (self::$container['Blueprint']->exist['logic']) {
+                self::$container['Blueprint']->type = 'logic';
+
+                if (self::$container['Blueprint']->isLogic()) {
+
+                    self::$container['Router']->logicRouting();
+                    self::$container['Blueprint']->lockRouter = true;
+                } elseif (self::$container['Blueprint']->isSubLogic()) {
+
+                    self::$container['Router']->subLogicRouting();
+                    self::$container['Blueprint']->lockRouter = true;
+                }
+
+            }
+            // END LOGIC
+
+            // PHYSICAL
+            if (self::$container['Blueprint']->exist['physical'] && !self::$container['Blueprint']->lockRouter) {
+                if (empty(self::$container['Blueprint']->type))
+                    self::$container['Blueprint']->type = 'physical';
+
+                if (self::$container['Blueprint']->isRest()) {
+                    self::$container['Router']->restRouting();
+                    self::$container['Blueprint']->lockRouter = true;
+                }
+                elseif (self::$container['Blueprint']->isComplexe()) {
+                    self::$container['Router']->complexeRouting();
+                }
+            }
+            // END PHYSICAL
+
+            if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
+                try {
+                    self::$container['Router']->execute();
+                } catch (RouterException $e) {
+                    // bad route for this controller !
+                    var_dump($e);
+                }
+            } else {
+                // no controller
+                echo "no controller";
+            }
+
+        } else {
+            // home
+        }
+    }
+
+    public static function response()
+    {
+        /**
+         * Make verif if is ajax request. If TRUE disable cache.
+         * Browser like I.E sometimes download the response in his cache
+         * and it never actualize the response again !!! Looks like that
+         *
+         * if (self::$container['Request']->isAjax()) {
+         *   self::$container['Response']->cache(FALSE);
+         * }
+         */
+
+        // with die at TRUE and erasePrevBuffer at TRUE the buffer will contain only this response
+        // if not all old or/and next content in buffer will be append
+        $params = array(
+            'die' => FALSE,
+            'erasePrevBuffer' => FALSE,
+        );
+
+        // SEND RESPONSE
+        self::$container['Response']->sendResponse($params);
+
+        self::stop();
     }
 
     public static function autoloader()
@@ -130,7 +140,7 @@ class App
     public static function stop($code = 200)
     {
         self::$container['Response']->setStatus($code)
-            ->write(ob_get_clean())
+            ->write(ob_get_clean(),true)
             ->send();
     }
 

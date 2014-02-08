@@ -13,8 +13,9 @@ class Rest extends Controller
 
     public function beforeMain()
     {
-        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
         parent::beforeMain();
+        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
+        self::$response->setType('json');
     }
 
     private function getMethod($const)
@@ -178,16 +179,14 @@ class Rest extends Controller
         $class = self::$class;
         $options = App::$container['ComplexeOptions'];
         $first = true;
-        var_dump(App::$container['ComplexeOptions']);
+        $models = array();
         $DB = App::$container['Database']->getConnection();
-
-        $results = $DB->select('SELECT * FROM users where CHAR_LENGTH(name) > 3');
-        $model = $class::whereRaw('CHAR_LENGTH(name) > 3')->get();
-        //var_dump($model);
+        $operators = array(
+            '<=','>=','<','>','='
+        );
 
         foreach($options as $option)
         {
-            echo $option['action'];
             if($option['action'] == 'occur' && $option['cond'][0] == '='){
                 if($first){
                     $model = $class::where($option['column'],$option['cond'][0],substr($option['cond'],1));
@@ -210,23 +209,42 @@ class Rest extends Controller
             }
             else if($option['action'] == 'length'){
                 if($first){
-                    $model = $class::whereRaw('CHAR_LENGTH('.$option['column'].' '.$option['cond'][0].' '.substr($option['cond'],1));
+                    $model = $class::whereRaw('CHAR_LENGTH('.$option['column'].') '.$option['cond'][0].' '.substr($option['cond'],1));
 
                 }
                 else{
+                    $model = $model->whereRaw('CHAR_LENGTH('.$option['column'].') '.$option['cond'][0].' '.substr($option['cond'],1));
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'compare'){
 
+                $i =0;
+                $myOp = $operators[$i];
+                while(strpos($option['cond'],$operators[$i]) === false)
+                {
+                    $i++;
+                    $myOp = $operators[$i];
+                }
+
+                if($first){
+                    $model = $class::where($option['column'],$myOp,str_replace($myOp,'',$option['cond']));
+
+                }
+                else{
+                    $model = $model->where($option['column'],$myOp,str_replace($myOp,'',$option['cond']));
                 }
                 $first = false;
             }
         }
-
-        var_dump($model->getQuery());
         $model = $model->get();
 
         foreach ($model as $object)
         {
-            var_dump($object);
+            $models[] = $object->getAttributes();
         }
+
+        self::$response->setData($models, 'default');
 
     }
 }

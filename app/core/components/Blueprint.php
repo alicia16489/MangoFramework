@@ -10,7 +10,6 @@ class BlueprintException extends \Exception
 
 class Blueprint
 {
-    public $request;
     public $route;
     public $pathInfo;
     public $controller;
@@ -32,10 +31,15 @@ class Blueprint
 
     public function __construct(Request $request)
     {
-        $this->request = $request;
         $this->pathInfo = $request->properties['REQUEST_OPTION'];
         $this->controller = ucfirst($request->properties['REQUEST_OPTION_PARTS'][1]) . 'Controller';
-        $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);;
+        $this->restMethod = $this->method = strtolower($request->properties['REQUEST_METHOD']);
+        $this->options = $request->properties['REQUEST_OPTION_PARTS'];
+        $this->init();
+    }
+
+    public function init()
+    {
         $this->existAsLogic();
         $this->existAsPhysical();
     }
@@ -90,7 +94,8 @@ class Blueprint
     {
         if (!preg_match($this->patterns['logic'], $this->pathInfo)) {
             $class = 'controllers\\' . $this->controller;
-            $controller = new $class();
+            if(class_exists($class))
+                $controller = new $class();
 
             if (property_exists($class, "routes")) {
                 foreach ($controller->routes as $route => $value) {
@@ -141,7 +146,7 @@ class Blueprint
     {
         $linkArr = array();
         $parts = array();
-        $arr = $this->request->properties['REQUEST_OPTION_PARTS'];
+        $arr = $this->options;
         $schemaManager = App::$container['Database']->getSchemaManager();
         $listTableColumns = $schemaManager->listTableColumns($arr[1].'s');
          //$listTableColumns['id']->getType();
