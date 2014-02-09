@@ -118,11 +118,12 @@ class Router extends Mux
 
         if (method_exists($controller, $this->route[2][1])) {
             $this->beforeRouting();
-            Executor::execute($this->route);
+            $response = Executor::execute($this->route);
             $this->afterRouting();
+
+            return $response;
         } else {
             throw new RouterException('missing methode');
         }
-
     }
 }

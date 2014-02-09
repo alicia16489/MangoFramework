@@ -74,7 +74,7 @@ class App
 
             if (self::$container['Blueprint']->exist['logic'] || self::$container['Blueprint']->exist['physical']) {
                 try {
-                    self::$container['Router']->execute();
+                    self::$container['Response']->setData(self::$container['Router']->execute());
                 } catch (RouterException $e) {
                     // bad route for this controller !
                     var_dump($e);

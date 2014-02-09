@@ -6,12 +6,14 @@ use core\App;
 
 abstract class Controller
 {
-    protected static $response;
     protected static $controller;
+    protected static $class;
+    protected  static $response;
 
     public function beforeMain()
     {
         self::$controller = strtolower(str_replace('Controller', '', str_replace('controllers\\', '', get_called_class())));
+        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
         self::$response = App::$container['Response'];
     }
 

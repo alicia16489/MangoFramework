@@ -9,13 +9,6 @@ use models;
 
 class Rest extends Controller
 {
-    private static $class;
-
-    public function beforeMain()
-    {
-        parent::beforeMain();
-        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
-    }
 
     public function beforeRest()
     {
@@ -33,12 +26,11 @@ class Rest extends Controller
     public function index()
     {
         $class = self::$class;
-        $index = array();
         $DB = App::$container['Database']->getConnection();
         $table = strtolower(str_replace('models\\','',$class)).'s';
-        $index = $DB->table('users')->select('*')->get();
+        $index = $DB->table($table)->select('*')->get();
 
-        self::$response->setData($index, 'default');
+        return $index;
     }
 
     public function get($id)
@@ -59,7 +51,7 @@ class Rest extends Controller
         }
 
         // set the response data default
-        self::$response->setData($data, 'default');
+        return $data;
     }
 
     public function post()
@@ -74,13 +66,12 @@ class Rest extends Controller
 
         foreach ($post as $column => $value) {
             if (!array_key_exists($column, $listTableColumns)) {
-                self::$response->setData(array(
+                return array(
                     'state' => 'attribute not found',
                     'controller' => self::$controller,
                     'method' => self::getMethod(__METHOD__),
                     'attribute' => $column
-                ), 'default');
-                return;
+                );
             } else {
                 $object->$column = $value;
             }
@@ -88,19 +79,19 @@ class Rest extends Controller
 
         try {
             $object->save();
-            self::$response->setData(array(
+            return array(
                 'state' => 'succeful',
                 'controller' => self::$controller,
                 'method' => self::getMethod(__METHOD__),
                 'id' => $object->getAttributes()['id']
-            ),'default');
+            );
         } catch (QueryException $e) {
-            self::$response->setData(array(
+            return array(
                 'state' => 'unsucceful',
                 'controller' => self::$controller,
                 'method' => self::getMethod(__METHOD__),
                 'Exception message' => $e->getMessage()
-            ),'default');
+            );
         }
     }
 
@@ -126,13 +117,12 @@ class Rest extends Controller
 
             foreach ($post as $column => $value) {
                 if (!array_key_exists($column, $listTableColumns)) {
-                    self::$response->setData(array(
+                    return array(
                         'state' => 'attribute not found',
                         'controller' => self::$controller,
                         'method' => self::getMethod(__METHOD__),
                         'attribute' => $column
-                    ), 'default');
-                    return;
+                    );
                 } else {
                     $result->$column = $value;
                 }
@@ -147,7 +137,7 @@ class Rest extends Controller
             $result->save();
         }
 
-        self::$response->setData($data, 'default');
+        return $data;
     }
 
     public function delete($id)
@@ -173,7 +163,7 @@ class Rest extends Controller
             );
         }
 
-        self::$response->setData($data, 'default');
+        return $data;
     }
 
     public function complexe()
