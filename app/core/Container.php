@@ -99,7 +99,7 @@ class Container extends \Pimple
             else {
                 if(class_exists($provider, true)) {
                     return call_user_func_array(array(
-                            new ReflectionClass($provider), 'newInstance'),
+                            new \ReflectionClass($provider), 'newInstance'),
                         $args);
                 }
                 throw new \Exception('Class not found :'.$provider);

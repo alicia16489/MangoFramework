@@ -4,7 +4,7 @@ namespace controllers;
 
 use core\components\Rest;
 use core\App;
-use Illuminate\Container\Container;
+use core\Container;
 use models\User;
 
 class UserController extends Rest
@@ -12,19 +12,19 @@ class UserController extends Rest
     public $routes = array(
         "/user/toto/:id/name/:name" => array("method" => "myMethod", "cond" => array(":id" => "\d+")),
         "/user/toto" => "toto",
-        //"/user/:id" => "myGet"
+        "/user/:id" => "myGet"
     );
 
     public function myGet()
     {
      $u = Container::make('UserFactory');
 
+        return 'toto';
     }
 
     public function toto()
     {
-        echo "HERE DUDE";
-        self::$response->setData('dfdfd');
+
     }
 
     public function index()
