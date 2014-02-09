@@ -306,7 +306,7 @@ class Response
                         $this->xmlEncode($value, $node, $file);
                     }
                 } else {
-                    $simpleXmlElement->addChild($key, $value);
+                    $simpleXmlElement->addChild('item' . $key, $value);
                 }
             }
         }

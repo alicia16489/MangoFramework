@@ -4,7 +4,7 @@
 
     Abstract Class Builder
     {
-        private function build($type = 'html', Array $analysis = array())
+        protected function build($type = 'html', Array $analysis = array())
         {
             if ($type === 'html') {
                 $builtArray = var_export($analysis, TRUE);
