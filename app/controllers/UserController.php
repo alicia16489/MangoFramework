@@ -4,18 +4,27 @@ namespace controllers;
 
 use core\components\Rest;
 use core\App;
+use core\Container;
 use models\User;
 
 class UserController extends Rest
 {
     public $routes = array(
         "/user/toto/:id/name/:name" => array("method" => "myMethod", "cond" => array(":id" => "\d+")),
-        "/user/myget" => "myGet"
+        "/user/toto" => "toto",
+        "/user/:id" => "myGet"
     );
 
     public function myGet()
     {
-        echo "here";
+     $u = Container::make('UserFactory');
+
+        return 'toto';
+    }
+
+    public function toto()
+    {
+
     }
 
     public function index()
@@ -25,10 +34,12 @@ class UserController extends Rest
          * Insert your code here
          */
 
+        //self::$response->setData('dfdfd','dds');
+
         /**
          * Comment this line to prevent the default behaviour
          */
-        parent::index();
+        return parent::index();
     }
 
     public function get($id)
@@ -41,7 +52,7 @@ class UserController extends Rest
         /**
          * Comment this line to prevent the default behaviour
          */
-        parent::get($id);
+        return parent::get($id);
     }
 
     public function post()
@@ -51,10 +62,12 @@ class UserController extends Rest
          * Insert your code here
          */
 
+        echo "AKAKAKAKAK";
+
         /**
          * Comment this line to prevent the default behaviour
          */
-        parent::post();
+        return parent::post();
     }
 
     public function put($id)
@@ -67,7 +80,7 @@ class UserController extends Rest
         /**
          * Comment this line to prevent the default behaviour
          */
-        parent::put($id);
+        return parent::put($id);
     }
 
     public function delete($id)
@@ -80,6 +93,6 @@ class UserController extends Rest
         /**
          * Comment this line to prevent the default behaviour
          */
-        parent::delete($id);
+        return parent::delete($id);
     }
 }

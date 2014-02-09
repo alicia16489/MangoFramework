@@ -7,4 +7,5 @@ use core\components\BaseModel;
 class User extends BaseModel
 {
     protected $softDelete = true;
+    protected $table = 'user';
 }

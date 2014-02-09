@@ -163,7 +163,7 @@ class Response
         return $this;
     }
 
-    public function setData($data, $type = 'default')
+    public function setData($data,$type = null)
     {
         if ($type === 'default') {
             $this->defaultData = $data;
@@ -277,7 +277,6 @@ class Response
         } else {
             $this->body .= $body;
         }
-
 
         $this->length = strlen($this->body);
 

@@ -31,7 +31,7 @@ class $class extends Rest
         /**
         * Comment this line to prevent the default behaviour
         */
-        parent::index();
+        return parent::index();
     }
 
     public function get(\$id)
@@ -44,7 +44,7 @@ class $class extends Rest
         /**
         * Comment this line to prevent the default behaviour
         */
-        parent::get(\$id);
+        return parent::get(\$id);
     }
 
     public function post()
@@ -57,7 +57,7 @@ class $class extends Rest
         /**
         * Comment this line to prevent the default behaviour
         */
-        parent::post();
+        return parent::post();
     }
 
     public function put(\$id)
@@ -70,7 +70,7 @@ class $class extends Rest
         /**
         * Comment this line to prevent the default behaviour
         */
-        parent::put(\$id);
+        return parent::put(\$id);
     }
 
     public function delete (\$id)
@@ -83,7 +83,7 @@ class $class extends Rest
         /**
         * Comment this line to prevent the default behaviour
         */
-        parent::delete(\$id);
+        return parent::delete(\$id);
     }
 }
 EOT;
