@@ -105,7 +105,7 @@ class App
 
     public static function autoloader()
     {
-        if (file_exists('vendors/autoload.php'))
+           if (file_exists('vendors/autoload.php'))
             require_once 'vendors/autoload.php';
         elseif (file_exists('../vendors/autoload.php'))
             require_once '../vendors/autoload.php';

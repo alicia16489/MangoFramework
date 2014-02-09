@@ -42,7 +42,7 @@ class Blueprint
 
     private function existAsPhysical()
     {
-        $physicalList = App::$container['controllerMap']->controllers['physical'];
+        $physicalList = App::$container['ControllerMap']->controllers['physical'];
         $entity = str_replace('Controller', '', $this->controller);
 
         if (in_array($entity, $physicalList)) {
@@ -58,7 +58,7 @@ class Blueprint
 
     private function existAsLogic()
     {
-        $logicList = App::$container['controllerMap']->controllers['logic'];
+        $logicList = App::$container['ControllerMap']->controllers['logic'];
 
         if (in_array($this->controller, $logicList)) {
             $class = '\controllers\\' . $this->controller;

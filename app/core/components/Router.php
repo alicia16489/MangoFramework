@@ -9,7 +9,7 @@ class RouterException extends \Exception
 {
 }
 
-;
+
 
 class Router extends Mux
 {

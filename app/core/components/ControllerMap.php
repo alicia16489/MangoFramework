@@ -5,7 +5,7 @@ class controllerMapException extends \Exception
 {
 }
 
-class controllerMap
+class ControllerMap
 {
     public $controllers = array();
     const physicalListPath = "./utils/list.php";

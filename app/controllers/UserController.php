@@ -1,9 +1,10 @@
 <?php
 
 namespace controllers;
-
+use factories;
 use core\components\Rest;
 use core\App;
+use core\Container;
 use models\User;
 
 class UserController extends Rest
@@ -15,7 +16,9 @@ class UserController extends Rest
 
     public function myGet()
     {
-        echo "here";
+        $factory = new factories\UserFactory();
+        //$factory = Container::make('UserFactory');
+        self::$response->setData($factory->countUser());
     }
 
     public function index()
