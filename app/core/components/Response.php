@@ -379,7 +379,7 @@ class Response
             "code" => 200,
             "encode" => TRUE,
             "replace" => TRUE,
-            "die" => TRUE,
+            "die" => FALSE,
             "xmlFile" => NULL,
             "htmlJSONEncode" => TRUE
         );
