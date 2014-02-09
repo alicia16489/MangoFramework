@@ -15,7 +15,7 @@ class Response
     protected $type = 'json';
     protected $data = NULL;
     protected $defaultData;
-    protected $errorData = NULL;
+    protected $errorData = FALSE;
     protected $prettyPrint = FALSE;
     protected $eraseBuffer = FALSE;
     protected $encodedErrorData = TRUE;
@@ -163,7 +163,7 @@ class Response
         return $this;
     }
 
-    public function setData($data,$type = null)
+    public function setData($data = null,$type = null)
     {
         if ($type === 'default') {
             $this->defaultData = $data;
@@ -296,21 +296,29 @@ class Response
 
             return $simpleXmlElement->asXML();
         } else {
-            foreach ($data as $key => $value) {
-                if (is_array($value)) {
-                    if (!is_numeric($key)) {
-                        $node = $simpleXmlElement->addChild($key);
-                        $this->xmlEncode($value, $node, $file);
+            if (is_array($data)) {
+                foreach ($data as $key => $value) {
+                    if (is_array($value)) {
+                        if (!is_numeric($key)) {
+                            $node = $simpleXmlElement->addChild($key);
+                            $this->xmlEncode($value, $node, $file);
+                        } else {
+                            $node = $simpleXmlElement->addChild('item' . $key);
+                            $this->xmlEncode($value, $node, $file);
+                        }
                     } else {
-                        $node = $simpleXmlElement->addChild('item' . $key);
-                        $this->xmlEncode($value, $node, $file);
+                        if (!is_numeric($key)) {
+                            $simpleXmlElement->addChild($key, $value);
+                        } else {
+                            $simpleXmlElement->addChild('item' . $key, $value);
+                        }
                     }
+                }
+            } else {
+                if (!is_null($data)) {
+                    $simpleXmlElement->addChild('item', $data);
                 } else {
-                    if (!is_numeric($key)) {
-                        $simpleXmlElement->addChild($key, $value);
-                    } else {
-                        $simpleXmlElement->addChild('item' . $key, $value);
-                    }
+                    $simpleXmlElement->addChild('item', 'null');
                 }
             }
         }

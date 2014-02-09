@@ -111,7 +111,7 @@ class App
         // SEND RESPONSE
         self::$container['Response']->sendResponse($params);
 
-        self::stop();
+        //self::stop();
     }
 
     public static function autoloader()
