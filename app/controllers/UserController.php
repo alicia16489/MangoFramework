@@ -4,6 +4,7 @@ namespace controllers;
 
 use core\components\Rest;
 use core\App;
+use Illuminate\Container\Container;
 use models\User;
 
 class UserController extends Rest
@@ -16,8 +17,7 @@ class UserController extends Rest
 
     public function myGet()
     {
-        echo "here";
-        $this->routingTo('/user/toto');
+     $u = Container::make('UserFactory');
 
     }
 

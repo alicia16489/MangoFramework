@@ -42,8 +42,7 @@ Class Database
             $this->connection = $capsule->getConnection();
             $this->schemaManager = $this->connection->getDoctrineSchemaManager();
         } else {
-            //throw Exception
-            echo 42;
+
         }
     }
 

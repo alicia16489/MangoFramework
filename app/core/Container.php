@@ -1,7 +1,7 @@
 <?php
 
 namespace core;
-
+use factories\UserFactory;
 use core\components\Database;
 
 class ContainerException extends \Exception
@@ -81,4 +81,30 @@ class Container extends \Pimple
         };
     }
 
+    public static function make($name, $args = array())
+    {
+
+        if (!file_exists('./config/app.php')) {
+            throw new Exception("Config file missing : ./config/app.php", 1);
+            return false;
+        }
+        else {
+            $providers = require_once './config/app.php';
+            $providers = $providers['providers'];
+            $provider = $providers[$name];
+            if (!array_key_exists($name, $providers)) {
+                throw new \Exception("No such providers :".$name, 1);
+                return 42;
+            }
+            else {
+                if(class_exists($provider, true)) {
+                    return call_user_func_array(array(
+                            new ReflectionClass($provider), 'newInstance'),
+                        $args);
+                }
+                throw new \Exception('Class not found :'.$provider);
+                return false;
+            }
+        }
+    }
 }
