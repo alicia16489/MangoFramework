@@ -9,59 +9,56 @@ class RouterException extends \Exception
 {
 }
 
-
-
 class Router extends Mux
 {
-    private $route;
+    public $route;
     private $class;
-    private $blueprints;
+    private $blueprint;
 
-    public function __construct(Blueprint $blueprints)
+    public function __construct(Blueprint $blueprint)
     {
-        $this->blueprints = $blueprints;
+        $this->blueprint = $blueprint;
     }
 
     public function logicRouting()
     {
-        $routePatern = '/' . strtolower(str_replace('Controller', '', $this->blueprints->controller));
-        $this->class = '\controllers\\' . $this->blueprints->controller;
+        $routePatern = '/' . strtolower(str_replace('Controller', '', $this->blueprint->controller));
+        $this->class = '\controllers\\' . $this->blueprint->controller;
 
         $this->add($routePatern, [$this->class, 'show']);
         $this->add($routePatern . "/", [$this->class, 'show']);
 
-        $this->prepare($_SERVER['PATH_INFO']);
+        $this->prepare($this->blueprint->pathInfo);
     }
 
     public function subLogicRouting()
     {
-        $routePatern = $this->blueprints->route;
-        $this->class = '\controllers\\' . $this->blueprints->controller;
+        $routePatern = $this->blueprint->route;
+        $this->class = '\controllers\\' . $this->blueprint->controller;
 
-        $this->add($routePatern, [$this->class, $this->blueprints->method]);
+        $this->add($routePatern, [$this->class, $this->blueprint->method]);
 
-        $this->prepare($_SERVER['PATH_INFO']);
+        $this->prepare($this->blueprint->pathInfo);
     }
 
     public function restRouting()
     {
-        $routePatern = '/' . strtolower(str_replace('Controller', '', $this->blueprints->controller));
-        $this->class = '\controllers\\' . $this->blueprints->controller;
+        $routePatern = '/' . strtolower(str_replace('Controller', '', $this->blueprint->controller));
+        $this->class = '\controllers\\' . $this->blueprint->controller;
 
         $this->get($routePatern . "/", [$this->class, 'index']);
         $this->get($routePatern, [$this->class, 'index']);
-        $this->get($routePatern . '/:id', [$this->class, $this->blueprints->restMethod]);
-        $this->post($routePatern, [$this->class, $this->blueprints->restMethod]);
-        $this->put($routePatern . '/:id', [$this->class, $this->blueprints->restMethod]);
-        $this->delete($routePatern . '/:id', [$this->class, $this->blueprints->restMethod]);
+        $this->get($routePatern . '/:id', [$this->class, 'get']);
+        $this->post($routePatern, [$this->class, 'post']);
+        $this->put($routePatern . '/:id', [$this->class, 'put']);
+        $this->delete($routePatern . '/:id', [$this->class, 'delete']);
 
-
-        $this->prepare($_SERVER['PATH_INFO']);
+        $this->prepare($this->blueprint->pathInfo);
     }
 
     public function complexeRouting()
     {
-        $this->class = '\controllers\\' . $this->blueprints->controller;
+        $this->class = '\controllers\\' . $this->blueprint->controller;
         $this->add('/complexe-wxx45wx4',[$this->class,'complexe']);
 
         $this->prepare('/complexe-wxx45wx4');
@@ -77,6 +74,19 @@ class Router extends Mux
         $this->add('/before:main-wxx45wx4', [$this->class, 'beforeMain']);
         try {
             Executor::execute($this->dispatch('/before:main-wxx45wx4'));
+        } catch (\Exception $e) {
+        }
+    }
+
+    public function beforeRestRouting()
+    {
+        $this->class = '\controllers\\' . $this->blueprint->controller;
+        $this->add('/before:rest-1qr1q6e', [$this->class, 'beforeRest']);
+        try {
+            //Executor::execute($this->dispatch('/before:rest-1qr1q6e'));
+            $this->prepare('/before:rest-1qr1q6e');
+            $this->execute();
+            $this->route = '';
         } catch (\Exception $e) {
         }
     }
@@ -101,7 +111,7 @@ class Router extends Mux
     public function execute()
     {
         if (empty($this->route))
-            throw new RouterException('bad route');
+            throw new RouterException('bad route : '.$this->blueprint->pathInfo);
 
         $class = $this->route[2][0];
         $controller = new $class();

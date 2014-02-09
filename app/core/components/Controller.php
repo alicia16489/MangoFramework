@@ -15,5 +15,14 @@ abstract class Controller
         self::$response = App::$container['Response'];
     }
 
+    public function routingTo($route)
+    {
+        App::$container['Blueprint']->pathInfo = $route;
+        $parts = explode('/',$route);
+        if(!empty($parts[1]))
+            App::$container['Blueprint']->controller = ucfirst($parts[1]) . 'Controller';
+        App::$container['Router']->route = '';
+        App::routing();
+    }
 
 }

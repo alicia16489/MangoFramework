@@ -5,3 +5,4 @@ return array(
     'prettyPrintJSON' => true,
     'eraseBuffer' => false
 );
+

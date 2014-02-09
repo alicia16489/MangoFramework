@@ -13,8 +13,13 @@ class Rest extends Controller
 
     public function beforeMain()
     {
-        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
         parent::beforeMain();
+        self::$class = 'models\\' . str_replace('Controller', '', str_replace('controllers\\', '', get_called_class()));
+    }
+
+    public function beforeRest()
+    {
+        self::$response->setType('json');
     }
 
     private function getMethod($const)
@@ -28,22 +33,17 @@ class Rest extends Controller
     public function index()
     {
         $class = self::$class;
-        $result = $class::All();
         $index = array();
+        $DB = App::$container['Database']->getConnection();
+        $table = strtolower(str_replace('models\\','',$class)).'s';
+        $index = $DB->table('users')->select('*')->get();
 
-        if (is_object($result)) {
-
-            foreach ($result as $object) {
-                $index[] = $object->getAttributes();
-            }
-
-            // set the response data default
-            self::$response->setData($index, 'default');
-        }
+        self::$response->setData($index, 'default');
     }
 
     public function get($id)
     {
+        self::$response->setType('json');
         $class = self::$class;
         $result = $class::find($id);
 
@@ -64,6 +64,7 @@ class Rest extends Controller
 
     public function post()
     {
+        self::$response->setType('json');
         $post = App::$container['post'];
         $class = self::$class;
         $object = new $class();
@@ -92,19 +93,20 @@ class Rest extends Controller
                 'controller' => self::$controller,
                 'method' => self::getMethod(__METHOD__),
                 'id' => $object->getAttributes()['id']
-            ));
+            ),'default');
         } catch (QueryException $e) {
             self::$response->setData(array(
                 'state' => 'unsucceful',
                 'controller' => self::$controller,
                 'method' => self::getMethod(__METHOD__),
                 'Exception message' => $e->getMessage()
-            ));
+            ),'default');
         }
     }
 
     public function put($id)
     {
+        self::$response->setType('json');
         $post = App::$container['post'];
         $class = self::$class;
         $result = $class::find($id);
@@ -150,6 +152,7 @@ class Rest extends Controller
 
     public function delete($id)
     {
+        self::$response->setType('json');
         $class = self::$class;
         $result = $class::find($id);
 
@@ -175,19 +178,88 @@ class Rest extends Controller
 
     public function complexe()
     {
+        self::$response->setType('json');
         $class = self::$class;
         $options = App::$container['ComplexeOptions'];
         $first = true;
-        var_dump(App::$container['ComplexeOptions']);
+        $models = array();
         $DB = App::$container['Database']->getConnection();
-
-        $results = $DB->select('SELECT * FROM users where CHAR_LENGTH(name) > 3');
-        $model = $class::whereRaw('CHAR_LENGTH(name) > 3')->get();
-        //var_dump($model);
+        $table = strtolower(str_replace('models\\','',$class)).'s';
+        $query = 'select * from '.$table;
+        $operators = array(
+            '<=','>=','<','>','='
+        );
 
         foreach($options as $option)
         {
-            echo $option['action'];
+            if($option['action'] == 'occur' && $option['cond'][0] == '='){
+                if($first){
+                    $query .= ' where '.$option['column'].' '.$option['cond'][0].' "'.substr($option['cond'],1).'"';
+                }
+                else{
+                    $query .= ' and '.$option['column'].' '.$option['cond'][0].' "'.substr($option['cond'],1).'"';
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'occur' && $option['cond'][0] == '~'){
+                if($first){
+                    $query .= ' where '.$option['column'].' LIKE "%'.substr($option['cond'],1).'%"';
+                }
+                else{
+                    $query .= ' and '.$option['column'].' LIKE "%'.substr($option['cond'],1).'%"';
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'length'){
+                if($first){
+                    $query .= ' where CHAR_LENGTH('.$option['column'].') '.$option['cond'][0].' '.substr($option['cond'],1);
+
+                }
+                else{
+                    $query .= ' and CHAR_LENGTH('.$option['column'].') '.$option['cond'][0].' '.substr($option['cond'],1);
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'compare'){
+
+                $i =0;
+                $myOp = $operators[$i];
+                while(strpos($option['cond'],$operators[$i]) === false)
+                {
+                    $i++;
+                    $myOp = $operators[$i];
+                }
+
+                if($first){
+                    $query .= ' where '.$option['column'].' '.$myOp.' '.str_replace($myOp,'',$option['cond']);
+                }
+                else{
+                    $query .= ' and '.$option['column'].' '.$myOp.' '.str_replace($myOp,'',$option['cond']);
+                }
+                $first = false;
+            }
+        }
+
+        $models = $DB->select($query);
+
+        self::$response->setData($models, 'default');
+
+    }
+
+    public function complexei()
+    {
+        self::$response->setType('json');
+        $class = self::$class;
+        $options = App::$container['ComplexeOptions'];
+        $first = true;
+        $models = array();
+        $DB = App::$container['Database']->getConnection();
+        $operators = array(
+            '<=','>=','<','>','='
+        );
+
+        foreach($options as $option)
+        {
             if($option['action'] == 'occur' && $option['cond'][0] == '='){
                 if($first){
                     $model = $class::where($option['column'],$option['cond'][0],substr($option['cond'],1));
@@ -210,23 +282,42 @@ class Rest extends Controller
             }
             else if($option['action'] == 'length'){
                 if($first){
-                    $model = $class::whereRaw('CHAR_LENGTH('.$option['column'].' '.$option['cond'][0].' '.substr($option['cond'],1));
+                    $model = $class::whereRaw('CHAR_LENGTH('.$option['column'].') '.$option['cond'][0].' '.substr($option['cond'],1));
 
                 }
                 else{
+                    $model = $model->whereRaw('CHAR_LENGTH('.$option['column'].') '.$option['cond'][0].' '.substr($option['cond'],1));
+                }
+                $first = false;
+            }
+            else if($option['action'] == 'compare'){
 
+                $i =0;
+                $myOp = $operators[$i];
+                while(strpos($option['cond'],$operators[$i]) === false)
+                {
+                    $i++;
+                    $myOp = $operators[$i];
+                }
+
+                if($first){
+                    $model = $class::where($option['column'],$myOp,str_replace($myOp,'',$option['cond']));
+
+                }
+                else{
+                    $model = $model->where($option['column'],$myOp,str_replace($myOp,'',$option['cond']));
                 }
                 $first = false;
             }
         }
-
-        var_dump($model->getQuery());
         $model = $model->get();
 
         foreach ($model as $object)
         {
-            var_dump($object);
+            $models[] = $object->getAttributes();
         }
+
+        self::$response->setData($models, 'default');
 
     }
 }
