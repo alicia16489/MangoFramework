@@ -4,6 +4,8 @@ namespace core\components;
 
 use core\app;
 
+class ResponseException extends \Exception {}
+
 class Response
 {
     protected $status = NULL;
@@ -14,10 +16,9 @@ class Response
     protected $data = NULL;
     protected $defaultData;
     protected $errorData = NULL;
-
+    protected $prettyPrint = FALSE;
     protected $eraseBuffer = FALSE;
-    public $encodedErrorData = TRUE;
-    public $prettyPrint = FALSE;
+    protected $encodedErrorData = TRUE;
 
     protected $validType = array(
         "json",
@@ -132,10 +133,10 @@ class Response
                         self::$statusCodes[$kcode] = $message;
                     }
                 } else {
-                    Throw New \Exception('Invalid var type : $code must be an array in this case');
+                    Throw New \ResponseException('Invalid var type : $code must be an array in this case');
                 }
             } else {
-                Throw New \Exception('Invalid status code');
+                Throw New \ResponseException('Invalid status code');
             }
         }
 
@@ -190,7 +191,7 @@ class Response
             if (array_key_exists($code, self::$statusCodes)) {
                 return self::$statusCodes[$code];
             } else {
-                Throw New \Exception('Invalid status code');
+                Throw New \ResponseException('Invalid status code');
             }
         } else {
             return $code;
@@ -246,7 +247,7 @@ class Response
             case 'serverError':
                 return $this->status >= 500 && $this->status < 600;
             default:
-                Throw new \Exception('Invalid var value');
+                Throw new \ResponseException('Invalid var $type value: check "is" method to have the list');
         }
     }
 
@@ -334,8 +335,8 @@ class Response
     {
         header(
             $_SERVER['SERVER_PROTOCOL'] .
-            ' ' . $this->status .
-            ' ' . self::$statusCodes[$this->status],
+                ' ' . $this->status .
+                ' ' . self::$statusCodes[$this->status],
             TRUE,
             $this->status
         );
@@ -380,7 +381,8 @@ class Response
             "encode" => TRUE,
             "replace" => TRUE,
             "die" => TRUE,
-            "xmlFile" => NULL
+            "xmlFile" => NULL,
+            "htmlJSONEncode" => TRUE
         );
 
         $this->status = (!is_null($this->status) ? $this->status : $params['code']);
@@ -401,7 +403,7 @@ class Response
         if (in_array($this->type, $this->validType)) {
             $type = $this->type;
         } else {
-            $data = $this->isDataError("Invalid response format : must be 'json', 'xml' or 'html'");
+            Throw new ResponseException("Invalid response format : must be 'json', 'xml' or 'html'");
         }
 
         // encode data
@@ -409,10 +411,12 @@ class Response
             if ($type === 'json') {
                 $encodedData = $this->jsonEncodeUTF8($data);
             } else if ($type === 'html' || $type === 'plain') {
-                if (!is_array($data)) {
-                    $encodedData = $data;
+                if (is_array($data) && $params['htmlJSONEncode'] === TRUE) {
+                    $encodedData = $this->jsonEncodeUTF8($data);
+                } else if (is_array($data) && $params['htmlJSONEncode'] === FALSE) {
+                    Throw new ResponseException('Invalid var type : $data can\'t be an array in html response mode');
                 } else {
-                    $encodedData = $this->isDataError('Invalid var type : $data can\'t be an array in html response mode', 403);
+                    $encodedData = $data;
                 }
             } else if ($type === 'xml') {
                 $encodedData = $this->xmlEncode($data, NULL, $params['xmlFile']);

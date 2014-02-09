@@ -2,7 +2,7 @@
 
 namespace utils;
 
-Class Analysis Extends htmlPattern
+Class Analysis Extends Builder
 {
     protected $fullContent = array();
     protected $docType = 'html';
@@ -11,39 +11,15 @@ Class Analysis Extends htmlPattern
     private $reflectionClass;
 
     // comming soon
-    private function buildTemplatePDF()
-    {
-
-    }
-
-    // comming soon
-    private function buildTemplateXML()
+    private function docPDF()
     {
 
     }
 
     // Waiting for template
-    private function buildTemplateHTML()
+    private function docHTML()
     {
-        $builtArray = var_export($this->builtArray, TRUE);
-        $htmlTag = var_export($this->tag, TRUE);
-        $cssProperties = var_export($this->style, TRUE);
-        $meta = var_export($this->meta, TRUE);
-
-        $docHtmlContent = <<<EOT
-<?php
-
-    \$builtArrayInject = $builtArray;
-    \$meta = $meta;
-    \$cssProperties = $cssProperties;
-    \$htmlTag = $htmlTag;
-
-    foreach(\$builtArrayInject as \$mainKey => \$fileParsed) {
-        echo 'file : ' . \$mainKey = \$builtArrayInject[\$mainKey]['infos']['filePath'] . '<br />';
-    }
-EOT;
-        var_dump($this->builtArray);
-        file_put_contents('doc.php', $docHtmlContent);
+        $this->build('html', $this->builtArray);
     }
 
     private function buildArray()
@@ -155,8 +131,8 @@ EOT;
         if (!empty($this->fullContent)) {
             $this->buildArray();
             if (!empty($this->builtArray)) {
-                if (in_array($this->docType, ['html', 'xml', 'pdf'])) {
-                    $this->{'buildTemplate' . strtoupper($this->docType)}();
+                if (in_array($this->docType, ['html', 'pdf'])) {
+                    $this->{'doc' . strtoupper($this->docType)}();
                 }
             }
         }
