@@ -2,6 +2,8 @@
 
 namespace utils;
 
+Class DocgenException Extends \Exception {}
+
 Class DocGen Extends Analysis
 {
     protected $filePaths = array();
@@ -14,7 +16,7 @@ Class DocGen Extends Analysis
         if (is_array($filePaths) && !empty($filePaths)) {
             $this->filePaths = $filePaths;
         } else {
-            Throw New \Exception('Invalid var type : $filePath must be an array and not be empty');
+            Throw New DocgenException('Invalid var type : $filePath must be an array and not be empty');
         }
     }
 
@@ -26,7 +28,7 @@ Class DocGen Extends Analysis
      * @param: string $content string to escape specials chars
      * @return: string $contentClean string escaped
      */
-    public function cleanPattern($char, $content)
+    private function cleanPattern($char, $content)
     {
         if (!is_array($char)) {
             $contentClean = str_replace($char, '\\' . $char, $content);
@@ -44,7 +46,7 @@ Class DocGen Extends Analysis
      * @param: string $content content to clean and to append in doc file
      * @return: void
      */
-    public function appendContent($content)
+    private function appendContent($content)
     {
         if (!file_exists($this->docPath)) {
             if (FALSE !== ($doc = fopen($this->docPath, 'w+'))) {
@@ -77,7 +79,7 @@ Class DocGen Extends Analysis
      * @param: array $analysis contain the analysis of each parsed file
      * @return: string $finalContent structured analysis to push in an array
      */
-    public function buildAnalysisToArray($analysis)
+    private function buildAnalysisToArray($analysis)
     {
         $finalContent = '';
 
@@ -116,7 +118,7 @@ Class DocGen Extends Analysis
      * @param: int $endKey key of each ending analysis contained in an array
      * @return: void
      */
-    public function createDoc($fileContent, $file, $startKey = NULL, $endKey = NULL, $count = 0)
+    private function createDoc($fileContent, $file, $startKey = NULL, $endKey = NULL, $count = 0)
     {
         if (!empty($this->pattern)) {
             $pattern = $this->pattern;
@@ -210,10 +212,10 @@ Class DocGen Extends Analysis
                     $this->fileNumber = $key;
                     $this->createDoc($content, $v);
                 } else {
-                    Throw New  \Exception('File ' . $v . ' can\'t be read');
+                    Throw New  DocgenException('File ' . $v . ' can\'t be read');
                 }
             } else {
-                Throw New \Exception('File ' . $v . ' doesn\'t exist');
+                Throw New DocgenException('File ' . $v . ' doesn\'t exist');
             }
         }
 

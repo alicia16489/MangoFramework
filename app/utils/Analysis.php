@@ -52,11 +52,9 @@ Class Analysis Extends Builder
             foreach ($fullContent as $secKey => $analysis) {
                 if ($secKey === 'analysis') {
                     foreach ($analysis as $thiKey => $analys) {
-                        //var_dump($analys);
-
                         foreach ($analys as $fouKey => $info) {
                             $info = trim($info);
-                            if (preg_match('#^\s$#', $info) === 0) {
+                            if (preg_match('#^\s$#', $info) === 0 || preg_match('#!+$#', $info) === 0) {
                                 if (preg_match('#^(method|attribute)$#', $info, $type)) {
                                     $property = $type[0];
                                 }
