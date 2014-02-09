@@ -20,41 +20,41 @@ Abstract Class Builder
         <meta name="description" content="API REST's Documentation">
         <meta name="Date" content="<?php echo date("D, j M Y G:i:s"); ?>">
         <title>Mango Documentation Generator</title>
+
+        <style>
+            header h3,
+            section article h4
+            {
+                text-align: center;
+            }
+
+            nav
+            {
+                float: left;
+
+                padding: 5px;
+                border: 1px solid black;
+            }
+
+            section
+            {
+                float: left;
+            }
+
+            section article.files
+            {
+                margin-left: 5px;
+                padding: 5px;
+
+                border: 1px solid black;
+            }
+
+            footer
+            {
+                clear: both;
+            }
+        </style>
     </head>
-
-    <style>
-        header h3,
-        section article h4
-        {
-            text-align: center;
-        }
-
-        nav
-        {
-            float: left;
-
-            padding: 5px;
-            border: 1px solid black;
-        }
-
-        section
-        {
-            float: left;
-        }
-
-        section article.files
-        {
-            margin-left: 5px;
-            padding: 5px;
-
-            border: 1px solid black;
-        }
-
-        footer
-        {
-            clear: both;
-        }
-    </style>
 
     <body>
         <header>
@@ -79,8 +79,9 @@ Abstract Class Builder
 
             ?>
 
-                    <article class="files" id="<?php echo strtolower(substr(\$fileParsed['infos']['fileName'], 0, -(strlen(\$fileParsed['infos']['extension'])+1))) ?>">
-                        <h4><?php echo \$fileParsed['infos']['fileName'] ?></h4>
+                    <article class="files" id="<?php echo strtolower(substr(\$fileParsed['infos']['fileName'], 0, -(strlen(\$fileParsed['infos']['extension'])+1))); ?>">
+                        <h4><?php echo ucfirst(strtolower(substr(\$fileParsed['infos']['fileName'], 0, -(strlen(\$fileParsed['infos']['extension'])+1)))); ?></h4>
+                        <div>
                     </article>
 
             <?php
@@ -89,15 +90,12 @@ Abstract Class Builder
 
             ?>
 
-
             <aside>
 
             </aside>
         </section>
 
-        <footer>
-
-        </footer>
+        <footer></footer>
 
     </body>
 </html>
