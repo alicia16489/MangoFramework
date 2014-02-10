@@ -79,6 +79,8 @@ Class Analysis Extends Builder
                                 }
 
                                 if (preg_match('#^((@?type.+)((attribute) +(public|private|protected) +(static +)?(.*)))$#', $info, $attrType) === 1) {
+                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['visibility'] = trim($attrType[5]);
+                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['isStatic'] = (!empty($attrType[6]) && trim($attrType[6]) === 'static') ? TRUE : FALSE;
                                     $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['type'] = (trim($attrType[7] === 'Array()') ? strtolower(substr(trim($attrType[7]), 0, -2)) : trim($attrType[7]));
                                 }
 

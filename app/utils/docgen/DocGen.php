@@ -8,19 +8,20 @@ Class FilesystemException Extends \Exception {}
 Class DocGen Extends Analysis
 {
     /**
-     * @var array
+     * File to parse.
+     *
+     * @type: attribute public Array()
+     * @name: $tag
      */
     protected $filePaths = array();
 
     /**
-     * @var bool
+     * Name of the doc generate.
+     *
+     * @type: attribute public string
+     * @name: $tag
      */
-    public $prettyMode = FALSE;
-
-    /**
-     * @var string
-     */
-    public $docPath = 'doc.php';
+    protected $docPath = 'doc.php';
 
     public function __construct($filePaths)
     {

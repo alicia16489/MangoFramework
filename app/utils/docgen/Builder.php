@@ -100,15 +100,33 @@ Abstract Class Builder
 
                                     echo ('<div>');
                                     if (!empty(\$fileParsed['analysis']['attribute'])) {
+                                        echo ('<span>Attributes: </span> <ul>');
                                         foreach (\$fileParsed['analysis']['attribute'] as \$attribute) {
 
                                 ?>
 
-
+                                        <li>
+                                            <?php echo \$attribute['name']; ?>
+                                            <ul>
+                                                <li>
+                                                    Description: <?php echo (!empty(\$attribute['description'])) ? \$attribute['description'] : 'none'; ?>
+                                                </li>
+                                                <li>
+                                                    Visibility: <?php echo (!empty(\$attribute['visibility'])) ? \$attribute['visibility'] : 'none'; ?>
+                                                </li>
+                                                <li>
+                                                    Static: <?php echo (\$attribute['isStatic'] === TRUE) ? 'yes' : 'no'; ?>
+                                                </li>
+                                                <li>
+                                                    Type: <?php echo (!empty(\$attribute['type'])) ? \$attribute['type'] : 'none'; ?>
+                                                </li>
+                                            </ul>
+                                        </li>
 
                                 <?php
 
                                         }
+                                        echo ('</ul>');
                                     } else {
                                         echo 'Attribute: none.';
                                     }
