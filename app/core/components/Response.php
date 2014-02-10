@@ -17,6 +17,7 @@ class Response
     protected $defaultData;
     protected $errorData = FALSE;
     protected $prettyPrint = FALSE;
+    protected $escapeSlashes = TRUE;
     protected $eraseBuffer = FALSE;
     protected $encodedErrorData = TRUE;
 
@@ -181,6 +182,13 @@ class Response
         return $this;
     }
 
+    public function setEscapeSlashes($bool)
+    {
+        $this->escapeSlashes = $bool;
+
+        return $this;
+    }
+
     public function getStatus($code = NULL, $messageOnly = FALSE)
     {
         if (is_null($code)) {
@@ -326,10 +334,18 @@ class Response
 
     public function jsonEncodeUTF8($data)
     {
-        if ($this->prettyPrint === TRUE) {
-            $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT | JSON_PRETTY_PRINT);
-        } else {
-            $json = json_encode($data, JSON_UNESCAPED_UNICODE | JSON_FORCE_OBJECT);
+        if ($this->prettyPrint === TRUE && $this->escapeSlashes === TRUE) {
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE |
+                JSON_FORCE_OBJECT |
+                JSON_PRETTY_PRINT |
+                JSON_UNESCAPED_SLASHES);
+        } else if ($this->escapeSlashes === TRUE) {
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE |
+                JSON_FORCE_OBJECT |
+                JSON_UNESCAPED_SLASHES);
+        } else if ($this->prettyPrint === FALSE && $this->escapeSlashes === FALSE) {
+            $json = json_encode($data, JSON_UNESCAPED_UNICODE |
+                JSON_FORCE_OBJECT);
         }
 
         return $json;
@@ -451,6 +467,10 @@ class Response
         // stop response if error when xml response type
         if ($this->errorData === TRUE || $type === 'xml') {
             $params['die'] = TRUE;
+        }
+
+        if ($encodedData == 'null') {
+            $encodedData = 'no response';
         }
 
         // send response
