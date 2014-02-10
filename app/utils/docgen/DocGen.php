@@ -32,55 +32,11 @@ Class DocGen Extends Analysis
         }
     }
 
-    /**
-     * Escape all specials characters of the $content
-     *
-     * @type: method
-     * @param: array $char content special chars
-     * @param: string $content string to escape specials chars
-     * @return: string $contentClean string escaped
-     */
-    private function cleanPattern($char, $content)
+    public function setDocPath($path)
     {
-        if (!is_array($char)) {
-            $contentClean = str_replace($char, '\\' . $char, $content);
-        } else {
-            $contentClean = str_replace($char, '', $content);
-        }
+        $this->docPath = $path;
 
-        return $contentClean;
-    }
-
-    /**
-     * Append all analysis structured in the documentation file
-     *
-     * @type: method
-     * @param: string $content content to clean and to append in doc file
-     * @return: void
-     */
-    private function appendContent($content)
-    {
-        if (!file_exists($this->docPath)) {
-            if (FALSE !== ($doc = fopen($this->docPath, 'w+'))) {
-                fclose($doc);
-            }
-        }
-
-        $searchTrim = array(' ', "\t", "\n", "\r", "\0", "\x0B");
-        $searchClean = array('*', '{', '}', '(', ')', '[', ']', '|', '$', '.', '#', '?', '^');
-
-        $contentClean = $this->cleanPattern($searchTrim, $content);
-
-        foreach ($searchClean as $s) {
-            $contentClean = $this->cleanPattern($s, $contentClean);
-        }
-
-        $pattern = "#" . $contentClean . "#i";
-        $docContent = str_replace($searchTrim, '', file_get_contents($this->docPath));
-
-        if (preg_match($pattern, $docContent) !== 1) {
-            file_put_contents($this->docPath, $content, FILE_APPEND);
-        }
+        return $this;
     }
 
     /**
@@ -308,6 +264,6 @@ Class DocGen Extends Analysis
             }
         }
 
-        $this->process();
+        $this->process($this->docPath);
     }
 }

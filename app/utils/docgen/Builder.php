@@ -4,7 +4,7 @@ namespace utils\docgen;
 
 Abstract Class Builder
 {
-    protected function build($type = 'html', $analysis = array())
+    protected function build($type = 'html', $analysis = array(), $docPath)
     {
         if ($type === 'html') {
             $builtArray = var_export($analysis, TRUE);
@@ -247,7 +247,7 @@ Abstract Class Builder
     </html>
 EOT;
 
-            file_put_contents('doc.php', $docHtmlContent);
+            file_put_contents($docPath, $docHtmlContent);
         }
     }
 }

@@ -17,9 +17,9 @@ Class Analysis Extends Builder
     }
 
     // Waiting for template
-    private function docHTML()
+    private function docHTML($docPath)
     {
-        $this->build('html', $this->builtArray);
+        $this->build('html', $this->builtArray, $docPath);
     }
 
     private function buildArray()
@@ -130,13 +130,13 @@ Class Analysis Extends Builder
         }
     }
 
-    protected function process()
+    protected function process($docPath)
     {
         if (!empty($this->fullContent)) {
             $this->buildArray();
             if (!empty($this->builtArray)) {
                 if (in_array($this->docType, ['html', 'pdf'])) {
-                    $this->{'doc' . strtoupper($this->docType)}();
+                    $this->{'doc' . strtoupper($this->docType)}($docPath);
                 }
             }
         }
