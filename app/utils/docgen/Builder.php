@@ -247,7 +247,6 @@ Abstract Class Builder
     </html>
 EOT;
 
-            var_dump($analysis);
             file_put_contents('doc.php', $docHtmlContent);
         }
     }
