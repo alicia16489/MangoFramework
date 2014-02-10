@@ -189,6 +189,13 @@ class Response
         return $this;
     }
 
+    public function setEraseBuffer($bool)
+    {
+        $this->eraseBuffer = $bool;
+
+        return $this;
+    }
+
     public function getStatus($code = NULL, $messageOnly = FALSE)
     {
         if (is_null($code)) {
