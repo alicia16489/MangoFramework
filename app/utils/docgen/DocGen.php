@@ -15,6 +15,8 @@ Class DocGen Extends Analysis
      */
     protected $filePaths = array();
 
+    public $route = '/documentation';
+
     /**
      * Name of the doc generate.
      *
@@ -23,20 +25,17 @@ Class DocGen Extends Analysis
      */
     protected $docPath = 'doc.php';
 
-    public function __construct($filePaths)
+    public function __construct()
     {
+        $filePaths = include_once('./config/docgen.php');
+
         if (is_array($filePaths) && !empty($filePaths)) {
-            $this->filePaths = $filePaths;
+            $this->filePaths = $filePaths[0];
+            $this->docPath = $filePaths[1]['file'];
+            $this->route = $filePaths[1]['route'];
         } else {
             Throw New DocgenException('Invalid var type : $filePath must be an array and not be empty');
         }
-    }
-
-    public function setDocPath($path)
-    {
-        $this->docPath = $path;
-
-        return $this;
     }
 
     /**
