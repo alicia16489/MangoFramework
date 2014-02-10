@@ -13,7 +13,7 @@ Conventions:
          {
          }
 
-    - :
+    - Attribute:
         /**
          * Your description
          * ... Your Description
