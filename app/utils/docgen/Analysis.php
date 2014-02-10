@@ -1,6 +1,6 @@
 <?php
 
-namespace utils;
+namespace utils\docgen;
 
 Class Analysis Extends Builder
 {
@@ -54,13 +54,13 @@ Class Analysis Extends Builder
                     foreach ($analysis as $thiKey => $analys) {
                         foreach ($analys as $fouKey => $info) {
                             $info = trim($info);
-                            if (preg_match('#^\s$#', $info) === 0 || preg_match('#!+$#', $info) === 0) {
+                            if (preg_match('#^\s$#', $info) === 0) {
                                 if (preg_match('#^(method|attribute)$#', $info, $type)) {
                                     $property = $type[0];
                                 }
 
                                 if (preg_match('#^(((static)? ?(abstract|final)? ?(static)? ?(public|private|protected)? (abstract|final)? ?(static)?) ?(function)? +(.+))$#', $info, $properties)) {
-                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['visbility'] = (!empty($properties[6]) ? trim($properties[6]) : 'public');
+                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['visibility'] = (!empty($properties[6]) ? trim($properties[6]) : 'public');
                                     $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['isStatic'] = ($properties[5] === 'static' || $properties[3] === 'static') ? TRUE : FALSE;
 
                                     if (!empty($properties[3])) {
@@ -102,8 +102,12 @@ Class Analysis Extends Builder
                                     }
                                 }
 
-                                if (preg_match('#^((@?return)(.)?(.+))$#', $info, $return) === 1) {
-                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['return'] = trim($return[4]);
+                                if (preg_match('#^@?return( ?: ?)?(([a-zA-Z]+) (\$[a-zA-Z0-9]+)(.+)?)$#', $info, $return) === 1) {
+                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['return'][$fouKey]['type'] = trim($return[3]);
+                                    $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['return'][$fouKey]['name'] = trim($return[4]);
+                                    if (!empty($return[5])) {
+                                        $this->builtArray[$mainKey]['analysis'][$property][$thiKey]['return'][$fouKey]['description'] = trim($return[5]);
+                                    }
                                 }
 
                                 if (!empty($delimitDescrKey)) {
