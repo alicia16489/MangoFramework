@@ -20,6 +20,10 @@ class Response
     protected $escapeSlashes = TRUE;
     protected $eraseBuffer = FALSE;
     protected $encodedErrorData = TRUE;
+    protected $dieAfterResponse = FALSE;
+    protected $createXmlFile = NULL;
+    protected $htmlJSONEncode = TRUE;
+    protected $replaceBody = TRUE;
 
     protected $validType = array(
         "json",
@@ -196,6 +200,27 @@ class Response
         return $this;
     }
 
+    public function setCreateXmlFile($bool)
+    {
+        $this->createXmlFile = $bool;
+
+        return $this;
+    }
+
+    public function setHtmlJSONEncode($bool)
+    {
+        $this->htmlJSONEncode = $bool;
+
+        return $this;
+    }
+
+    public function setReplaceBody($bool)
+    {
+        $this->replaceBody = $bool;
+
+        return $this;
+    }
+
     public function getStatus($code = NULL, $messageOnly = FALSE)
     {
         if (is_null($code)) {
@@ -333,7 +358,7 @@ class Response
                 if (!is_null($data)) {
                     $simpleXmlElement->addChild('item', $data);
                 } else {
-                    $simpleXmlElement->addChild('item', 'null');
+                    $simpleXmlElement->addChild('item', 'no response');
                 }
             }
         }
@@ -413,10 +438,10 @@ class Response
         $params = array(
             "code" => 200,
             "encode" => TRUE,
-            "replace" => TRUE,
-            "die" => FALSE,
-            "xmlFile" => NULL,
-            "htmlJSONEncode" => TRUE
+            "replace" => $this->replaceBody,
+            "die" => $this->dieAfterResponse,
+            "xmlFile" => $this->createXmlFile,
+            "htmlJSONEncode" => $this->htmlJSONEncode
         );
 
         $this->status = (!is_null($this->status) ? $this->status : $params['code']);
@@ -440,6 +465,10 @@ class Response
             Throw new ResponseException("Invalid response format : must be 'json', 'xml' or 'html'");
         }
 
+        if (is_null($data)) {
+            $data = 'no response';
+        }
+
         // encode data
         if ($params['encode'] === TRUE) {
             if ($type === 'json') {
@@ -449,7 +478,9 @@ class Response
                     $encodedData = $this->jsonEncodeUTF8($data);
                 } else if (is_array($data) && $params['htmlJSONEncode'] === FALSE) {
                     Throw new ResponseException('Invalid var type : $data can\'t be an array in html response mode');
-                } else {
+                } else if (!is_array($data) && $params['htmlJSONEncode'] === TRUE) {
+                    $encodedData = $this->jsonEncodeUTF8($data);
+                } else if (!is_array($data) && $params['htmlJSONEncode'] === FALSE) {
                     $encodedData = $data;
                 }
             } else if ($type === 'xml') {
@@ -474,10 +505,6 @@ class Response
         // stop response if error when xml response type
         if ($this->errorData === TRUE || $type === 'xml') {
             $params['die'] = TRUE;
-        }
-
-        if ($encodedData == 'null') {
-            $encodedData = 'no response';
         }
 
         // send response
